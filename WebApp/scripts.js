@@ -1,10 +1,10 @@
 !function () {
 
     var floatRight = '<div class="uk-flex uk-flex-right">@content</div>';
-    var userInputTmp = floatRight.replace('@content', '<div class="uk-card uk-card-default uk-card-small uk-card-body uk-margin-small uk-margin-small-right uk-width-1-2@s">@message</div>');
+    var userInputTmp = floatRight.replace('@content', '<div class="uk-card uk-card-default uk-card-small uk-card-body uk-margin-small uk-margin-small-right uk-width-2-5@s">@message</div>');
 
     var image = '<img class="uk-border-rounded" src="https://getuikit.com/v2/docs/images/placeholder_200x200.svg" width="30" height="30">';
-    var responseTmp = '<div class="uk-card uk-card-default uk-card-small uk-card-body uk-margin-small uk-margin-small-left uk-width-1-2@s">@image   @message</div>'.replace('@image', image);
+    var responseTmp = '<div class="uk-card uk-card-default uk-card-small uk-card-body uk-margin-small uk-margin-small-left uk-width-2-5@s">@image   @message</div>'.replace('@image', image);
 
 
     $('.js-sent').on('click', function () {
