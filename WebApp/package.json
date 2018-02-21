@@ -1,0 +1,15 @@
+{
+  "name": "prototype",
+  "version": "0.0.1",
+  "description": "",
+  "keywords": [ "" ],
+  "repository": "https://github.com/A-Hsien/KeJiRungYi_2018.git",
+  "homepage": "https://github.com/A-Hsien/KeJiRungYi_2018",
+  "author": "",
+  "dependencies": {
+  },
+  "main": "index",
+  "scripts": {
+    "postinstall": "npm update"
+  }
+}
