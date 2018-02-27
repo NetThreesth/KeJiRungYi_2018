@@ -1,3 +1,4 @@
+'use strict';
 !function () {
 
     var floatRight = '<div class="uk-flex uk-flex-right">@content</div>';
@@ -30,4 +31,71 @@
     };
 
     UIkit.offcanvas(document.getElementById('offcanvas-nav')).show();
+
+
+    $('.js-webrtc').on('click', recordAudio);
+
+    var webRtcRunning = false;
+    var audioStream = null;
+
+    function runWebRtc() {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            alert('your divice not support "WebRtc".');
+            return;
+        };
+        webRtcRunning = true;
+
+        var constraints = window.constraints = {
+            audio: true,
+            video: false
+        };
+
+        var handleSuccess = function (stream) {
+            audioStream = stream;
+            var audioTracks = stream.getAudioTracks();
+            console.log('Got stream with constraints:', constraints);
+            console.log('Using audio device: ' + audioTracks[0].label);
+            stream.oninactive = function () { console.log('Stream ended'); };
+            recordAudio();
+        };
+
+        var handleError = function (error) {
+            console.log('navigator.getUserMedia error: ', error);
+        };
+
+        navigator.mediaDevices
+            .getUserMedia(constraints)
+            .then(handleSuccess)
+            .catch(handleError);
+    };
+
+    var audioRecording = false;
+    function recordAudio() {
+        if (!webRtcRunning) { runWebRtc(); }
+        if (!audioStream || audioRecording) return;
+
+        audioRecording = true;
+        console.log('audio recording.');
+        var audioChunks = [];
+        var mediaRecorder = new MediaRecorder(audioStream);
+        mediaRecorder.addEventListener("dataavailable", function (event) {
+            audioChunks.push(event.data);
+        });
+        mediaRecorder.addEventListener("stop", function () {
+            var audioBlob = new Blob(audioChunks);
+            var audioUrl = URL.createObjectURL(audioBlob);
+            var audio = new Audio(audioUrl);
+            audio.play();
+            console.log('audio play.');
+        });
+
+        mediaRecorder.start();
+        $('.js-webrtc').prop('disabled', true);
+        setTimeout(function () {
+            mediaRecorder.stop();
+            audioRecording = false;
+            console.log('audio recording end.');
+            $('.js-webrtc').prop('disabled', false);
+        }, 3000);
+    };
 }();
