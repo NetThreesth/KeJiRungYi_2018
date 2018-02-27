@@ -15,9 +15,7 @@
 
         $input.val('').focus();
 
-        var $dialog = $('.dialog-box');
-        $dialog.append(userInputTmp.replace('@message', text))
-            .animate({ scrollTop: $dialog.height() }, 1000);
+        addMessage(text);
 
         window.setTimeout(function () {
             insertResponse(text + '! ' + text + '! ' + text + '!!!');
@@ -28,6 +26,12 @@
         var $dialog = $('.dialog-box');
         $dialog.append(responseTmp.replace('@message', message));
         $dialog.animate({ scrollTop: $dialog.height() }, 1000);
+    };
+
+    var addMessage = function (text) {
+        var $dialog = $('.dialog-box');
+        $dialog.append(userInputTmp.replace('@message', text))
+            .animate({ scrollTop: $dialog.height() }, 1000);
     };
 
     UIkit.offcanvas(document.getElementById('offcanvas-nav')).show();
@@ -75,7 +79,7 @@
         if (!audioStream || audioRecording) return;
 
         audioRecording = true;
-        console.log('audio recording.');
+        addMessage('audio recording.');
         var audioChunks = [];
         var mediaRecorder = new MediaRecorder(audioStream);
         mediaRecorder.addEventListener("dataavailable", function (event) {
@@ -86,7 +90,7 @@
             var audioUrl = URL.createObjectURL(audioBlob);
             var audio = new Audio(audioUrl);
             audio.play();
-            console.log('audio play.');
+            addMessage('audio playing.');
         });
 
         mediaRecorder.start();
@@ -94,7 +98,7 @@
         setTimeout(function () {
             mediaRecorder.stop();
             audioRecording = false;
-            console.log('audio recording end.');
+            addMessage('audio recording end.');
             $('.js-webrtc').prop('disabled', false);
         }, 3000);
     };
