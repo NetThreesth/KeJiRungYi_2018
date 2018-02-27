@@ -28,4 +28,6 @@
         $dialog.append(responseTmp.replace('@message', message));
         $dialog.animate({ scrollTop: $dialog.height() }, 1000);
     };
+
+    UIkit.offcanvas(document.getElementById('offcanvas-nav')).show();
 }();

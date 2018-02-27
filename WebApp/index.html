@@ -21,12 +21,45 @@
             height: 100%;
         }
 
+        .menu-toggle {
+            position: absolute;
+            top: 0;
+            left: 0;
+            padding: 10px 14px;
+        }
+
+        .uk-offcanvas-container .uk-offcanvas-content {
+            position: relative;
+            margin-left: 220px;
+            height: 100%;
+        }
+
+        .menu-title {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 1.2rem;
+            font-weight: 400;
+            color: #fff;
+        }
+
+        .uk-nav {
+            margin-top: 20px;
+        }
+
+
+
         .uk-navbar-container {
             height: 35px;
         }
 
+        .uk-offcanvas-bar {
+            background: #4d394b;
+            max-width: 220px;
+        }
+
         #message-box {
-            position: fixed;
+            position: absolute;
             bottom: 0;
             right: 0;
             width: 100%;
@@ -58,58 +91,38 @@
 
     <div class="uk-offcanvas-content">
 
-
-        <!-- This is an anchor toggling the off-canvas -->
-
-        <div id="offcanvas-nav" uk-offcanvas="overlay: true">
+        <div id="offcanvas-nav" uk-offcanvas>
             <div class="uk-offcanvas-bar">
 
                 <button class="uk-offcanvas-close" type="button" uk-close></button>
+                <div class="menu-title">科技融藝</div>
                 <ul class="uk-nav uk-nav-default">
-                    <li class="uk-active"><a href="#">Active</a></li>
-                    <li class="uk-parent">
-                        <a href="#">Parent</a>
-                        <ul class="uk-nav-sub">
-                            <li><a href="#">Sub item</a></li>
-                            <li><a href="#">Sub item</a></li>
-                        </ul>
-                    </li>
-                    <li class="uk-nav-header">Header</li>
-                    <li><a href="#"><span class="uk-margin-small-right" uk-icon="icon: table"></span> Item</a></li>
-                    <li><a href="#"><span class="uk-margin-small-right" uk-icon="icon: thumbnails"></span> Item</a></li>
-                    <li class="uk-nav-divider"></li>
-                    <li><a href="#"><span class="uk-margin-small-right" uk-icon="icon: trash"></span> Item</a></li>
+
+                    <li class="uk-nav-header">Channels</li>
+                    <li class="uk-active"><a href=""><span class="uk-margin-small-right" uk-icon="icon: hashtag"></span>general</a></li>
+
+                    <li class="uk-nav-header">Direct Messages</li>
+                    <li><a href=""><span class="uk-margin-small-right" uk-icon="icon: user"></span>Bot</a></li>
+                    <li><a href=""><span class="uk-margin-small-right" uk-icon="icon: user"></span>Algae</a></li>
                 </ul>
 
             </div>
         </div>
 
-    </div>
-    <nav class="uk-navbar-container" uk-navbar>
-        <div class="uk-navbar-left">
-            <ul class="uk-navbar-nav">
-                <li>
-                    <a href="#offcanvas-nav" uk-toggle><span uk-icon="icon: menu"></span></a>
-                </li>
-                <li class="uk-active"><a href="">Item1</a></li>
-                <li class="uk-parent"><a href="">Item2</a></li>
-                <li><a href="">Item3</a></li>
-            </ul>
+        <div class="menu-toggle" uk-toggle="#offcanvas-nav"><span uk-icon="icon: menu"></span></div>
+
+        <div class="dialog-box"></div>
+
+        <div id="message-box" class="uk-grid uk-background-muted">
+            <input type="text" class="uk-input uk-width-expand js-input">
+            <div class="uk-width-auto js-upload" uk-form-custom>
+                <input type="file" multiple>
+                <button class="uk-button uk-button-default" type="button" tabindex="-1"><span uk-icon="camera"></span></button>
+            </div>
+            <button class="uk-button uk-button-default uk-width-auto js-sent">Sent</button>
         </div>
-    </nav>
-
-    <div class="dialog-box">
-
     </div>
 
-    <div id="message-box" class="uk-grid uk-background-muted">
-        <input type="text" class="uk-input uk-width-expand js-input">
-        <div class="uk-width-auto js-upload" uk-form-custom>
-            <input type="file" multiple>
-            <button class="uk-button uk-button-default" type="button" tabindex="-1"><span uk-icon="camera"></span></button>
-        </div>
-        <button class="uk-button uk-button-default uk-width-auto js-sent">Sent</button>
-    </div>
 
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-beta.40/js/uikit.min.js"></script>
