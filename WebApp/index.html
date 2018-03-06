@@ -67,7 +67,7 @@
             padding: 3px 0;
         }
 
-        .js-upload {
+        .upload {
             padding-left: 0;
         }
 
@@ -116,11 +116,15 @@
         <div id="message-box" class="uk-grid uk-background-muted">
             <button class="uk-button uk-button-default uk-width-auto js-sent">Sent</button>
             <input type="text" class="uk-input uk-width-expand js-input">
-            <div class="uk-width-auto js-upload" uk-form-custom>
-                <input type="file" multiple>
+            <div class="uk-width-auto upload" uk-form-custom>
+                <input type="file">
                 <button class="uk-button uk-button-default" type="button" tabindex="-1"><span uk-icon="camera"></span></button>
             </div>
-            <button class="uk-button uk-button-default uk-width-auto js-webrtc"><span uk-icon="receiver"></span></button>
+            <div id="js-audio-file" class="uk-width-auto upload" uk-form-custom>
+                <input type="file" accept="audio/*;capture=microphone">
+                <button class="uk-button uk-button-default" type="button" tabindex="-1"><i class="fas fa-microphone"></i></button>
+            </div>
+            <button id="js-webrtc" class="uk-button uk-button-default uk-width-auto"><i class="fas fa-microphone"></i></button>
         </div>
     </div>
 
@@ -129,6 +133,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-beta.40/js/uikit.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-beta.40/js/uikit-icons.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
     <script src="scripts.js"></script>
 
 </body>

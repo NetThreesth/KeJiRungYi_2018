@@ -37,16 +37,24 @@
     UIkit.offcanvas(document.getElementById('offcanvas-nav')).show();
 
 
-    $('.js-webrtc').on('click', recordAudio);
+
+    var getUserMedia = navigator.mediaDevices ? navigator.mediaDevices.getUserMedia : null;
+
+    if (getUserMedia) {
+        $('#js-webrtc').on('click', recordAudio);
+        $('#js-audio-file').hide();
+    } else {
+        $('#js-webrtc').hide();
+        $('#js-audio-file').on('change', function (e) {
+            var audioBlob = e.target.files[0];
+            playAudio(audioBlob);
+        });
+    };
 
     var webRtcRunning = false;
     var audioStream = null;
 
     function runWebRtc() {
-        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-            alert('your divice not support "WebRtc".');
-            return;
-        };
         webRtcRunning = true;
 
         var constraints = window.constraints = {
@@ -67,8 +75,8 @@
             console.log('navigator.getUserMedia error: ', error);
         };
 
-        navigator.mediaDevices
-            .getUserMedia(constraints)
+
+        navigator.mediaDevices.getUserMedia(constraints)
             .then(handleSuccess)
             .catch(handleError);
     };
@@ -87,10 +95,7 @@
         });
         mediaRecorder.addEventListener("stop", function () {
             var audioBlob = new Blob(audioChunks);
-            var audioUrl = URL.createObjectURL(audioBlob);
-            var audio = new Audio(audioUrl);
-            audio.play();
-            addMessage('audio playing.');
+            playAudio(audioBlob);
         });
 
         mediaRecorder.start();
@@ -101,5 +106,12 @@
             addMessage('audio recording end.');
             $('.js-webrtc').prop('disabled', false);
         }, 3000);
+    };
+
+    function playAudio(audioBlob) {
+        var audioUrl = URL.createObjectURL(audioBlob);
+        var audio = new Audio(audioUrl);
+        audio.play();
+        addMessage('audio playing.');
     };
 }();
