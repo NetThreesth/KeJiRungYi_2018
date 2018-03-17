@@ -49,7 +49,7 @@
         };
         webRtcRunning = true;
 
-        var constraints = window.constraints = {
+        var constraints = {
             audio: true,
             video: false
         };
@@ -101,5 +101,35 @@
             addMessage('audio recording end.');
             $('.js-webrtc').prop('disabled', false);
         }, 3000);
+    };
+
+    $('#js-upload').on('change', handleFiles);
+
+    function handleFiles($ele) {
+        var image = $ele.currentTarget.files[0];
+        if (!image) return;
+
+        var $imgContainer = $(userInputTmp.replace('@message', '<img>'));
+        var img = $imgContainer.find('img').get(0);
+        img.src = window.URL.createObjectURL(image);
+        img.width = 260;
+        img.onload = function () {
+            window.URL.revokeObjectURL(img.src);
+        };
+        var $dialog = $('.dialog-box');
+        $dialog.append($imgContainer).animate({ scrollTop: $dialog.height() }, 1000);
+
+
+        $.get('/uploadImage').done(function (resp) {
+            console.log(resp);
+            var $dialog = $('.dialog-box');
+            var messages = resp.map(function (data) {
+                return '<li>' + data.description + ': ' + data.score + '</li>'
+            });
+            var $html = $(userInputTmp.replace('@message', '<ul>' + messages.join('') + '</ul>'));
+            $dialog.append($html).animate({ scrollTop: $dialog.height() }, 1000);
+        }).fail(function () {
+            console.log("error");
+        });
     };
 }();

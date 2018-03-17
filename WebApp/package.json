@@ -2,14 +2,23 @@
   "name": "prototype",
   "version": "0.0.1",
   "description": "",
-  "keywords": [ "" ],
+  "keywords": [
+    ""
+  ],
   "repository": "https://github.com/A-Hsien/KeJiRungYi_2018.git",
   "homepage": "https://github.com/A-Hsien/KeJiRungYi_2018",
   "author": "",
   "dependencies": {
+    "express": "4.15.4",
+    "@google-cloud/vision": "0.16.0"
+  },
+  "devDependencies": {
+    "@google-cloud/nodejs-repo-tools": "1.4.17"
   },
   "main": "index",
   "scripts": {
-    "postinstall": "npm update"
+    "postinstall": "npm update",
+    "deploy": "gcloud app deploy",
+    "start": "node app.js"
   }
 }
