@@ -1,5 +1,6 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
+
 <head>
 
     <base href="">
@@ -17,7 +18,8 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-beta.40/css/uikit.min.css" />
     <style>
-        html, body {
+        html,
+        body {
             height: 100%;
         }
 
@@ -67,7 +69,7 @@
             padding: 3px 0;
         }
 
-        .upload {
+        .js-upload {
             padding-left: 0;
         }
 
@@ -81,9 +83,13 @@
             overflow: auto;
         }
 
-            .dialog-box .uk-card-body {
-                padding: 10px;
-            }
+        .dialog-box .uk-card-body {
+            padding: 10px;
+        }
+
+        .dialog-box image {
+            float: right;
+        }
     </style>
 </head>
 
@@ -99,32 +105,43 @@
                 <ul class="uk-nav uk-nav-default">
 
                     <li class="uk-nav-header">Channels</li>
-                    <li class="uk-active"><a href=""><span class="uk-margin-small-right" uk-icon="icon: hashtag"></span>general</a></li>
+                    <li class="uk-active">
+                        <a href="">
+                            <span class="uk-margin-small-right" uk-icon="icon: hashtag"></span>general</a>
+                    </li>
 
                     <li class="uk-nav-header">Direct Messages</li>
-                    <li><a href=""><span class="uk-margin-small-right" uk-icon="icon: user"></span>Bot</a></li>
-                    <li><a href=""><span class="uk-margin-small-right" uk-icon="icon: user"></span>Algae</a></li>
+                    <li>
+                        <a href="">
+                            <span class="uk-margin-small-right" uk-icon="icon: user"></span>Bot</a>
+                    </li>
+                    <li>
+                        <a href="">
+                            <span class="uk-margin-small-right" uk-icon="icon: user"></span>Algae</a>
+                    </li>
                 </ul>
 
             </div>
         </div>
 
-        <div class="menu-toggle" uk-toggle="#offcanvas-nav"><span uk-icon="icon: menu"></span></div>
+        <div class="menu-toggle" uk-toggle="#offcanvas-nav">
+            <span uk-icon="icon: menu"></span>
+        </div>
 
         <div class="dialog-box"></div>
 
         <div id="message-box" class="uk-grid uk-background-muted">
             <button class="uk-button uk-button-default uk-width-auto js-sent">Sent</button>
             <input type="text" class="uk-input uk-width-expand js-input">
-            <div class="uk-width-auto upload" uk-form-custom>
-                <input type="file">
-                <button class="uk-button uk-button-default" type="button" tabindex="-1"><span uk-icon="camera"></span></button>
+            <div class="uk-width-auto" uk-form-custom>
+                <input id="js-upload" type="file" accept="image/*">
+                <button class="uk-button uk-button-default" type="button" tabindex="-1">
+                    <span uk-icon="camera"></span>
+                </button>
             </div>
-            <div id="js-audio-file" class="uk-width-auto upload" uk-form-custom>
-                <input name="audioCapture" type="file" accept="audio/*" capture>
-                <button class="uk-button uk-button-default" type="button" tabindex="-1"><i class="fas fa-microphone"></i></button>
-            </div>
-            <button id="js-webrtc" class="uk-button uk-button-default uk-width-auto"><i class="fas fa-microphone"></i></button>
+            <button class="uk-button uk-button-default uk-width-auto js-webrtc">
+                <span uk-icon="receiver"></span>
+            </button>
         </div>
     </div>
 
@@ -133,8 +150,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-beta.40/js/uikit.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-beta.40/js/uikit-icons.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script src="https://use.fontawesome.com/releases/v5.0.8/js/all.js"></script>
     <script src="scripts.js"></script>
 
 </body>
+
 </html>

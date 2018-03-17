@@ -37,27 +37,19 @@
     UIkit.offcanvas(document.getElementById('offcanvas-nav')).show();
 
 
-
-    var getUserMedia = navigator.mediaDevices ? navigator.mediaDevices.getUserMedia : null;
-
-    if (getUserMedia) {
-        $('#js-webrtc').on('click', recordAudio);
-        $('#js-audio-file').hide();
-    } else {
-        $('#js-webrtc').hide();
-        $('#js-audio-file').on('change', function (e) {
-            var audioBlob = e.target.files[0];
-            playAudio(audioBlob);
-        });
-    };
+    $('.js-webrtc').on('click', recordAudio);
 
     var webRtcRunning = false;
     var audioStream = null;
 
     function runWebRtc() {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            alert('your divice not support "WebRtc".');
+            return;
+        };
         webRtcRunning = true;
 
-        var constraints = window.constraints = {
+        var constraints = {
             audio: true,
             video: false
         };
@@ -75,8 +67,8 @@
             console.log('navigator.getUserMedia error: ', error);
         };
 
-
-        navigator.mediaDevices.getUserMedia(constraints)
+        navigator.mediaDevices
+            .getUserMedia(constraints)
             .then(handleSuccess)
             .catch(handleError);
     };
@@ -95,7 +87,10 @@
         });
         mediaRecorder.addEventListener("stop", function () {
             var audioBlob = new Blob(audioChunks);
-            playAudio(audioBlob);
+            var audioUrl = URL.createObjectURL(audioBlob);
+            var audio = new Audio(audioUrl);
+            audio.play();
+            addMessage('audio playing.');
         });
 
         mediaRecorder.start();
@@ -108,10 +103,33 @@
         }, 3000);
     };
 
-    function playAudio(audioBlob) {
-        var audioUrl = URL.createObjectURL(audioBlob);
-        var audio = new Audio(audioUrl);
-        audio.play();
-        addMessage('audio playing.');
+    $('#js-upload').on('change', handleFiles);
+
+    function handleFiles($ele) {
+        var image = $ele.currentTarget.files[0];
+        if (!image) return;
+
+        var $imgContainer = $(userInputTmp.replace('@message', '<img>'));
+        var img = $imgContainer.find('img').get(0);
+        img.src = window.URL.createObjectURL(image);
+        img.width = 260;
+        img.onload = function () {
+            window.URL.revokeObjectURL(img.src);
+        };
+        var $dialog = $('.dialog-box');
+        $dialog.append($imgContainer).animate({ scrollTop: $dialog.height() }, 1000);
+
+
+        $.get('/uploadImage').done(function (resp) {
+            console.log(resp);
+            var $dialog = $('.dialog-box');
+            var messages = resp.map(function (data) {
+                return '<li>' + data.description + ': ' + data.score + '</li>'
+            });
+            var $html = $(userInputTmp.replace('@message', '<ul>' + messages.join('') + '</ul>'));
+            $dialog.append($html).animate({ scrollTop: $dialog.height() }, 1000);
+        }).fail(function () {
+            console.log("error");
+        });
     };
 }();
