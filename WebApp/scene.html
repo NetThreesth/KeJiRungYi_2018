@@ -45,9 +45,9 @@
             var scene = new BABYLON.Scene(engine);
 
             // Add a camera to the scene and attach it to the canvas
-            var camera = new BABYLON.ArcRotateCamera("Camera", Math.PI / 2, Math.PI / 2, 2, BABYLON.Vector3.Zero(), scene);
+            var camera = new BABYLON.UniversalCamera("Camera", new BABYLON.Vector3(0, 0, -10), scene);
+            camera.setTarget(BABYLON.Vector3.Zero());
             camera.attachControl(canvas, true);
-            camera.lowerRadiusLimit = 5;
 
             // Add lights to the scene
             var light1 = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(1, 1, 0), scene);
@@ -97,6 +97,38 @@
 
             createNewSystem();
 
+            var texts = [];
+            for (var i = 0; i < 10; i++) {
+                addText('Some Text ' + i, getRandomInt() * 2, getRandomInt(), -3 + getRandomNegativeInt());
+            }
+
+            function getRandomInt() {
+                var r = getRandomNegativeInt() > 4 ? 1 : -1;
+                return getRandomNegativeInt() * r;
+            };
+            function getRandomNegativeInt() {
+                return Math.round(Math.random() * 10);
+            };
+            function addText(text, x, y, z) {
+                var outputplaneTexture = new BABYLON.DynamicTexture("dynamic texture", 500, scene, true);
+                outputplaneTexture.hasAlpha = true;
+                //outputplaneTexture.getContext().clearRect(0, 140, 512, 512);
+                outputplaneTexture.drawText(text, null, 140, "20px verdana", "white");
+
+                var outputplane = BABYLON.Mesh.CreatePlane("outputplane", 10, scene, false);
+                outputplane.billboardMode = BABYLON.AbstractMesh.BILLBOARDMODE_ALL;
+                outputplane.position = new BABYLON.Vector3(x, y, z);
+                outputplane.scaling.y = 1;
+
+                outputplane.material = new BABYLON.StandardMaterial("outputplane", scene);
+                outputplane.material.diffuseTexture = outputplaneTexture;
+                outputplane.material.specularColor = new BABYLON.Color3(0, 0, 0);
+                outputplane.material.emissiveColor = new BABYLON.Color3(1, 1, 1);
+                outputplane.material.backFaceCulling = false;
+                texts.push(outputplane);
+            };
+
+
 
             var alpha = 0;
             var moveEmitter = true;
@@ -113,6 +145,10 @@
                 }
 
                 alpha += 0.01;
+
+/*                 texts.forEach(function (t) {
+                    t.position.z += (0.001 * getRandomInt());
+                }); */
             });
 
 
