@@ -20,155 +20,33 @@
             height: 100%;
             touch-action: none;
         }
+
+        .mark {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 10;
+            transform: translate(-50%, -50%);
+            color: thistle;
+            border: 1px solid thistle;
+            padding: 6px;
+            display: none;
+        }
     </style>
 
-    <script src="https://preview.babylonjs.com/babylon.js"></script>
-    <script src="https://code.jquery.com/pep/0.4.1/pep.js"></script>
 
 </head>
 
 <body>
 
-    <canvas id="renderCanvas" touch-action="none"></canvas> //touch-action="none" for best results from PEP
+    <canvas id="renderCanvas" touch-action="none"></canvas>
+    <div class="mark">HTML based Text</div>
 
-    <script>
+    <script src="https://preview.babylonjs.com/babylon.js"></script>
+    <script src="https://code.jquery.com/pep/0.4.1/pep.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
-        var canvas = document.getElementById("renderCanvas"); // Get the canvas element 
-
-        var engine = new BABYLON.Engine(canvas, true); // Generate the BABYLON 3D engine
-
-
-        /******* Add the create scene function ******/
-        var createScene = function () {
-
-            // Create the scene space
-            var scene = new BABYLON.Scene(engine);
-
-            // Add a camera to the scene and attach it to the canvas
-            var camera = new BABYLON.UniversalCamera("Camera", new BABYLON.Vector3(0, 0, -10), scene);
-            camera.setTarget(BABYLON.Vector3.Zero());
-            camera.attachControl(canvas, true);
-
-            // Add lights to the scene
-            var light1 = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(1, 1, 0), scene);
-            var light2 = new BABYLON.PointLight("light2", new BABYLON.Vector3(0, 1, -1), scene);
-
-            var skyboxMaterial = new BABYLON.StandardMaterial("skyBox", scene);
-            skyboxMaterial.backFaceCulling = false;
-            skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture("https://www.babylonjs.com/assets/skybox/nebula", scene);
-            skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
-            skyboxMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
-            skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
-            skyboxMaterial.disableLighting = true;
-            var skybox = BABYLON.Mesh.CreateBox("skyBox", 1500.0, scene);
-            skybox.material = skyboxMaterial;
-
-            var fountain = BABYLON.Mesh.CreateBox("foutain", 0.1, scene);
-            fountain.visibility = 0.1;
-            fountain.isVisible = false;
-
-            // Create a particle system
-            var particleSystem;
-            var useGPUVersion = true;
-
-            var createNewSystem = function () {
-                if (particleSystem) {
-                    particleSystem.dispose();
-                }
-
-                if (useGPUVersion && BABYLON.GPUParticleSystem.IsSupported) {
-                    particleSystem = new BABYLON.GPUParticleSystem("particles", { capacity: 1000000 }, scene);
-                    particleSystem.activeParticleCount = 200000;
-                    particleSystem.emitRate = 1000;
-                } else {
-                    particleSystem = new BABYLON.ParticleSystem("particles", 50000, scene);
-                    particleSystem.emitRate = 10000;
-                }
-
-                particleSystem.particleEmitterType = new BABYLON.SphereParticleEmitter(1);
-                particleSystem.particleTexture = new BABYLON.Texture("https://www.babylonjs-playground.com/textures/flare.png", scene);
-                particleSystem.maxLifeTime = 10;
-                particleSystem.minSize = 0.01;
-                particleSystem.maxSize = 0.1;
-                particleSystem.emitter = fountain;
-
-                particleSystem.start();
-            }
-
-            createNewSystem();
-
-            var texts = [];
-            for (var i = 0; i < 10; i++) {
-                addText('Some Text ' + i, getRandomInt() * 2, getRandomInt(), -3 + getRandomNegativeInt());
-            }
-
-            function getRandomInt() {
-                var r = getRandomNegativeInt() > 4 ? 1 : -1;
-                return getRandomNegativeInt() * r;
-            };
-            function getRandomNegativeInt() {
-                return Math.round(Math.random() * 10);
-            };
-            function addText(text, x, y, z) {
-                var outputplaneTexture = new BABYLON.DynamicTexture("dynamic texture", 500, scene, true);
-                outputplaneTexture.hasAlpha = true;
-                //outputplaneTexture.getContext().clearRect(0, 140, 512, 512);
-                outputplaneTexture.drawText(text, null, 140, "20px verdana", "white");
-
-                var outputplane = BABYLON.Mesh.CreatePlane("outputplane", 10, scene, false);
-                outputplane.billboardMode = BABYLON.AbstractMesh.BILLBOARDMODE_ALL;
-                outputplane.position = new BABYLON.Vector3(x, y, z);
-                outputplane.scaling.y = 1;
-
-                outputplane.material = new BABYLON.StandardMaterial("outputplane", scene);
-                outputplane.material.diffuseTexture = outputplaneTexture;
-                outputplane.material.specularColor = new BABYLON.Color3(0, 0, 0);
-                outputplane.material.emissiveColor = new BABYLON.Color3(1, 1, 1);
-                outputplane.material.backFaceCulling = false;
-                texts.push(outputplane);
-            };
-
-
-
-            var alpha = 0;
-            var moveEmitter = true;
-            var rotateEmitter = true;
-
-            scene.registerBeforeRender(function () {
-                if (moveEmitter) {
-                    fountain.position.x = 5 * Math.cos(alpha);
-                    fountain.position.z = 5 * Math.sin(alpha);
-                }
-
-                if (rotateEmitter) {
-                    fountain.rotation.x += 0.01;
-                }
-
-                alpha += 0.01;
-
-/*                 texts.forEach(function (t) {
-                    t.position.z += (0.001 * getRandomInt());
-                }); */
-            });
-
-
-            return scene;
-        };
-
-        /******* End of the create scene function ******/
-
-        var scene = createScene(); //Call the createScene function
-
-        engine.runRenderLoop(function () { // Register a render loop to repeatedly render the scene
-            scene.render();
-        });
-
-
-        window.addEventListener("resize", function () { // Watch for browser/canvas resize events
-            engine.resize();
-        });
-    </script>
-
+    <script src="scene.js"></script>
 </body>
 
 </html>
