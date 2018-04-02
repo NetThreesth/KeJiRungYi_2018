@@ -75,37 +75,6 @@
 
         createNewSystem();
 
-        for (var i = 0; i < 10; i++) {
-            addText('3D space text ' + i, getRandomInt() * 2, getRandomInt(), -3 + getRandomNegativeInt());
-        }
-
-        function getRandomInt() {
-            var r = getRandomNegativeInt() > 4 ? 1 : -1;
-            return getRandomNegativeInt() * r;
-        };
-        function getRandomNegativeInt() {
-            return Math.round(Math.random() * 10);
-        };
-        function addText(text, x, y, z) {
-            var outputplaneTexture = new BABYLON.DynamicTexture("dynamic texture", { width: 500, height: 80 }, scene, true);
-            // outputplaneTexture.hasAlpha = true;
-            outputplaneTexture.drawText(text, 0, 60, "60px verdana", "white", true, true);
-
-            var outputplane = BABYLON.MeshBuilder.CreatePlane("outputplane", { width: 5, height: 1 }, scene);
-            outputplane.billboardMode = BABYLON.AbstractMesh.BILLBOARDMODE_ALL;
-            outputplane.position = new BABYLON.Vector3(x, y, z);
-            outputplane.scaling.y = 1;
-
-            outputplane.material = new BABYLON.StandardMaterial("outputplane", scene);
-            outputplane.material.diffuseTexture = outputplaneTexture;
-            outputplane.material.specularColor = new BABYLON.Color3(0, 0, 0);
-            outputplane.material.emissiveColor = new BABYLON.Color3(1, 1, 1);
-            outputplane.material.backFaceCulling = false;
-
-            outputplane._message = text;
-            texts.push(outputplane);
-        };
-
 
 
         var alpha = 0;
@@ -138,6 +107,7 @@
     engine.runRenderLoop(function () { // Register a render loop to repeatedly render the scene
         scene.render();
         var test = texts[0];
+        if (!test) return;
         var transformationMatrix = camera.getViewMatrix().multiply(camera.getProjectionMatrix());
         var projectedPosition = BABYLON.Vector3.Project(origin, test.computeWorldMatrix(false), transformationMatrix, viewport);
 
@@ -153,6 +123,90 @@
         $mark.text(JSON.stringify(projectedPosition));
     });
 
+    function getRandomInt() {
+        var r = getRandomNegativeInt() > 4 ? 1 : -1;
+        return getRandomNegativeInt() * r;
+    };
+    function getRandomNegativeInt() {
+        return Math.round(Math.random() * 10);
+    };
+    function addText(text, x, y, z) {
+        var outputplaneTexture = new BABYLON.DynamicTexture("dynamic texture", { width: 500, height: 80 }, scene, true);
+        // outputplaneTexture.hasAlpha = true;
+        outputplaneTexture.drawText(text, 0, 60, "60px verdana", "white", true, true);
+
+        var outputplane = BABYLON.MeshBuilder.CreatePlane("outputplane", { width: 5, height: 1 }, scene);
+        outputplane.billboardMode = BABYLON.AbstractMesh.BILLBOARDMODE_ALL;
+        outputplane.position = new BABYLON.Vector3(x, y, z);
+        outputplane.scaling.y = 1;
+
+        outputplane.material = new BABYLON.StandardMaterial("outputplane", scene);
+        outputplane.material.diffuseTexture = outputplaneTexture;
+        outputplane.material.specularColor = new BABYLON.Color3(0, 0, 0);
+        outputplane.material.emissiveColor = new BABYLON.Color3(1, 1, 1);
+        outputplane.material.backFaceCulling = false;
+
+        outputplane._message = text;
+        texts.push(outputplane);
+    };
+
+    var images = [];
+    function addImage(image, x, y, z) {
+        var outputplaneTexture = new BABYLON.Texture.CreateFromBase64String(image, 'image-' + (images.length + 1), scene);
+        // outputplaneTexture.hasAlpha = true;
+
+        var outputplane = BABYLON.MeshBuilder.CreatePlane("outputplane", { width: 5, height: 5 }, scene);
+        outputplane.billboardMode = BABYLON.AbstractMesh.BILLBOARDMODE_ALL;
+        outputplane.position = new BABYLON.Vector3(x, y, z);
+        outputplane.scaling.y = 1;
+
+        outputplane.material = new BABYLON.StandardMaterial("outputplane", scene);
+        outputplane.material.diffuseTexture = outputplaneTexture;
+        outputplane.material.specularColor = new BABYLON.Color3(0, 0, 0);
+        outputplane.material.emissiveColor = new BABYLON.Color3(1, 1, 1);
+        outputplane.material.backFaceCulling = false;
+
+        images.push(image);
+    };
+
+    $('.js-sent').on('click', function () {
+        var $input = $('.js-input');
+        var text = $input.val();
+        if (!text) return;
+
+        $input.val('').focus();
+
+        addText(text, getRandomInt() * 2, getRandomInt(), -3 + getRandomNegativeInt());
+
+
+        // mock response
+        window.setTimeout(function () {
+            addText(text + '! ' + text + '! ' + text + '!!!', getRandomInt() * 2, getRandomInt(), -3 + getRandomNegativeInt());
+        }, 700);
+    });
+
+
+    $('#js-upload').on('change', handleFiles);
+
+    function handleFiles($ele) {
+        var image = $ele.currentTarget.files[0];
+        if (!image) return;
+
+        var FR = new FileReader();
+
+        FR.addEventListener("load", function (e) {
+            addImage(e.target.result, getRandomInt() * 2, getRandomInt(), -3 + getRandomNegativeInt());
+        });
+
+        FR.readAsDataURL(image);
+
+
+        $.get('/uploadImage').done(function (resp) {
+            console.log(resp);
+        }).fail(function (err) {
+            console.log(err);
+        });
+    };
 
     window.addEventListener("resize", function () { // Watch for browser/canvas resize events
         engine.resize();

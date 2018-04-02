@@ -5,6 +5,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Scene Test</title>
 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-beta.40/css/uikit.min.css" />
     <style>
         html,
         body {
@@ -32,6 +33,23 @@
             padding: 6px;
             display: none;
         }
+
+        .control-panel {
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            width: 100%;
+            border-top: 1px solid lightgray;
+            padding: 3px 0;
+        }
+
+        .control-panel>* {
+            padding: 0px;
+        }
+
+        .control-panel button {
+            padding: 0px 12px;
+        }
     </style>
 
 
@@ -42,6 +60,19 @@
     <canvas id="renderCanvas" touch-action="none"></canvas>
     <div class="mark">HTML based Text</div>
 
+    <div class="control-panel uk-grid uk-background-muted">
+        <input type="text" class="uk-input uk-width-expand js-input">
+        <button class="uk-button uk-button-default uk-width-auto js-sent">Sent</button>
+        <div class="uk-width-auto" uk-form-custom>
+            <input id="js-upload" type="file" accept="image/*">
+            <button class="uk-button uk-button-default" type="button" tabindex="-1">
+                <span uk-icon="camera"></span>
+            </button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-beta.40/js/uikit.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-beta.40/js/uikit-icons.min.js"></script>
     <script src="https://preview.babylonjs.com/babylon.js"></script>
     <script src="https://code.jquery.com/pep/0.4.1/pep.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
