@@ -17,9 +17,16 @@
         var camera = new BABYLON.UniversalCamera("Camera", new BABYLON.Vector3(0, 0, -10), scene);
         camera.setTarget(BABYLON.Vector3.Zero());
         camera.attachControl(canvas, true);
+
+        camera.position.x = 0;
+        camera.position.y = 0;
+        camera.position.z = -100;
         return camera;
     };
 
+    var light;
+    var lightOfCamera;
+    var spotLight;
     /******* Add the create scene function ******/
     function createScene() {
 
@@ -28,8 +35,18 @@
 
 
         // Add lights to the scene
-        var light1 = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(1, 1, 0), scene);
-        var light2 = new BABYLON.PointLight("light2", new BABYLON.Vector3(0, 1, -1), scene);
+        new BABYLON.HemisphericLight("HemiLight", new BABYLON.Vector3(0, 0, -10), scene);
+
+        light = new BABYLON.PointLight("light", new BABYLON.Vector3(0, 0, 0), scene);
+        light.intensity = 0.8;
+        lightOfCamera = new BABYLON.PointLight("lightOfCamera", new BABYLON.Vector3(0, 0, 0), scene);
+        lightOfCamera.diffuse = new BABYLON.Color3(1, 1, 1);
+        lightOfCamera.specular = new BABYLON.Color3(0.8, 0.8, 0.2);
+        spotLight = new BABYLON.SpotLight("spotLight", new BABYLON.Vector3(-10, 0, 0), new BABYLON.Vector3(0, 0, 0), Math.PI / 4, 20, scene);
+        spotLight.diffuse = new BABYLON.Color3(1, 0, 0);
+        spotLight.specular = new BABYLON.Color3(1, 0, 0);
+        spotLight.intensity = 0.8;
+
 
         var skyboxMaterial = new BABYLON.StandardMaterial("skyBox", scene);
         skyboxMaterial.backFaceCulling = false;
@@ -41,60 +58,146 @@
         var skybox = BABYLON.Mesh.CreateBox("skyBox", 1500.0, scene);
         skybox.material = skyboxMaterial;
 
-        var fountain = BABYLON.Mesh.CreateBox("foutain", 0.1, scene);
-        fountain.visibility = 0.1;
-        fountain.isVisible = false;
+        var fountain = BABYLON.Mesh.CreateBox("foutain", 0.01, scene);
+        fountain.visibility = 0;
 
         // Create a particle system
         var particleSystem;
-        var useGPUVersion = true;
 
-        var createNewSystem = function () {
+        var createParticleSystem = function () {
             if (particleSystem) {
                 particleSystem.dispose();
             }
 
-            if (useGPUVersion && BABYLON.GPUParticleSystem.IsSupported) {
-                particleSystem = new BABYLON.GPUParticleSystem("particles", { capacity: 1000000 }, scene);
-                particleSystem.activeParticleCount = 200000;
-                particleSystem.emitRate = 1000;
+            if (BABYLON.GPUParticleSystem.IsSupported) {
+                particleSystem = new BABYLON.GPUParticleSystem("particles", { capacity: 50000 }, scene);
+                particleSystem.activeParticleCount = 1500;
+                particleSystem.manualEmitCount = particleSystem.activeParticleCount;
+
             } else {
-                particleSystem = new BABYLON.ParticleSystem("particles", 50000, scene);
-                particleSystem.emitRate = 10000;
+                particleSystem = new BABYLON.ParticleSystem("particles", 2500, scene);
+                particleSystem.manualEmitCount = particleSystem.getCapacity();
             }
 
-            particleSystem.particleEmitterType = new BABYLON.SphereParticleEmitter(1);
-            particleSystem.particleTexture = new BABYLON.Texture("https://www.babylonjs-playground.com/textures/flare.png", scene);
-            particleSystem.maxLifeTime = 10;
-            particleSystem.minSize = 0.01;
-            particleSystem.maxSize = 0.1;
+
+            particleSystem.minEmitBox = new BABYLON.Vector3(-50, -50, -50); // Starting all from
+            particleSystem.maxEmitBox = new BABYLON.Vector3(50, 50, 50); // To..
+            particleSystem.particleTexture = new BABYLON.Texture("https://raw.githubusercontent.com/aWeirdo/Babylon.js/master/smoke_15.png", scene);
             particleSystem.emitter = fountain;
 
-            particleSystem.start();
+            particleSystem.color1 = new BABYLON.Color4(0.8, 0.8, 0.8, 0.1);
+            particleSystem.color2 = new BABYLON.Color4(.95, .95, .95, 0.15);
+            particleSystem.colorDead = new BABYLON.Color4(0.9, 0.9, 0.9, 0.1);
+            particleSystem.minSize = 3.5;
+            particleSystem.maxSize = 5.0;
+            particleSystem.minLifeTime = Number.MAX_SAFE_INTEGER;
+            particleSystem.emitRate = 50000;
+            particleSystem.blendMode = BABYLON.ParticleSystem.BLENDMODE_STANDARD;
+            particleSystem.gravity = new BABYLON.Vector3(0, 0, 0);
+            particleSystem.direction1 = new BABYLON.Vector3(0, 0, 0);
+            particleSystem.direction2 = new BABYLON.Vector3(0, 0, 0);
+            particleSystem.minAngularSpeed = -2;
+            particleSystem.maxAngularSpeed = 2;
+            particleSystem.minEmitPower = .5;
+            particleSystem.maxEmitPower = 1;
+            particleSystem.updateSpeed = 0.005;
         }
 
-        createNewSystem();
+        createParticleSystem();
 
+
+
+        // SPS creation
+
+        var s = BABYLON.MeshBuilder.CreateSphere("s", { diameter: 3, segments: 12 }, scene);
+        var SPS = new BABYLON.SolidParticleSystem('SPS', scene);
+
+        SPS.addShape(s, 30);
+        var mesh = SPS.buildMesh();
+        mesh.material = function () {
+            var mat = new BABYLON.StandardMaterial("mat", scene);
+            //mat.backFaceCulling = false;
+            mat.alpha = 0.2;
+
+            return mat;
+        }();
+
+        mesh.position.x = 0;
+        mesh.position.y = 0;
+        mesh.position.z = 0;
+
+        s.dispose();
+
+
+        // SPS behavior definition
+        var speed = 0.3;
+        var gravity = -0.02;
+
+        // init
+        SPS.initParticles = function () {
+            // just recycle everything
+            for (var p = 0; p < this.nbParticles; p++) {
+                this.recycleParticle(this.particles[p]);
+            }
+        };
+
+        // recycle
+        var scale;
+        SPS.recycleParticle = function (particle) {
+            // Set particle new velocity, scale and rotation
+            // As this function is called for each particle, we don't allocate new
+            // memory by using "new BABYLON.Vector3()" but we set directly the
+            // x, y, z particle properties instead
+            particle.position.x = 0;
+            particle.position.y = 0;
+            particle.position.z = 0;
+            particle.velocity.x = (Math.random() - 0.5) * speed / 3;
+            particle.velocity.y = Math.random() * speed;
+            particle.velocity.z = (Math.random() - 0.5) * speed / 3;
+            scale = 1 * Math.random() + 0.2;
+            particle.scale.x = scale;
+            particle.scale.y = scale;
+            particle.scale.z = scale;
+            particle.age = Math.random();
+        };
+
+        // update : will be called by setParticles()
+        SPS.updateParticle = function (particle) {
+            // some physics here 
+            if (particle.position.y < 0 || particle.age < 0) {
+                this.recycleParticle(particle);
+            }
+            // particle.velocity.y += gravity;                         // apply gravity to y
+            (particle.position).addInPlace(particle.velocity);      // update particle new position
+            particle.position.y += speed / 2;
+
+            particle.age -= 0.01;
+
+        };
+
+
+        // init all particle values and set them once to apply textures, colors, etc
+        SPS.initParticles();
+        SPS.setParticles();
+
+        // Tuning : 
+        SPS.computeParticleColor = false;
+        SPS.computeParticleTexture = false;
+        SPS.computeParticleRotation = false;
 
 
         var alpha = 0;
-        var moveEmitter = true;
-        var rotateEmitter = true;
 
         scene.registerBeforeRender(function () {
-            if (moveEmitter) {
-                fountain.position.x = 5 * Math.cos(alpha);
-                fountain.position.z = 5 * Math.sin(alpha);
-            }
+            SPS.setParticles();
 
-            if (rotateEmitter) {
-                fountain.rotation.x += 0.01;
-            }
+            lightOfCamera.position = camera.position;
 
             alpha += 0.01;
+            light.intensity = Math.cos(alpha);
 
+            particleSystem.activeParticleCount;
         });
-
 
         return scene;
     };
