@@ -9,15 +9,22 @@
   "homepage": "https://github.com/A-Hsien/KeJiRungYi_2018",
   "author": "",
   "dependencies": {
-    "express": "4.15.4",
-    "@google-cloud/vision": "0.16.0"
+    "@google-cloud/vision": "0.16.0",
+    "babylonjs": "3.1.0",
+    "express": "4.15.4"
   },
   "devDependencies": {
-    "@google-cloud/nodejs-repo-tools": "1.4.17"
+    "@google-cloud/nodejs-repo-tools": "1.4.17",
+    "@types/jquery": "^3.3.1",
+    "ts-loader": "^4.2.0",
+    "typescript": "^2.8.1",
+    "webpack": "4.5.0",
+    "webpack-cli": "^2.0.14"
   },
   "main": "index",
   "scripts": {
     "postinstall": "npm update",
+    "build": "webpack --config webpack.config.js",
     "deploy": "gcloud app deploy",
     "start": "node app.js"
   }
