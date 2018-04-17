@@ -1,10 +1,12 @@
 import * as BABYLON from 'babylonjs';
 import * as $ from 'jquery';
+import { CommonUtility } from './CommonUtility';
 
 export class Scene {
 
-    private texts: any[] = [];
-    private images = [];
+
+    private texts: BABYLON.Mesh[] = [];
+    private panel: Panel = new Panel();
 
 
     private canvas = document.getElementById("renderCanvas");
@@ -26,7 +28,7 @@ export class Scene {
         this.createSPS();
         this.registerBeforeRender();
         this.runRenderLoop();
-        this.initPanel();
+        this.panel.initPanel(this.addText.bind(this), this.addImage.bind(this));
 
         window.addEventListener("resize", () => {
             this.engine.resize();
@@ -165,10 +167,9 @@ export class Scene {
             this.lightOfCamera['position'] = this.camera.position;
 
             alpha += 0.01;
-            this.light.intensity = Math.cos(alpha);
-
+            const variable = Math.cos(alpha);
+            this.light.intensity = Math.cos(variable);
         });
-
     };
 
     private runRenderLoop() {
@@ -179,10 +180,10 @@ export class Scene {
 
         this.engine.runRenderLoop(() => { // Register a render loop to repeatedly render the scene
             this.scene.render();
-            var test = this.texts[0];
-            if (!test) return;
+            var text = this.texts[0];
+            if (!text) return;
             var transformationMatrix = this.camera.getViewMatrix().multiply(this.camera.getProjectionMatrix());
-            var projectedPosition = BABYLON.Vector3.Project(origin, test.computeWorldMatrix(false), transformationMatrix, viewport);
+            var projectedPosition = BABYLON.Vector3.Project(origin, text.computeWorldMatrix(false), transformationMatrix, viewport);
 
             if (projectedPosition.z > 1) {
                 $mark.hide();
@@ -198,37 +199,7 @@ export class Scene {
     };
 
 
-    private initPanel() {
-        $('.js-sent').on('click', () => {
-            var $input = $('.js-input');
-            var text = $input.val();
-            if (!text) return;
-
-            $input.val('').focus();
-
-            this.addText(
-                text,
-                this.getRandomInt() * 2,
-                this.getRandomInt(),
-                -3 + this.getRandomNegativeInt()
-            );
-
-
-            // mock response
-            window.setTimeout(() => {
-                this.addText(text + '! ' + text + '! ' + text + '!!!',
-                    this.getRandomInt() * 2,
-                    this.getRandomInt(),
-                    -3 + this.getRandomNegativeInt()
-                );
-            }, 700);
-        });
-
-
-        $('#js-upload').on('change', this.handleFiles);
-    };
-
-    private addText(text, x, y, z) {
+    private addText(text: string, x: number, y: number, z: number) {
         var outputplaneTexture = new BABYLON.DynamicTexture(
             "dynamic texture",
             { width: 500, height: 80 },
@@ -246,6 +217,7 @@ export class Scene {
         outputplane.billboardMode = BABYLON.AbstractMesh.BILLBOARDMODE_ALL;
         outputplane.position = new BABYLON.Vector3(x, y, z);
         outputplane.scaling.y = 1;
+        outputplane['_message'] = text;
 
         const material = outputplane.material = new BABYLON.StandardMaterial("outputplane", this.scene);
         material.diffuseTexture = outputplaneTexture;
@@ -253,38 +225,15 @@ export class Scene {
         material.emissiveColor = new BABYLON.Color3(1, 1, 1);
         material.backFaceCulling = false;
 
-        outputplane['_message'] = text;
         this.texts.push(outputplane);
+
     };
 
-    private handleFiles($ele) {
-        var image = $ele.currentTarget.files[0];
-        if (!image) return;
 
-        var FR = new FileReader();
-
-        FR.addEventListener("load", e => {
-            this.addImage(
-                e.target['result'],
-                this.getRandomInt() * 2,
-                this.getRandomInt(), -3 + this.getRandomNegativeInt()
-            );
-        });
-
-        FR.readAsDataURL(image);
-
-
-        $.get('/uploadImage').done(function (resp) {
-            console.log(resp);
-        }).fail(function (err) {
-            console.log(err);
-        });
-    };
-
-    private addImage(image, x, y, z) {
+    private addImage(image: string, x: number, y: number, z: number) {
         var outputplaneTexture = BABYLON.Texture.CreateFromBase64String(
             image,
-            'image-' + (this.images.length + 1),
+            'image-' + Date.now,
             this.scene
         );
         // outputplaneTexture.hasAlpha = true;
@@ -299,16 +248,78 @@ export class Scene {
         material.specularColor = new BABYLON.Color3(0, 0, 0);
         material.emissiveColor = new BABYLON.Color3(1, 1, 1);
         material.backFaceCulling = false;
+    };
+};
 
-        this.images.push(image);
+
+class Panel {
+
+    private addText: (text: string, x: number, y: number, z: number) => void = null;
+    private addImage: (image: string, x: number, y: number, z: number) => void = null;
+
+
+
+    initPanel(addText: (text: string, x: number, y: number, z: number) => void, addImage: (image: string, x: number, y: number, z: number) => void) {
+        this.addText = addText;
+        this.addImage = addImage;
+        $('#js-sent').on('click', this.handleText.bind(this));
+        $('#js-upload').on('change', this.handleFiles.bind(this));
     };
 
 
-    private getRandomInt() {
-        const r = this.getRandomNegativeInt() > 4 ? 1 : -1;
-        return this.getRandomNegativeInt() * r;
+    private handleText() {
+        var $input = $('.js-input');
+        var text = String($input.val());
+        if (!text) return;
+
+        $input.val('').focus();
+
+        this.addText(
+            text,
+            CommonUtility.getRandomInt() * 2,
+            CommonUtility.getRandomInt(),
+            -3 + CommonUtility.getRandomNegativeInt()
+        );
+
+        const $mask = $('.mask');
+        $mask.addClass('flash');
+        setTimeout(() => {
+            $mask.removeClass('flash');
+        }, 500);
+
+        // mock response
+        window.setTimeout(() => {
+            this.addText(text + '! ' + text + '! ' + text + '!!!',
+                CommonUtility.getRandomInt() * 2,
+                CommonUtility.getRandomInt(),
+                -3 + CommonUtility.getRandomNegativeInt()
+            );
+        }, 700);
     };
-    private getRandomNegativeInt() {
-        return Math.round(Math.random() * 10);
+
+
+    private handleFiles($ele) {
+        const image: Blob = $ele.currentTarget.files[0];
+        if (!image) return;
+
+        var FR = new FileReader();
+
+        FR.addEventListener("load", e => {
+            const base64Image: string = e.target['result'];
+            this.addImage(
+                base64Image,
+                CommonUtility.getRandomInt() * 2,
+                CommonUtility.getRandomInt(), -3 + CommonUtility.getRandomNegativeInt()
+            );
+        });
+
+        FR.readAsDataURL(image);
+
+
+        $.get('/uploadImage').done(function (resp) {
+            console.log(resp);
+        }).fail(function (err) {
+            console.log(err);
+        });
     };
 };
