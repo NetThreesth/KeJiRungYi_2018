@@ -12,7 +12,7 @@ app.listen(PORT, () => {
   console.log('Press Ctrl+C to quit.');
 });
 
-app.route('/uploadImage')
+app.route('/apis/uploadImage')
   .get(function (req, res, next) {
     //  Google Cloud Vision Api
     const vision = require('@google-cloud/vision');
@@ -28,7 +28,22 @@ app.route('/uploadImage')
         console.error('ERROR:', err);
       });
 
-  })
+  });
+
+app.route('/apis/getPoints')
+  .get(function (req, res, next) {
+    res.writeHead(200, {
+      'Content-Type': 'text/json',
+      'Access-Control-Allow-Origin': '*',
+      'X-Powered-By': 'nodejs'
+    });
+
+    var fs = require('fs');
+    fs.readFile('MockPoints.json', function (err, content) {
+      res.write(content);
+      res.end();
+    });
+  });
 // [END app]
 
 
