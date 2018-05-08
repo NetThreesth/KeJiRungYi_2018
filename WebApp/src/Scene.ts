@@ -41,13 +41,10 @@ export class Scene {
     private initScene() {
         const scene = this.scene = new BABYLON.Scene(this.engine);
 
-        const camera = this.camera = new BABYLON.UniversalCamera("Camera", new BABYLON.Vector3(0, 0, -10), this.scene);
+        const camera = this.camera = new BABYLON.UniversalCamera("Camera", new BABYLON.Vector3(0, 0, -30), this.scene);
+        camera.speed = 0.5;
         camera.setTarget(BABYLON.Vector3.Zero());
         camera.attachControl(this.canvas, true);
-
-        camera.position.x = 0;
-        camera.position.y = 0;
-        camera.position.z = -100;
 
 
         // Add lights to the scene
@@ -78,15 +75,15 @@ export class Scene {
 
     private createSPS() {
         // SPS creation
-        var s = BABYLON.MeshBuilder.CreateSphere("s", { diameter: 3, segments: 12 }, this.scene);
+        var sphere = BABYLON.MeshBuilder.CreateSphere("s", { diameter: 1, segments: 12 }, this.scene);
         var SPS = new BABYLON.SolidParticleSystem('SPS', this.scene);
 
-        SPS.addShape(s, 30);
+        SPS.addShape(sphere, 20);
         var mesh = SPS.buildMesh();
         mesh.material = function () {
             var mat = new BABYLON.StandardMaterial("mat", this.scene);
             //mat.backFaceCulling = false;
-            mat.alpha = 0.2;
+            mat.alpha = 0.1;
 
             return mat;
         }.bind(this)();
@@ -95,11 +92,11 @@ export class Scene {
         mesh.position.y = 0;
         mesh.position.z = 0;
 
-        s.dispose();
+        sphere.dispose();
 
 
         // SPS behavior definition
-        var speed = 0.3;
+        var speed = 0.1;
         var gravity = -0.02;
 
         // init
@@ -127,7 +124,7 @@ export class Scene {
             particle.scale.x = scale;
             particle.scale.y = scale;
             particle.scale.z = scale;
-            particle['age'] = Math.random();
+            particle['age'] = Math.random() * 0.8;
 
             return particle;
         };
@@ -229,7 +226,7 @@ export class Scene {
         material.backFaceCulling = false;
 
         this.texts.push(outputplane);
-
+        this.createParticle();
     };
 
 
@@ -253,20 +250,49 @@ export class Scene {
         material.backFaceCulling = false;
     };
 
+    private createParticle() {
+
+        const ico = BABYLON.MeshBuilder.CreateIcoSphere("ico", {
+            radius: CommonUtility.getRandomNegativeInt() * 0.2,
+            radiusY: CommonUtility.getRandomNegativeInt() * 0.2,
+            subdivisions: CommonUtility.getRandomNegativeInt() * 0.5
+        }, this.scene);
+        ico.position = new BABYLON.Vector3(
+            CommonUtility.getRandomIntInRange(-30, 30),
+            CommonUtility.getRandomIntInRange(-30, 30),
+            CommonUtility.getRandomIntInRange(-30, 30),
+        );
+        const icoMaterial = new BABYLON.StandardMaterial("icoMaterial", this.scene);
+        icoMaterial.diffuseColor = new BABYLON.Color3(
+            CommonUtility.getRandomNegativeInt() * 0.1,
+            CommonUtility.getRandomNegativeInt() * 0.1,
+            CommonUtility.getRandomNegativeInt() * 0.1,
+        );
+        icoMaterial.alpha = 0.6;
+        ico.material = icoMaterial;
+    };
+
     private drawLine() {
         $.getJSON(
             'apis/getPoints',
             (data: { 'key': { x: number, y: number, z: number }[] }) => {
-                Object.keys(data).forEach(key => {
-                    const points = data[key].map(p => new BABYLON.Vector3(p.x, p.y, p.z));
-                    //Create lines 
-                    const line = BABYLON.MeshBuilder.CreateLines("line", { points: points, updatable: true, instance: null }, this.scene);
-                    line.color = new BABYLON.Color3(
-                        Math.random(),
-                        Math.random(),
-                        Math.random()
-                    );
-                });
+                let points = [];
+                Object.keys(data).forEach(key => points = points.concat(
+                    data[key].map(p => new BABYLON.Vector3(p.x, p.y, CommonUtility.getRandomNegativeInt()))
+                ));
+                //Create lines 
+                const line = BABYLON.MeshBuilder.CreateTube("line", {
+                    path: points,
+                    radius: 0.05,
+                    updatable: true,
+                    instance: null
+                }, this.scene);
+
+                var greenMat = new BABYLON.StandardMaterial("greenMat", this.scene);
+                greenMat.diffuseColor = new BABYLON.Color3(0, 1, 0);
+                greenMat.alpha = 0.2;
+
+                line.material = greenMat;
             }
         );
     };

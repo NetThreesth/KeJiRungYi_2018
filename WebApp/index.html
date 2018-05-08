@@ -1,67 +1,76 @@
 <!DOCTYPE html>
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml">
 
 <head>
-
-    <base href="">
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
-    <title>KeJiRungYi_2018_Prototype</title>
-    <meta name="description" content="KeJiRungYi_2018_Prototype">
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, user-scalable=no" />
-
-
-    <!--[if lt IE 9]>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
-    <![endif]-->
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Scene Test</title>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-beta.40/css/uikit.min.css" />
     <style>
         html,
         body {
+            overflow: hidden;
+            width: 100%;
             height: 100%;
+            margin: 0;
+            padding: 0;
         }
 
-        .menu-toggle {
-            position: absolute;
+        #renderCanvas {
+            width: 100%;
+            height: 100%;
+            touch-action: none;
+        }
+
+        .mask {
+            position: fixed;
             top: 0;
             left: 0;
-            padding: 10px 14px;
-        }
-
-        .uk-offcanvas-container .uk-offcanvas-content {
-            position: relative;
-            margin-left: 220px;
+            width: 100%;
             height: 100%;
+            pointer-events: none;
         }
 
-        .menu-title {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            font-size: 1.2rem;
-            font-weight: 400;
-            color: #fff;
+        .flash {
+            -webkit-animation-name: flash-animation;
+            -webkit-animation-duration: 1s;
+
+            animation-name: flash-animation;
+            animation-duration: 1s;
         }
 
-        .uk-nav {
-            margin-top: 20px;
+        @-webkit-keyframes flash-animation {
+            from {
+                background: rgba(255, 255, 255, 0.8);
+            }
+            to {
+                background: default;
+            }
         }
 
-
-
-        .uk-navbar-container {
-            height: 35px;
+        @keyframes flash-animation {
+            from {
+                background: rgba(255, 255, 255, 0.8);
+            }
+            to {
+                background: default;
+            }
         }
 
-        .uk-offcanvas-bar {
-            background: #4d394b;
-            max-width: 220px;
+        .mark {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 10;
+            transform: translate(-50%, -50%);
+            color: thistle;
+            border: 1px solid thistle;
+            padding: 6px;
+            display: none;
         }
 
-        #message-box {
-            position: absolute;
+        .control-panel {
+            position: fixed;
             bottom: 0;
             right: 0;
             width: 100%;
@@ -69,89 +78,40 @@
             padding: 3px 0;
         }
 
-        .js-upload {
-            padding-left: 0;
+        .control-panel>* {
+            padding: 0px;
         }
 
-        #message-box button {
-            padding: 0 10px;
-        }
-
-        .dialog-box {
-            height: calc(100% - 80px);
-            width: 100%;
-            overflow: auto;
-        }
-
-        .dialog-box .uk-card-body {
-            padding: 10px;
-        }
-
-        .dialog-box image {
-            float: right;
+        .control-panel button {
+            padding: 0px 12px;
         }
     </style>
 </head>
 
 <body>
 
-    <div class="uk-offcanvas-content">
+    <canvas id="renderCanvas" touch-action="none"></canvas>
+    <div class="mask"></div>
+    <div class="mark">HTML based Text</div>
 
-        <div id="offcanvas-nav" uk-offcanvas>
-            <div class="uk-offcanvas-bar">
-
-                <button class="uk-offcanvas-close" type="button" uk-close></button>
-                <div class="menu-title">科技融藝</div>
-                <ul class="uk-nav uk-nav-default">
-
-                    <li class="uk-nav-header">Channels</li>
-                    <li class="uk-active">
-                        <a href="">
-                            <span class="uk-margin-small-right" uk-icon="icon: hashtag"></span>general</a>
-                    </li>
-
-                    <li class="uk-nav-header">Direct Messages</li>
-                    <li>
-                        <a href="">
-                            <span class="uk-margin-small-right" uk-icon="icon: user"></span>Bot</a>
-                    </li>
-                    <li>
-                        <a href="">
-                            <span class="uk-margin-small-right" uk-icon="icon: user"></span>Algae</a>
-                    </li>
-                </ul>
-
-            </div>
-        </div>
-
-        <div class="menu-toggle" uk-toggle="#offcanvas-nav">
-            <span uk-icon="icon: menu"></span>
-        </div>
-
-        <div class="dialog-box"></div>
-
-        <div id="message-box" class="uk-grid uk-background-muted">
-            <button class="uk-button uk-button-default uk-width-auto js-sent">Sent</button>
-            <input type="text" class="uk-input uk-width-expand js-input">
-            <div class="uk-width-auto" uk-form-custom>
-                <input id="js-upload" type="file" accept="image/*">
-                <button class="uk-button uk-button-default" type="button" tabindex="-1">
-                    <span uk-icon="camera"></span>
-                </button>
-            </div>
-            <button class="uk-button uk-button-default uk-width-auto js-webrtc">
-                <span uk-icon="receiver"></span>
+    <div class="control-panel uk-grid uk-background-muted">
+        <input type="text" class="uk-input uk-width-expand js-input">
+        <button id="js-sent" class="uk-button uk-button-default uk-width-auto">Sent</button>
+        <div class="uk-width-auto" uk-form-custom>
+            <input id="js-upload" type="file" accept="image/*">
+            <button class="uk-button uk-button-default" type="button" tabindex="-1">
+                <span uk-icon="camera"></span>
             </button>
         </div>
     </div>
 
-
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-beta.40/js/uikit.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-beta.40/js/uikit-icons.min.js"></script>
+    <script src="https://preview.babylonjs.com/babylon.js"></script>
+    <script src="https://code.jquery.com/pep/0.4.1/pep.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script src="dist/index.js"></script>
 
+    <script src="dist/main.js"></script>
 </body>
 
 </html>
