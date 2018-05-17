@@ -14,6 +14,8 @@ export class Scene {
     private engine = new BABYLON.Engine(this.canvas as HTMLCanvasElement, true);
     private scene: BABYLON.Scene;
     private camera: BABYLON.Camera;
+    private glowLayerForParticle: BABYLON.GlowLayer;
+    private glowLayerForLine: BABYLON.GlowLayer;
 
     private light: BABYLON.Light;
     private lightOfCamera: BABYLON.Light;
@@ -47,23 +49,29 @@ export class Scene {
         camera.attachControl(this.canvas, true);
 
 
-        // Add lights to the scene
-        new BABYLON.HemisphericLight("HemiLight", new BABYLON.Vector3(0, 0, -10), scene);
+        new BABYLON.HemisphericLight("HemiLight", new BABYLON.Vector3(0, 0, 0), scene);
 
         this.light = new BABYLON.PointLight("light", new BABYLON.Vector3(0, 0, 0), scene);
         this.light.intensity = 0.8;
         this.lightOfCamera = new BABYLON.PointLight("lightOfCamera", new BABYLON.Vector3(0, 0, 0), scene);
         this.lightOfCamera.diffuse = new BABYLON.Color3(1, 1, 1);
         this.lightOfCamera.specular = new BABYLON.Color3(0.8, 0.8, 0.2);
-        this.spotLight = new BABYLON.SpotLight("spotLight", new BABYLON.Vector3(-10, 0, 0), new BABYLON.Vector3(0, 0, 0), Math.PI / 4, 20, scene);
-        this.spotLight.diffuse = new BABYLON.Color3(1, 0, 0);
-        this.spotLight.specular = new BABYLON.Color3(1, 0, 0);
-        this.spotLight.intensity = 0.8;
+        /*      this.spotLight = new BABYLON.SpotLight("spotLight", new BABYLON.Vector3(-10, 0, 0), new BABYLON.Vector3(0, 0, 0), Math.PI / 4, 20, scene);
+             this.spotLight.diffuse = new BABYLON.Color3(1, 0, 0);
+             this.spotLight.specular = new BABYLON.Color3(1, 0, 0)
+             this.spotLight.intensity = 0.8; */
+
+
+        this.glowLayerForParticle = new BABYLON.GlowLayer("glowLayerForParticle", this.scene);
+        this.glowLayerForParticle.intensity = 0.3;
+        this.glowLayerForLine = new BABYLON.GlowLayer("glowLayerForLine", this.scene);
+        this.glowLayerForLine.intensity = 0.01;
 
 
         var skyboxMaterial = new BABYLON.StandardMaterial("skyBox", scene);
         skyboxMaterial.backFaceCulling = false;
-        skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture("https://www.babylonjs.com/assets/skybox/nebula", scene);
+        skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture(
+            "assets/skybox/sb", scene);
         skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
         skyboxMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
         skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
@@ -206,8 +214,8 @@ export class Scene {
             this.scene,
             true
         );
-        // outputplaneTexture.hasAlpha = true;
-        outputplaneTexture.drawText(text, 0, 60, "60px verdana", "white", 'true', true);
+        outputplaneTexture.drawText(text, 0, 60, "60px verdana", "white", 'true');
+        outputplaneTexture.hasAlpha = true;
 
         var outputplane = BABYLON.MeshBuilder.CreatePlane(
             "outputplane",
@@ -221,8 +229,7 @@ export class Scene {
 
         const material = outputplane.material = new BABYLON.StandardMaterial("outputplane", this.scene);
         material.diffuseTexture = outputplaneTexture;
-        material.specularColor = new BABYLON.Color3(0, 0, 0);
-        material.emissiveColor = new BABYLON.Color3(1, 1, 1);
+        material.alpha = 0;
         material.backFaceCulling = false;
 
         this.texts.push(outputplane);
@@ -250,49 +257,111 @@ export class Scene {
         material.backFaceCulling = false;
     };
 
-    private createParticle() {
 
-        const ico = BABYLON.MeshBuilder.CreateIcoSphere("ico", {
-            radius: CommonUtility.getRandomNegativeInt() * 0.2,
-            radiusY: CommonUtility.getRandomNegativeInt() * 0.2,
-            subdivisions: CommonUtility.getRandomNegativeInt() * 0.5
-        }, this.scene);
-        ico.position = new BABYLON.Vector3(
-            CommonUtility.getRandomIntInRange(-30, 30),
-            CommonUtility.getRandomIntInRange(-30, 30),
-            CommonUtility.getRandomIntInRange(-30, 30),
+    private createParticle() {
+        const center = [5, 5, -8];
+        const range = 15;
+        const position = new BABYLON.Vector3(
+            center[0] + (CommonUtility.getRandomIntInRange(range * -1, range) * 0.1),
+            center[1] + (CommonUtility.getRandomIntInRange(range * -1, range) * 0.1),
+            center[2] + (CommonUtility.getRandomIntInRange(range * -1, range) * 0.1),
         );
-        const icoMaterial = new BABYLON.StandardMaterial("icoMaterial", this.scene);
-        icoMaterial.diffuseColor = new BABYLON.Color3(
-            CommonUtility.getRandomNegativeInt() * 0.1,
-            CommonUtility.getRandomNegativeInt() * 0.1,
-            CommonUtility.getRandomNegativeInt() * 0.1,
-        );
-        icoMaterial.alpha = 0.6;
-        ico.material = icoMaterial;
+
+        let colorInRGB = [251, 235, 13];
+        const random = CommonUtility.getRandomNegativeInt();
+        if (random > 3) colorInRGB = [252, 203, 165];
+        if (random > 6) colorInRGB = [250, 239, 255];
+        console.log(colorInRGB);
+        const color = new BABYLON.Color3(colorInRGB[0] / 255, colorInRGB[1] / 255, colorInRGB[2] / 255);
+
+        const radius = CommonUtility.getRandomIntInRange(5, 8) * 0.01;
+
+
+        // start creation
+        /*        const ico = BABYLON.MeshBuilder.CreateIcoSphere("ico", {
+                   radius: radius,
+                   radiusY: radius * CommonUtility.getRandomIntInRange(6, 14) * 0.1,
+                   subdivisions: CommonUtility.getRandomIntInRange(1, 5)
+               }, this.scene);
+               ico.position = position;
+               const icoMaterial = new BABYLON.StandardMaterial("icoMaterial", this.scene);
+               icoMaterial.diffuseColor = color;
+               icoMaterial.emissiveColor = color;
+               // icoMaterial.alpha = 0.05;
+               ico.material = icoMaterial; */
+
+
+        var core = BABYLON.Mesh.CreateSphere("core", 2, radius, this.scene);
+        core.position = position;
+
+        const coreMaterial = core.material = new BABYLON.StandardMaterial('coreMaterial', this.scene);
+        coreMaterial.diffuseColor = color;
+        coreMaterial.specularColor = color;
+        coreMaterial.emissiveColor = color;
+
+
+        this.glowLayerForParticle.addIncludedOnlyMesh(core);
     };
+
 
     private drawLine() {
         $.getJSON(
             'apis/getPoints',
             (data: { 'key': { x: number, y: number, z: number }[] }) => {
-                let points = [];
-                Object.keys(data).forEach(key => points = points.concat(
-                    data[key].map(p => new BABYLON.Vector3(p.x, p.y, CommonUtility.getRandomNegativeInt()))
-                ));
+                let points: BABYLON.Vector3[] = [];
+                Object.keys(data).forEach(key => {
+                    const pointInGroup = data[key].map(p =>
+                        new BABYLON.Vector3(p.x, p.y, CommonUtility.getRandomNegativeInt()));
+                    points = points.concat(pointInGroup);
+                });
+                const lines: {
+                    key: string,
+                    from: BABYLON.Vector3,
+                    to: BABYLON.Vector3,
+                    distance: number
+                }[] = [];
+
+                const maxDistance = 2.2;
+                points.forEach((from, iOfFrom) => {
+                    points.forEach((to, iOfTo) => {
+                        if (iOfFrom < iOfTo) {
+                            const distance = CommonUtility.distanceVector(from, to);
+                            if (distance < maxDistance) {
+                                const key = `${iOfFrom}-${iOfTo}`;
+                                lines.push({
+                                    key: key,
+                                    from: from,
+                                    to: to,
+                                    distance: distance
+                                });
+                            }
+                        }
+                    });
+                });
+                console.log(`max distance: ${maxDistance}, line count: ${lines.length}`);
+
                 //Create lines 
-                const line = BABYLON.MeshBuilder.CreateTube("line", {
-                    path: points,
-                    radius: 0.05,
-                    updatable: true,
-                    instance: null
-                }, this.scene);
+                const colors = [
+                    [71, 148, 90],
+                    [166, 221, 125],
+                    [168, 213, 133]
+                ];
 
-                var greenMat = new BABYLON.StandardMaterial("greenMat", this.scene);
-                greenMat.diffuseColor = new BABYLON.Color3(0, 1, 0);
-                greenMat.alpha = 0.2;
+                lines.forEach((e, i) => {
+                    const color = colors[CommonUtility.getRandomIntInRange(0, 2)];
+                    console.log(`line${i}: ${color}`)
+                    var greenMat = new BABYLON.StandardMaterial("greenMat" + i, this.scene);
+                    greenMat.emissiveColor = greenMat.diffuseColor = new BABYLON.Color3(color[0], color[1], color[2]);
+                    const line = BABYLON.MeshBuilder.CreateTube("line" + i, {
+                        path: [e.from, e.to],
+                        radius: 0.03,
+                        updatable: true,
+                        instance: null
+                    }, this.scene);
+                    line.material = greenMat;
 
-                line.material = greenMat;
+                    this.glowLayerForLine.addIncludedOnlyMesh(line);
+                });
             }
         );
     };

@@ -12,4 +12,12 @@ export const CommonUtility = new class CommonUtility {
     getRandomNegativeInt() {
         return Math.round(Math.random() * 10);
     };
+
+    distanceVector(v1: { x: number, y: number, z: number }, v2: { x: number, y: number, z: number }) {
+        var dx = v1.x - v2.x;
+        var dy = v1.y - v2.y;
+        var dz = v1.z - v2.z;
+
+        return Math.sqrt(dx * dx + dy * dy + dz * dz);
+    }
 }();

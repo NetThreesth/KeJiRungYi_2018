@@ -10,7 +10,7 @@
   "author": "",
   "dependencies": {
     "@google-cloud/vision": "0.16.0",
-    "babylonjs": "3.1.0",
+    "babylonjs": "3.2.0",
     "express": "4.15.4"
   },
   "devDependencies": {
