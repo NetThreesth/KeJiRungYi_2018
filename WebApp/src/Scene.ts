@@ -30,6 +30,9 @@ export class Scene {
         this.initScene();
         this.createSPS();
         this.drawLine();
+        for (let i = 0; i < 20; i++) {
+            this.createParticle();
+        }
 
         this.registerBeforeRender();
         this.runRenderLoop();
@@ -62,12 +65,6 @@ export class Scene {
              this.spotLight.intensity = 0.8; */
 
 
-        this.glowLayerForParticle = new BABYLON.GlowLayer("glowLayerForParticle", this.scene);
-        this.glowLayerForParticle.intensity = 0.3;
-        this.glowLayerForLine = new BABYLON.GlowLayer("glowLayerForLine", this.scene);
-        this.glowLayerForLine.intensity = 0.01;
-
-
         var skyboxMaterial = new BABYLON.StandardMaterial("skyBox", scene);
         skyboxMaterial.backFaceCulling = false;
         skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture(
@@ -78,6 +75,8 @@ export class Scene {
         skyboxMaterial.disableLighting = true;
         var skybox = BABYLON.Mesh.CreateBox("skyBox", 1500.0, scene);
         skybox.material = skyboxMaterial;
+        skybox.infiniteDistance = true;
+        skybox.renderingGroupId = 0;
     };
 
 
@@ -138,10 +137,10 @@ export class Scene {
         };
 
         // update : will be called by setParticles()
-        SPS.updateParticle = function (particle) {
+        SPS.updateParticle = (particle) => {
             // some physics here 
             if (particle.position.y < 0 || particle['age'] < 0) {
-                this.recycleParticle(particle);
+                SPS.recycleParticle(particle);
             }
             // particle.velocity.y += gravity;                         // apply gravity to y
             (particle.position).addInPlace(particle.velocity);      // update particle new position
@@ -233,7 +232,6 @@ export class Scene {
         material.backFaceCulling = false;
 
         this.texts.push(outputplane);
-        this.createParticle();
     };
 
 
@@ -267,14 +265,22 @@ export class Scene {
             center[2] + (CommonUtility.getRandomIntInRange(range * -1, range) * 0.1),
         );
 
-        let colorInRGB = [251, 235, 13];
-        const random = CommonUtility.getRandomNegativeInt();
-        if (random > 3) colorInRGB = [252, 203, 165];
-        if (random > 6) colorInRGB = [250, 239, 255];
-        console.log(colorInRGB);
-        const color = new BABYLON.Color3(colorInRGB[0] / 255, colorInRGB[1] / 255, colorInRGB[2] / 255);
+        const colorsSets = [
+            { diffuseColor: [253, 245, 134], glowColor: [255, 252, 193, 0.85] },
+            { diffuseColor: [253, 229, 210], glowColor: [255, 219, 225, 0.85] },
+            { diffuseColor: [252, 247, 255], glowColor: [255, 249, 254, 0.85] }
+        ].map(set => {
+            set.diffuseColor = set.diffuseColor.map(n => n / 255);
+            set.glowColor = set.glowColor.map((n, i) => i !== 3 ? n / 255 : n);
+            return set;
+        });
 
-        const radius = CommonUtility.getRandomIntInRange(5, 8) * 0.01;
+        const colorSetIndex = CommonUtility.getRandomIntInRange(0, 2);
+        const colorSet = colorsSets[colorSetIndex];
+        const colorInRGB = colorSet.diffuseColor;
+        const color = new BABYLON.Color3(colorInRGB[0], colorInRGB[1], colorInRGB[2]);
+
+        const radius = CommonUtility.getRandomIntInRange(50, 70) * 0.001;
 
 
         // start creation
@@ -291,15 +297,22 @@ export class Scene {
                ico.material = icoMaterial; */
 
 
-        var core = BABYLON.Mesh.CreateSphere("core", 2, radius, this.scene);
+        var core = BABYLON.Mesh.CreateSphere(`core-colorSetIndex:${colorSetIndex}`, 2, radius, this.scene);
         core.position = position;
 
-        const coreMaterial = core.material = new BABYLON.StandardMaterial('coreMaterial', this.scene);
+        const coreMaterial = core.material = new BABYLON.StandardMaterial(`coreMaterial`, this.scene);
         coreMaterial.diffuseColor = color;
-        coreMaterial.specularColor = color;
-        coreMaterial.emissiveColor = color;
+        coreMaterial.emissiveColor = BABYLON.Color3.Black();
 
-
+        if (!this.glowLayerForParticle) {
+            this.glowLayerForParticle = new BABYLON.GlowLayer("glowLayerForParticle", this.scene);
+            this.glowLayerForParticle.intensity = 0.5;
+            this.glowLayerForParticle.customEmissiveColorSelector = (mesh, subMesh, material, result) => {
+                const colorSetIndex = mesh.name.replace('core-colorSetIndex:', '');
+                const glowColor = colorsSets[colorSetIndex].glowColor;
+                result.set(glowColor[0], glowColor[1], glowColor[2], glowColor[3]);
+            }
+        }
         this.glowLayerForParticle.addIncludedOnlyMesh(core);
     };
 
@@ -341,21 +354,32 @@ export class Scene {
                 console.log(`max distance: ${maxDistance}, line count: ${lines.length}`);
 
                 //Create lines 
-                const colors = [
-                    [71, 148, 90],
-                    [166, 221, 125],
+                const colorSets = [
+                    [199, 222, 205],
+                    [192, 231, 164],
                     [168, 213, 133]
-                ];
+                ].map(set => set.map(n => n / 255));
+
+                const glowColor = [246 / 255, 255 / 255, 201 / 255, 0.84];
+                if (!this.glowLayerForLine) {
+                    this.glowLayerForLine = new BABYLON.GlowLayer("glowLayerForLine", this.scene);
+                    this.glowLayerForLine.intensity = 0.2;
+                    this.glowLayerForLine.customEmissiveColorSelector = (mesh, subMesh, material, result) => {
+                        result.set(glowColor[0], glowColor[1], glowColor[2], glowColor[3]);
+                    }
+                }
+                const emissiveColor = BABYLON.Color3.Black();
 
                 lines.forEach((e, i) => {
-                    const color = colors[CommonUtility.getRandomIntInRange(0, 2)];
-                    console.log(`line${i}: ${color}`)
-                    var greenMat = new BABYLON.StandardMaterial("greenMat" + i, this.scene);
-                    greenMat.emissiveColor = greenMat.diffuseColor = new BABYLON.Color3(color[0], color[1], color[2]);
-                    const line = BABYLON.MeshBuilder.CreateTube("line" + i, {
+                    const colorInRGB = colorSets[CommonUtility.getRandomIntInRange(0, 2)];
+                    const color = new BABYLON.Color3(colorInRGB[0], colorInRGB[1], colorInRGB[2]);
+                    var greenMat = new BABYLON.StandardMaterial(`greenMat${i}`, this.scene);
+                    greenMat.diffuseColor = color;
+                    greenMat.emissiveColor = emissiveColor;
+                    const line = BABYLON.MeshBuilder.CreateTube(`line${i}`, {
                         path: [e.from, e.to],
                         radius: 0.03,
-                        updatable: true,
+                        updatable: false,
                         instance: null
                     }, this.scene);
                     line.material = greenMat;

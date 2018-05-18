@@ -15,8 +15,8 @@
   },
   "devDependencies": {
     "@google-cloud/nodejs-repo-tools": "1.4.17",
-    "@types/jquery": "^3.3.1",
-    "ts-loader": "^4.2.0",
+    "@types/jquery": "^3.3.2",
+    "ts-loader": "^4.3.0",
     "typescript": "^2.8.1",
     "webpack": "4.5.0",
     "webpack-cli": "^2.0.14"
