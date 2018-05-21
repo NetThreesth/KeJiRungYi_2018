@@ -17,20 +17,18 @@ export class Scene {
     private glowLayerForParticle: BABYLON.GlowLayer;
     private glowLayerForLine: BABYLON.GlowLayer;
 
-    private light: BABYLON.Light;
     private lightOfCamera: BABYLON.Light;
-    private spotLight: BABYLON.Light;
 
 
-    private sps: BABYLON.SolidParticleSystem;
+    private bubbleSpray: BABYLON.SolidParticleSystem;
 
     /******* Add the create scene function ******/
     init() {
 
         this.initScene();
-        this.createSPS();
+        this.createBubbleSpray();
         this.drawLine();
-        for (let i = 0; i < 20; i++) {
+        for (let i = 0; i < 50; i++) {
             this.createParticle();
         }
 
@@ -54,15 +52,9 @@ export class Scene {
 
         new BABYLON.HemisphericLight("HemiLight", new BABYLON.Vector3(0, 0, 0), scene);
 
-        this.light = new BABYLON.PointLight("light", new BABYLON.Vector3(0, 0, 0), scene);
-        this.light.intensity = 0.8;
         this.lightOfCamera = new BABYLON.PointLight("lightOfCamera", new BABYLON.Vector3(0, 0, 0), scene);
         this.lightOfCamera.diffuse = new BABYLON.Color3(1, 1, 1);
         this.lightOfCamera.specular = new BABYLON.Color3(0.8, 0.8, 0.2);
-        /*      this.spotLight = new BABYLON.SpotLight("spotLight", new BABYLON.Vector3(-10, 0, 0), new BABYLON.Vector3(0, 0, 0), Math.PI / 4, 20, scene);
-             this.spotLight.diffuse = new BABYLON.Color3(1, 0, 0);
-             this.spotLight.specular = new BABYLON.Color3(1, 0, 0)
-             this.spotLight.intensity = 0.8; */
 
 
         var skyboxMaterial = new BABYLON.StandardMaterial("skyBox", scene);
@@ -80,13 +72,13 @@ export class Scene {
     };
 
 
-    private createSPS() {
-        // SPS creation
-        var sphere = BABYLON.MeshBuilder.CreateSphere("s", { diameter: 1, segments: 12 }, this.scene);
-        var SPS = new BABYLON.SolidParticleSystem('SPS', this.scene);
+    private createBubbleSpray() {
+        // creation
+        var sphere = BABYLON.MeshBuilder.CreateSphere("s", { diameter: 0.08, segments: 12 }, this.scene);
+        var bubbleSpray = new BABYLON.SolidParticleSystem('bubbleSpray', this.scene);
 
-        SPS.addShape(sphere, 20);
-        var mesh = SPS.buildMesh();
+        bubbleSpray.addShape(sphere, 20);
+        var mesh = bubbleSpray.buildMesh();
         mesh.material = function () {
             var mat = new BABYLON.StandardMaterial("mat", this.scene);
             //mat.backFaceCulling = false;
@@ -102,12 +94,11 @@ export class Scene {
         sphere.dispose();
 
 
-        // SPS behavior definition
-        var speed = 0.1;
-        var gravity = -0.02;
+        // behavior definition
+        var speed = 0.01;
 
         // init
-        SPS.initParticles = function () {
+        bubbleSpray.initParticles = function () {
             // just recycle everything
             for (var p = 0; p < this.nbParticles; p++) {
                 this.recycleParticle(this.particles[p]);
@@ -116,7 +107,7 @@ export class Scene {
 
         // recycle
         let scale;
-        SPS.recycleParticle = (particle) => {
+        bubbleSpray.recycleParticle = (particle) => {
             // Set particle new velocity, scale and rotation
             // As this function is called for each particle, we don't allocate new
             // memory by using "new BABYLON.Vector3()" but we set directly the
@@ -125,7 +116,7 @@ export class Scene {
             particle.position.y = 0;
             particle.position.z = 0;
             particle.velocity.x = (Math.random() - 0.5) * speed / 3;
-            particle.velocity.y = Math.random() * speed;
+            particle.velocity.y = Math.random() * speed ;
             particle.velocity.z = (Math.random() - 0.5) * speed / 3;
             scale = 1 * Math.random() + 0.2;
             particle.scale.x = scale;
@@ -137,12 +128,11 @@ export class Scene {
         };
 
         // update : will be called by setParticles()
-        SPS.updateParticle = (particle) => {
+        bubbleSpray.updateParticle = (particle) => {
             // some physics here 
             if (particle.position.y < 0 || particle['age'] < 0) {
-                SPS.recycleParticle(particle);
+                bubbleSpray.recycleParticle(particle);
             }
-            // particle.velocity.y += gravity;                         // apply gravity to y
             (particle.position).addInPlace(particle.velocity);      // update particle new position
             particle.position.y += speed / 2;
 
@@ -153,15 +143,15 @@ export class Scene {
 
 
         // init all particle values and set them once to apply textures, colors, etc
-        SPS.initParticles();
-        SPS.setParticles();
+        bubbleSpray.initParticles();
+        bubbleSpray.setParticles();
 
         // Tuning : 
-        SPS.computeParticleColor = false;
-        SPS.computeParticleTexture = false;
-        SPS.computeParticleRotation = false;
+        bubbleSpray.computeParticleColor = false;
+        bubbleSpray.computeParticleTexture = false;
+        bubbleSpray.computeParticleRotation = false;
 
-        this.sps = SPS;
+        this.bubbleSpray = bubbleSpray;
     };
 
 
@@ -169,13 +159,14 @@ export class Scene {
         var alpha = 0;
 
         this.scene.registerBeforeRender(() => {
-            this.sps.setParticles();
+            this.bubbleSpray.setParticles();
 
             this.lightOfCamera['position'] = this.camera.position;
 
             alpha += 0.01;
             const variable = Math.cos(alpha);
-            this.light.intensity = Math.cos(variable);
+
+            this.translateParticles();
         });
     };
 
@@ -256,6 +247,11 @@ export class Scene {
     };
 
 
+    private particles: {
+        mesh: BABYLON.Mesh,
+        translateVector: BABYLON.Vector3,
+        duration: number
+    }[] = [];
     private createParticle() {
         const center = [5, 5, -8];
         const range = 15;
@@ -282,21 +278,6 @@ export class Scene {
 
         const radius = CommonUtility.getRandomIntInRange(50, 70) * 0.001;
 
-
-        // start creation
-        /*        const ico = BABYLON.MeshBuilder.CreateIcoSphere("ico", {
-                   radius: radius,
-                   radiusY: radius * CommonUtility.getRandomIntInRange(6, 14) * 0.1,
-                   subdivisions: CommonUtility.getRandomIntInRange(1, 5)
-               }, this.scene);
-               ico.position = position;
-               const icoMaterial = new BABYLON.StandardMaterial("icoMaterial", this.scene);
-               icoMaterial.diffuseColor = color;
-               icoMaterial.emissiveColor = color;
-               // icoMaterial.alpha = 0.05;
-               ico.material = icoMaterial; */
-
-
         var core = BABYLON.Mesh.CreateSphere(`core-colorSetIndex:${colorSetIndex}`, 2, radius, this.scene);
         core.position = position;
 
@@ -314,8 +295,43 @@ export class Scene {
             }
         }
         this.glowLayerForParticle.addIncludedOnlyMesh(core);
+
+
+        const translateVector = this.getRandomVector3();
+        this.particles.push({
+            mesh: core,
+            translateVector: translateVector,
+            duration: this.getDurationForParticle()
+        });
     };
 
+    private translateParticles() {
+        const scale = 0.003;
+        this.particles.forEach(p => {
+            if (p.duration <= 0) {
+                p.translateVector = this.getRandomVector3();
+                p.duration = this.getDurationForParticle();
+            }
+            const translateVector = p.translateVector;
+            p.mesh.position.x += (translateVector.x * scale);
+            p.mesh.position.y += (translateVector.y * scale);
+            p.mesh.position.z += (translateVector.z * scale);
+            p.duration -= 1;
+        });
+    };
+
+    private getRandomVector3() {
+        return new BABYLON.Vector3(
+            CommonUtility.getRandomInt(),
+            CommonUtility.getRandomInt(),
+            CommonUtility.getRandomInt()
+        ).normalize();
+    };
+
+    // unit: frame number
+    private getDurationForParticle() {
+        return CommonUtility.getRandomIntInRange(60 * 3, 60 * 6);
+    };
 
     private drawLine() {
         $.getJSON(
