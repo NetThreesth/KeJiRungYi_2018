@@ -363,7 +363,7 @@ export class Scene {
                     });
                     this.createBubbleSpray(center);
 
-                    for (let i = 0; i < 50; i++) {
+                    for (let i = 0; i < 30; i++) {
                         this.createParticle(center);
                     }
                     lines = lines.concat(linesInGroup.filter(l => l.distance < maxDistance));
@@ -423,6 +423,7 @@ export class Scene {
             const color = new BABYLON.Color3(colorInRGB[0], colorInRGB[1], colorInRGB[2]);
             const mat = new BABYLON.StandardMaterial(`lineMat${i}`, this.scene);
             mat.diffuseColor = color;
+            mat.alpha = 0.6;
             return mat;
         });
 
