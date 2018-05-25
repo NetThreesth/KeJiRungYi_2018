@@ -1,5 +1,9 @@
 import { Scene } from './Scene';
 import { LoginPanel } from './LoginPanel';
 
-new Scene().init();
-new LoginPanel().init();
+
+const loginPanel = new LoginPanel();
+loginPanel.init();
+const scene = new Scene();
+scene.init();
+loginPanel.afterLogin = scene.zoomIn.bind(scene);

@@ -103,6 +103,76 @@
             position: fixed;
             top: 0;
             left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.2);
+            overflow: auto;
+        }
+
+        #loginPanel .contentContainer {
+            width: 80%;
+            max-width: 600px;
+            padding: 50px 0;
+        }
+
+        #centerByMargin {
+            margin: 0 auto;
+        }
+
+        #signinButton {
+            display: inline-block;
+            background: white;
+            border-radius: 5px;
+            border: thin solid #888;
+            box-shadow: 1px 1px 1px grey;
+            font-size: 14px;
+            font-weight: bold;
+            font-family: 'Roboto', sans-serif;
+            padding: 0 20px;
+        }
+
+        #signinButton:hover {
+            cursor: pointer;
+        }
+
+        #signInWrapper {
+            display: none;
+        }
+
+        #signInWrapper .label {
+            font-family: serif;
+            font-weight: normal;
+        }
+
+        #signInWrapper .icon {
+            background: url('https://google-developers.appspot.com/identity/sign-in/g-normal.png') transparent -7px 50% no-repeat;
+            display: inline-block;
+            vertical-align: middle;
+            width: 25px;
+            height: 30px;
+        }
+
+
+        .flex {
+            display: flex;
+        }
+
+        .flex-row {
+            flex-direction: row;
+        }
+
+        .flex-column {
+            flex-direction: column;
+        }
+
+        .flex-center {
+            align-items: center;
+            justify-content: center;
+        }
+
+        .white-text {
+            color: #fff;
+            text-shadow: 0px 0px 6px #404040;
         }
     </style>
 </head>
@@ -134,12 +204,32 @@
                     <td>Coordinate</td>
                     <td id="coordinate"></td>
                 </tr>
+                <tr>
+                    <td>Target</td>
+                    <td id="target"></td>
+                </tr>
             </tbody>
         </table>
     </div>
 
-    <div id="loginPanel">
-        <button id="signinButton">Sign In</button>
+    <div id="loginPanel" class="flex flex-center">
+        <div class="contentContainer">
+            <p id="intro" class="white-text">
+                2006年小說〈三體〉的問世,讓這一古老的天文物理難題再度來到世人面前, 然而三體問題所引發的思辨, 除了可以朝著更大尺度的外太空( Outer Universe)與更為深邃的時空間( Deep Spacetime)外, 亦或可反轉為當代文明的運作模式,即原先的自然─人類雙體文明,在科技逐步全面化,
+                透過種種量化技術,解構原先的現代二元對立架構,建立了更為複雜的體系。
+                <br> “一切事物的初始狀態,都只是一些看似無關的碎片,然而當此混沌過程 結束之時,這些碎片終自主有序的聚合成一個整體。” by Google 不同於先古時代人們對於世界觀的詮釋歸因於一體-自然、文藝復興後 的時代先驅對於二體-人與物的探討,當代社會的文明脈絡顯然由自
+                然、人類、科技三體共構。現代人面對的經驗對象轉變成以數據為基礎 的數位資訊,不論是科技工業和農業、社群網站、最新一代的電腦,再 再顯示出這個時代世界觀與知識典範的移轉 — 一個三體(自然、人、科 技)共構的網絡。
+                這一複雜性,建立於量化的數據基礎,數據由原先作為物與人的衍生物 ,逐漸轉換為具有主體與能動性的存在。此一數據主體在表徵上與科技 的關聯性,轉化成為此一世紀科技的象徵,翻轉了現代的架構,建立出 以數據構築,自然、人類、科技三者交互作用產生的有機網絡性社會。
+            </p>
+
+            <div id="signInWrapper">
+                <span class="label white-text">Sign in with Google Account:&nbsp;</span>
+                <div id="signinButton">
+                    <span class="icon"></span>
+                    <span class="buttonText">Google</span>
+                </div>
+            </div>
+        </div>
     </div>
 
 
@@ -148,7 +238,7 @@
     <script src="https://code.jquery.com/pep/0.4.1/pep.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://apis.google.com/js/api.js"></script>
-    
+
     <script src="dist/main.js"></script>
 </body>
 

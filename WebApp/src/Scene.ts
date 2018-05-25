@@ -13,14 +13,17 @@ export class Scene {
     private canvas = document.getElementById("renderCanvas");
     private engine = new BABYLON.Engine(this.canvas as HTMLCanvasElement, true);
     private scene: BABYLON.Scene;
-    private camera: BABYLON.Camera;
-    private glowLayerForParticle: BABYLON.GlowLayer;
-    private glowLayerForLine: BABYLON.GlowLayer;
 
+
+    private camera: BABYLON.UniversalCamera;
     private lightOfCamera: BABYLON.Light;
+    private cameraLocations: BABYLON.Vector3[] = [];
 
 
+    private glowLayerForParticle: BABYLON.GlowLayer;
     private bubbleSprays: BABYLON.SolidParticleSystem[] = [];
+
+
 
     /******* Add the create scene function ******/
     init() {
@@ -28,8 +31,7 @@ export class Scene {
         this.initScene();
         this.getPoints();
 
-        this.registerBeforeRender();
-        this.runRenderLoop();
+        this.registerRunRenderLoop();
         this.panel.initPanel(this.addText.bind(this), this.addImage.bind(this));
 
 
@@ -42,7 +44,7 @@ export class Scene {
     private initScene() {
         const scene = this.scene = new BABYLON.Scene(this.engine);
 
-        const camera = this.camera = new BABYLON.UniversalCamera("Camera", new BABYLON.Vector3(0, 0, -30), this.scene);
+        const camera = this.camera = new BABYLON.UniversalCamera("Camera", new BABYLON.Vector3(0, 0, -25), this.scene);
         camera.speed = 0.5;
         camera.setTarget(BABYLON.Vector3.Zero());
         camera.attachControl(this.canvas, true);
@@ -152,37 +154,46 @@ export class Scene {
     };
 
 
-    private registerBeforeRender() {
-        let alpha = 0;
-
-        this.scene.registerBeforeRender(() => {
-            this.bubbleSprays.forEach(e => e.setParticles());
-
-            this.lightOfCamera['position'] = this.camera.position;
-
-            alpha += 0.01;
-            const variable = Math.cos(alpha);
-
-            this.translateParticles();
-        });
-    };
-
-    private runRenderLoop() {
+    private registerRunRenderLoop() {
 
         const origin = { x: 0, y: 0, z: 0 } as BABYLON.Vector3;
         const viewport = this.camera.viewport.toGlobal(this.camera.getEngine(), null);
         const $mark = $('.mark');
 
+        const positionToString = (position: BABYLON.Vector3) => {
+            const positions = ['x', 'y', 'z'].map(k => {
+                return position[k].toFixed(2);
+            });
+            return positions.join(', ');
+        };
+
         this.engine.runRenderLoop(() => { // Register a render loop to repeatedly render the scene
+
+            this.bubbleSprays.forEach(e => e.setParticles());
+
+            if (this.cameraLocations.length > 0) {
+                const position = this.camera.position = this.cameraLocations.shift();
+                const normalizePosition = position.normalizeToNew();
+                const target = new BABYLON.Vector3(
+                    position.x - normalizePosition.x,
+                    position.y - normalizePosition.y,
+                    position.z - normalizePosition.z
+                )
+                this.camera.setTarget(target);
+                if (this.cameraLocations.length < 10) console.log(this.camera.getTarget());
+            }
+
+            this.lightOfCamera['position'] = this.camera.position;
+            this.translateParticles();
+
             this.scene.render();
 
             const $fps = document.getElementById('fps');
             $fps.innerHTML = this.engine.getFps().toFixed() + ' fps';
             const $coordinate = document.getElementById('coordinate');
-            const positions = Object.keys(this.camera.position).map(k => {
-                return this.camera.position[k].toFixed(2);
-            });
-            $coordinate.innerHTML = positions.join(', ');
+            $coordinate.innerHTML = positionToString(this.camera.position);
+            const $target = document.getElementById('target');
+            $target.innerHTML = positionToString(this.camera.getTarget());
 
 
             const text = this.texts[0];
@@ -339,6 +350,7 @@ export class Scene {
         return CommonUtility.getRandomIntInRange(60 * 3, 60 * 6);
     };
 
+    private chatRooms: BABYLON.Vector3[] = [];
 
     private getPoints() {
         $.getJSON(
@@ -361,6 +373,7 @@ export class Scene {
                     Object.keys(center).forEach(axis => {
                         center[axis] = (maxLine.from[axis] + maxLine.to[axis]) / 2
                     });
+                    this.chatRooms.push(center);
                     this.createBubbleSpray(center);
 
                     for (let i = 0; i < 30; i++) {
@@ -446,6 +459,17 @@ export class Scene {
         });
     };
 
+
+
+    zoomIn() {
+        const orgin = new BABYLON.Vector3(0, 0, 0);
+        const chatRoom = this.chatRooms[CommonUtility.getRandomIntInRange(0, this.chatRooms.length - 1)];
+        // const dist = new BABYLON.Vector3(chatRoom.x + (chatRoom.x), chatRoom.y + (chatRoom.y), 0);
+        const dist = new BABYLON.Vector3(10, 15, 0)
+        const curve = BABYLON.Curve3.CreateHermiteSpline(this.camera.position, orgin, dist, orgin, 60 * 5);
+        const points = curve.getPoints();
+        this.cameraLocations = points;
+    };
 };
 
 

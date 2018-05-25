@@ -17,28 +17,42 @@ export class LoginPanel {
             discoveryDocs: ['https://people.googleapis.com/$discovery/rest?version=v1'],
             scope: 'profile'
         }).then(() => {
-            gapi.auth2.getAuthInstance().isSignedIn.listen(this.updateSigninStatus.bind(this));
-            this.updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
+            const isSignedIn = gapi.auth2.getAuthInstance().isSignedIn.get();
+            if (!isSignedIn) this.setSignInButton();
+            else this.queryUser();
         });
     };
 
-    private signin() {
-        gapi.auth2.getAuthInstance().signIn();
+
+    private setSignInButton() {
+        gapi.auth2.getAuthInstance().isSignedIn.listen(this.login.bind(this));
+        $('#signInWrapper').show();
+        $('#signinButton').on('click', () => gapi.auth2.getAuthInstance().signIn());
     };
 
-    private updateSigninStatus(isSignedIn: boolean) {
-        console.log(isSignedIn);
-        if (!isSignedIn) return;
-        this.makeApiCall();
-    };
 
-    private makeApiCall() {
+
+    private queryUser() {
         gapi.client.people.people.get({
             'resourceName': 'people/me',
             'requestMask.includeField': 'person.names'
-        }).then(function (resp) {
-            console.log(resp.result);
-            const name = resp.result.names[0].displayName
+        }).then(resp => {
+            const name = resp.result.names[0].displayName;
+            this.setLoiginButton(name);
         });
     };
+
+    private setLoiginButton(name) {
+        $('#signInWrapper').show();
+        $('#signInWrapper .buttonText').text(name);
+        $('#signinButton').on('click', this.login.bind(this));
+    };
+
+    private login() {
+        const $loginPanel = $('#loginPanel');
+        $loginPanel.animate({ opacity: 0 }, 2000, () => $loginPanel.hide());
+        this.afterLogin();
+    };
+
+    afterLogin: () => void = () => { };
 };
