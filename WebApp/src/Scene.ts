@@ -3,6 +3,7 @@ import * as $ from 'jquery';
 import { CommonUtility } from './CommonUtility';
 import { Panel } from './Panel';
 
+
 export class Scene {
 
 
@@ -160,12 +161,6 @@ export class Scene {
         const viewport = this.camera.viewport.toGlobal(this.camera.getEngine(), null);
         const $mark = $('.mark');
 
-        const positionToString = (position: BABYLON.Vector3) => {
-            const positions = ['x', 'y', 'z'].map(k => {
-                return position[k].toFixed(2);
-            });
-            return positions.join(', ');
-        };
 
         this.engine.runRenderLoop(() => { // Register a render loop to repeatedly render the scene
 
@@ -173,14 +168,8 @@ export class Scene {
 
             if (this.cameraLocations.length > 0) {
                 const position = this.camera.position = this.cameraLocations.shift();
-                const normalizePosition = position.normalizeToNew();
-                const target = new BABYLON.Vector3(
-                    position.x - normalizePosition.x,
-                    position.y - normalizePosition.y,
-                    position.z - normalizePosition.z
-                )
-                this.camera.setTarget(target);
-                if (this.cameraLocations.length < 10) console.log(this.camera.getTarget());
+                if (this.cameraLocations.length >= 1)
+                    this.camera.setTarget(BABYLON.Vector3.Zero());
             }
 
             this.lightOfCamera['position'] = this.camera.position;
@@ -188,13 +177,8 @@ export class Scene {
 
             this.scene.render();
 
-            const $fps = document.getElementById('fps');
-            $fps.innerHTML = this.engine.getFps().toFixed() + ' fps';
-            const $coordinate = document.getElementById('coordinate');
-            $coordinate.innerHTML = positionToString(this.camera.position);
-            const $target = document.getElementById('target');
-            $target.innerHTML = positionToString(this.camera.getTarget());
 
+            this.updateDevPanel();
 
             const text = this.texts[0];
             if (!text) return;
@@ -214,6 +198,13 @@ export class Scene {
         });
     };
 
+    private updateDevPanel() {
+
+        const $fps = document.getElementById('fps');
+        $fps.innerHTML = this.engine.getFps().toFixed() + ' fps';
+        const $coordinate = document.getElementById('coordinate');
+        $coordinate.innerHTML = CommonUtility.positionToString(this.camera.position);
+    };
 
     private addText(text: string, x: number, y: number, z: number) {
         const outputplaneTexture = new BABYLON.DynamicTexture(
@@ -359,16 +350,16 @@ export class Scene {
                 let pointInGroups: BABYLON.Vector3[][] = [];
                 Object.keys(data).forEach((key, i) => {
                     const pointInGroup = data[key].map(p =>
-                        new BABYLON.Vector3(p.x, p.y, CommonUtility.getRandomNegativeInt())
+                        new BABYLON.Vector3(p.x, p.y, CommonUtility.getRandomNumber(3) * 0.006)
                     );
                     pointInGroups[i] = pointInGroup;
                 });
                 let lines: Line[] = [];
 
-                const maxDistance = 2.2;
+                const take = 1200 / 8;
                 pointInGroups.forEach(points => {
                     const linesInGroup = this.getLineToEachOther(points);
-                    const maxLine = this.sort(linesInGroup, e => e.distance).reverse()[0];
+                    const maxLine = this.sort(linesInGroup, e => e.distance)[linesInGroup.length - 1];
                     const center = new BABYLON.Vector3(0, 0, 0);
                     Object.keys(center).forEach(axis => {
                         center[axis] = (maxLine.from[axis] + maxLine.to[axis]) / 2
@@ -379,9 +370,9 @@ export class Scene {
                     for (let i = 0; i < 30; i++) {
                         this.createParticle(center);
                     }
-                    lines = lines.concat(linesInGroup.filter(l => l.distance < maxDistance));
+                    lines = lines.concat(linesInGroup.slice(0, take));
                 });
-                console.log(`max distance: ${maxDistance}, line count: ${lines.length}`);
+                console.log(`line count: ${lines.length}`);
                 this.drawLine(lines);
             }
         );
@@ -436,7 +427,6 @@ export class Scene {
             const color = new BABYLON.Color3(colorInRGB[0], colorInRGB[1], colorInRGB[2]);
             const mat = new BABYLON.StandardMaterial(`lineMat${i}`, this.scene);
             mat.diffuseColor = color;
-            mat.alpha = 0.6;
             return mat;
         });
 
@@ -464,8 +454,8 @@ export class Scene {
     zoomIn() {
         const orgin = new BABYLON.Vector3(0, 0, 0);
         const chatRoom = this.chatRooms[CommonUtility.getRandomIntInRange(0, this.chatRooms.length - 1)];
-        // const dist = new BABYLON.Vector3(chatRoom.x + (chatRoom.x), chatRoom.y + (chatRoom.y), 0);
-        const dist = new BABYLON.Vector3(10, 15, 0)
+        const dist = new BABYLON.Vector3(chatRoom.x * 3, chatRoom.y * 3, 0);
+
         const curve = BABYLON.Curve3.CreateHermiteSpline(this.camera.position, orgin, dist, orgin, 60 * 5);
         const points = curve.getPoints();
         this.cameraLocations = points;
