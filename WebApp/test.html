@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Scene Test</title>
+</head>
+
+<body>
+    <style>
+        #testGround {
+            border: 1px solid black;
+            background-color: black;
+        }
+
+        #testGround div {
+            position: absolute;
+            background-color: white;
+            height: 1px;
+            width: 1px;
+        }
+    </style>
+    <canvas id="canvas" style="display: none"></canvas>
+
+    <div id="testGround" style="position: relative;"></div>
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script>
+        !function () {
+            var canvas = document.getElementById('canvas');
+            var img = new Image();
+            img.onload = function () {
+                var height = canvas.height = img.height;
+                var width = canvas.width = img.width;
+                var context = canvas.getContext('2d');
+                context.drawImage(img, 0, 0, width, height);
+                var imgData = context.getImageData(0, 0, width, height);
+
+                var pixels = [];
+                var threshold = 50;
+                var positions = [];
+                var len = imgData.data.length;
+                var widthInPixel = Math.sqrt(len / 4);
+                for (var i = 0; i < len; i += 4) {
+
+                    var r = imgData.data[i];
+                    var g = imgData.data[i + 1];
+                    var b = imgData.data[i + 2];
+                    var a = imgData.data[i + 3];
+                    var brightness = (0.299 * r) + (0.587 * g) + (0.114 * b);
+                    pixels.push({ r: r, g: g, b: b, a: a, brightness: brightness });
+
+                    if (brightness > threshold) {
+                        var indexInPixel = i / 4;
+                        var rowNumber = Math.floor(indexInPixel / widthInPixel);
+                        var culNumber = indexInPixel % widthInPixel;
+                        positions.push({ x: rowNumber, y: culNumber });
+                    }
+                }
+                var testGround = document.getElementById('testGround');
+                $(testGround).css({ 'height': height + 'px', 'width': width + 'px' });
+                positions.forEach(function (position) {
+                    var pix = document.createElement('div');
+                    pix.setAttribute('style', 'top:' + position.y + 'px; left:' + position.x + 'px');
+                    testGround.appendChild(pix);
+                });
+            };
+            img.src = 'assets/textImage/image.png';
+
+        }();
+    </script>
+</body>
+
+</html>
