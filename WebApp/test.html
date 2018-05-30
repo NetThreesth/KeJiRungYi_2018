@@ -35,13 +35,22 @@
                 var width = canvas.width = img.width;
                 var context = canvas.getContext('2d');
                 context.drawImage(img, 0, 0, width, height);
-                var imgData = context.getImageData(0, 0, width, height);
+
+
+                // inputs
+                var startX = 64;
+                var startY = 64;
+                var takeWidth = 64 * 2;
+                var rateOfWoverH = 2 / 1;
+
+
+                var imgData = context.getImageData(startX, startY, takeWidth, takeWidth / rateOfWoverH);
 
                 var pixels = [];
                 var threshold = 50;
                 var positions = [];
                 var len = imgData.data.length;
-                var widthInPixel = Math.sqrt(len / 4);
+                var heightInPixel = Math.sqrt(len / rateOfWoverH);
                 for (var i = 0; i < len; i += 4) {
 
                     var r = imgData.data[i];
@@ -52,17 +61,27 @@
                     pixels.push({ r: r, g: g, b: b, a: a, brightness: brightness });
 
                     if (brightness > threshold) {
-                        var indexInPixel = i / 4;
-                        var rowNumber = Math.floor(indexInPixel / widthInPixel);
-                        var culNumber = indexInPixel % widthInPixel;
-                        positions.push({ x: rowNumber, y: culNumber });
+                        var pixelNumber = (i / 4) + 1;
+                        var culNumber = Math.floor(pixelNumber / heightInPixel);
+                        var rowNumber = pixelNumber % heightInPixel;
+                        positions.push({
+                            x: rowNumber,
+                            y: culNumber,
+                            r: r,
+                            g: g,
+                            b: b,
+                        });
                     }
                 }
                 var testGround = document.getElementById('testGround');
                 $(testGround).css({ 'height': height + 'px', 'width': width + 'px' });
                 positions.forEach(function (position) {
                     var pix = document.createElement('div');
-                    pix.setAttribute('style', 'top:' + position.y + 'px; left:' + position.x + 'px');
+                    pix.setAttribute('style',
+                        'top:' + position.y + 'px;' +
+                        'left:' + position.x + 'px;'
+                        // 'background-color:rgb(' + position.r + ',' + position.g + ',' + position.b + ');'
+                    );
                     testGround.appendChild(pix);
                 });
             };
