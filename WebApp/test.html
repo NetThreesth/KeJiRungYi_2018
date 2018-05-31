@@ -22,6 +22,7 @@
     </style>
     <canvas id="canvas" style="display: none"></canvas>
 
+    <canvas id="testCanvas"></canvas>
     <div id="testGround" style="position: relative;"></div>
 
 
@@ -30,6 +31,7 @@
         !function () {
             var canvas = document.getElementById('canvas');
             var img = new Image();
+            img.src = 'assets/textImage/image.png';
             img.onload = function () {
                 var height = canvas.height = img.height;
                 var width = canvas.width = img.width;
@@ -38,19 +40,25 @@
 
 
                 // inputs
-                var startX = 64;
+                var startX = 64 * 2;
                 var startY = 64;
                 var takeWidth = 64 * 2;
-                var rateOfWoverH = 2 / 1;
+                var rateOfWoverH = 1 / 2;
+
+                var takeHeight = takeWidth / rateOfWoverH;
+                var imgData = context.getImageData(startX, startY, takeWidth, takeHeight);
 
 
-                var imgData = context.getImageData(startX, startY, takeWidth, takeWidth / rateOfWoverH);
+                var testCanvas = document.getElementById('testCanvas');
+                testCanvas.height = takeHeight;
+                testCanvas.width = takeWidth;
+                testCanvas.getContext('2d').putImageData(imgData, 0, 0);
+
 
                 var pixels = [];
                 var threshold = 50;
                 var positions = [];
                 var len = imgData.data.length;
-                var heightInPixel = Math.sqrt(len / rateOfWoverH);
                 for (var i = 0; i < len; i += 4) {
 
                     var r = imgData.data[i];
@@ -60,13 +68,13 @@
                     var brightness = (0.299 * r) + (0.587 * g) + (0.114 * b);
                     pixels.push({ r: r, g: g, b: b, a: a, brightness: brightness });
 
-                    if (brightness > threshold) {
+                    if (brightness > threshold ) {
                         var pixelNumber = (i / 4) + 1;
-                        var culNumber = Math.floor(pixelNumber / heightInPixel);
-                        var rowNumber = pixelNumber % heightInPixel;
+                        var rowNumber = Math.floor(pixelNumber / takeWidth);
+                        var culNumber = pixelNumber % takeWidth;
                         positions.push({
-                            x: rowNumber,
-                            y: culNumber,
+                            x: culNumber,
+                            y: rowNumber,
                             r: r,
                             g: g,
                             b: b,
@@ -79,13 +87,12 @@
                     var pix = document.createElement('div');
                     pix.setAttribute('style',
                         'top:' + position.y + 'px;' +
-                        'left:' + position.x + 'px;'
-                        // 'background-color:rgb(' + position.r + ',' + position.g + ',' + position.b + ');'
+                        'left:' + position.x + 'px;' +
+                        'background-color:rgb(' + position.r + ',' + position.g + ',' + position.b + ');'
                     );
                     testGround.appendChild(pix);
                 });
             };
-            img.src = 'assets/textImage/image.png';
 
         }();
     </script>

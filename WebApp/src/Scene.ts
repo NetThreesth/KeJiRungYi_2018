@@ -30,7 +30,8 @@ export class Scene {
     init() {
 
         this.initScene();
-        this.getPoints();
+        this.getTexts();
+        // this.getPoints();
 
         this.registerRunRenderLoop();
         this.panel.initPanel(this.addText.bind(this), this.addImage.bind(this));
@@ -256,6 +257,15 @@ export class Scene {
     };
 
 
+    private colorsSetForParticle = [
+        { diffuseColor: [253, 245, 134], glowColor: [255, 252, 193, 0.85] },
+        { diffuseColor: [253, 229, 210], glowColor: [255, 219, 225, 0.85] },
+        { diffuseColor: [252, 247, 255], glowColor: [255, 249, 254, 0.85] }
+    ].map(set => {
+        set.diffuseColor = set.diffuseColor.map(n => n / 255);
+        set.glowColor = set.glowColor.map((n, i) => i !== 3 ? n / 255 : n);
+        return set;
+    });
     private particles: {
         mesh: BABYLON.Mesh,
         translateVector: BABYLON.Vector3,
@@ -269,18 +279,9 @@ export class Scene {
             center.z + (CommonUtility.getRandomIntInRange(range * -1, range) * 0.1),
         );
 
-        const colorsSets = [
-            { diffuseColor: [253, 245, 134], glowColor: [255, 252, 193, 0.85] },
-            { diffuseColor: [253, 229, 210], glowColor: [255, 219, 225, 0.85] },
-            { diffuseColor: [252, 247, 255], glowColor: [255, 249, 254, 0.85] }
-        ].map(set => {
-            set.diffuseColor = set.diffuseColor.map(n => n / 255);
-            set.glowColor = set.glowColor.map((n, i) => i !== 3 ? n / 255 : n);
-            return set;
-        });
 
         const colorSetIndex = CommonUtility.getRandomIntInRange(0, 2);
-        const colorSet = colorsSets[colorSetIndex];
+        const colorSet = this.colorsSetForParticle[colorSetIndex];
         const colorInRGB = colorSet.diffuseColor;
         const color = new BABYLON.Color3(colorInRGB[0], colorInRGB[1], colorInRGB[2]);
 
@@ -298,7 +299,7 @@ export class Scene {
             this.glowLayerForParticle.intensity = 0.5;
             this.glowLayerForParticle.customEmissiveColorSelector = (mesh, subMesh, material, result) => {
                 const colorSetIndex = mesh.name.replace('core-colorSetIndex:', '');
-                const glowColor = colorsSets[colorSetIndex].glowColor;
+                const glowColor = this.colorsSetForParticle[colorSetIndex].glowColor;
                 result.set(glowColor[0], glowColor[1], glowColor[2], glowColor[3]);
             }
         }
@@ -450,11 +451,72 @@ export class Scene {
     };
 
 
+    getTexts() {
+        var img = new Image();
+        img.src = 'assets/textImage/image.png';
+        img.onload = () => {
+            var canvas = document.createElement('canvas');
+            var height = canvas.height = img.height;
+            var width = canvas.width = img.width;
+            var context = canvas.getContext('2d');
+            context.drawImage(img, 0, 0, width, height);
+
+
+            // inputs
+            var startX = 64;
+            var startY = 64;
+            var takeWidth = 64;
+            var rateOfWoverH = 1 / 1;
+
+            var takeHeight = takeWidth / rateOfWoverH;
+            var imgData = context.getImageData(startX, startY, takeWidth, takeHeight);
+
+
+            var threshold = 50;
+            var pixels: {
+                x: number,
+                y: number,
+                r: number,
+                g: number,
+                b: number,
+            }[] = [];
+            var len = imgData.data.length;
+            for (var i = 0; i < len; i += 4) {
+
+                var r = imgData.data[i];
+                var g = imgData.data[i + 1];
+                var b = imgData.data[i + 2];
+                var brightness = (0.299 * r) + (0.587 * g) + (0.114 * b);
+
+                if (brightness > threshold) {
+                    var pixelNumber = (i / 4) + 1;
+                    var rowNumber = Math.floor(pixelNumber / takeWidth);
+                    var culNumber = pixelNumber % takeWidth;
+                    pixels.push({
+                        x: culNumber,
+                        y: rowNumber,
+                        r: r,
+                        g: g,
+                        b: b,
+                    });
+                }
+            }
+            pixels.forEach((p, i) => {
+                const rate = 3;
+                const s = BABYLON.Mesh.CreateSphere(`pixels-${i}`, 2, 0.2, this.scene);
+                s.position = new BABYLON.Vector3((p.x - 32) / rate, (p.y - 32) / rate, 10);
+            });
+        };
+    };
+
+
 
     zoomIn() {
         const orgin = new BABYLON.Vector3(0, 0, 0);
         const chatRoom = this.chatRooms[CommonUtility.getRandomIntInRange(0, this.chatRooms.length - 1)];
-        const dist = new BABYLON.Vector3(chatRoom.x * 3, chatRoom.y * 3, 0);
+        const dist = chatRoom ?
+            new BABYLON.Vector3(chatRoom.x * 3, chatRoom.y * 3, 0) :
+            BABYLON.Vector3.Zero();
 
         const curve = BABYLON.Curve3.CreateHermiteSpline(this.camera.position, orgin, dist, orgin, 60 * 5);
         const points = curve.getPoints();
