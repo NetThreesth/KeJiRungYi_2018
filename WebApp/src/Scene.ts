@@ -1,12 +1,13 @@
 import * as BABYLON from 'babylonjs';
 import * as $ from 'jquery';
 import { CommonUtility } from './CommonUtility';
+import { BabylonUtility, Line } from './BabylonUtility';
 import { Panel } from './Panel';
 
 
 export class Scene {
 
-
+    private lineCountLimit = 8 * 10; // 8個聊天室
     private texts: BABYLON.Mesh[] = [];
     private panel: Panel = new Panel();
 
@@ -163,8 +164,9 @@ export class Scene {
         const $mark = $('.mark');
 
 
-        this.engine.runRenderLoop(() => { // Register a render loop to repeatedly render the scene
+        this.engine.runRenderLoop(() => {
 
+            /** render before */
             this.bubbleSprays.forEach(e => e.setParticles());
 
             if (this.cameraLocations.length > 0) {
@@ -174,11 +176,16 @@ export class Scene {
             }
 
             this.lightOfCamera['position'] = this.camera.position;
+            this.translateLinesForTextNodes();
             this.translateParticles();
+            this.bubbleSprays.forEach(e => e.setParticles());
+            /** render before end */
+
 
             this.scene.render();
 
 
+            /** render after */
             this.updateDevPanel();
 
             const text = this.texts[0];
@@ -196,6 +203,7 @@ export class Scene {
             const scale = 1 / (1 - projectedPosition.z);
             // $mark.css('transform', 'translate(-50%, -50%) scale(' + scale + ',' + scale + ')');
             $mark.text(JSON.stringify(projectedPosition));
+            /** render after end */
         });
     };
 
@@ -204,7 +212,7 @@ export class Scene {
         const $fps = document.getElementById('fps');
         $fps.innerHTML = this.engine.getFps().toFixed() + ' fps';
         const $coordinate = document.getElementById('coordinate');
-        $coordinate.innerHTML = CommonUtility.positionToString(this.camera.position);
+        $coordinate.innerHTML = BabylonUtility.positionToString(this.camera.position);
     };
 
     private addText(text: string, x: number, y: number, z: number) {
@@ -314,7 +322,15 @@ export class Scene {
         });
     };
 
+    private translateLinesForTextNodes() {
+        if (this.textNodes.length === 0) return;
+        const lines = BabylonUtility.getLineToEachOther(this.textNodes);
+        const linesToDraw = CommonUtility.sort(lines, l => l.distance).slice(0, this.lineCountLimit);
+        this.drawLine(linesToDraw);
+    };
+
     private translateParticles() {
+        if (this.particles.length === 0) return;
         const scale = 0.003;
         this.particles.forEach(p => {
             if (p.duration <= 0) {
@@ -357,10 +373,10 @@ export class Scene {
                 });
                 let lines: Line[] = [];
 
-                const take = 1200 / 8;
+                const take = this.lineCountLimit / 8;
                 pointInGroups.forEach(points => {
-                    const linesInGroup = this.getLineToEachOther(points);
-                    const maxLine = this.sort(linesInGroup, e => e.distance)[linesInGroup.length - 1];
+                    const linesInGroup = BabylonUtility.getLineToEachOther(points);
+                    const maxLine = CommonUtility.sort(linesInGroup, e => e.distance)[linesInGroup.length - 1];
                     const center = new BABYLON.Vector3(0, 0, 0);
                     Object.keys(center).forEach(axis => {
                         center[axis] = (maxLine.from[axis] + maxLine.to[axis]) / 2
@@ -379,43 +395,28 @@ export class Scene {
         );
     };
 
-    private sort<T>(array: T[], func: (e: T) => number) {
-        array.sort((a, b) => {
-            return func(a) - func(b);
-        });
-        return array;
-    };
 
 
-    private getLineToEachOther(points: BABYLON.Vector3[]) {
 
-        const lines: Line[] = [];
-        points.forEach((from, iOfFrom) => {
-            points.forEach((to, iOfTo) => {
-                if (iOfFrom < iOfTo) {
-                    const distance = CommonUtility.distanceVector(from, to);
-                    const key = `${iOfFrom}-${iOfTo}`;
-                    lines.push({
-                        key: key,
-                        from: from,
-                        to: to,
-                        distance: distance
-                    });
-                }
-            });
-        });
-        return lines;
-    };
-
+    private highlightForLine: BABYLON.HighlightLayer = null;
+    private lineMeshes: BABYLON.Mesh[] = [];
 
     private drawLine(lines: Line[]) {
+        const oldLineMeshes = this.lineMeshes.splice(0, lines.length);
+        oldLineMeshes.forEach(mesh => mesh.material.alpha = 1);
+        this.lineMeshes.forEach(mesh => mesh.material.alpha = 0);
 
-        //Create lines 
         const glowColorInRGB = [246 / 255, 255 / 255, 201 / 255, 0.84];
         const glowColor = new BABYLON.Color3(glowColorInRGB[0], glowColorInRGB[1], glowColorInRGB[2])
 
-        const highlightForLine = new BABYLON.HighlightLayer("highlightForLine", this.scene);
-        highlightForLine.innerGlow = false;
+        const highlightForLine = this.highlightForLine =
+            this.highlightForLine ||
+            function () {
+                const highlightForLine = new BABYLON.HighlightLayer("highlightForLine", this.scene);
+                highlightForLine.innerGlow = false;
+                return highlightForLine;
+            }.bind(this)();
+
 
         const colorSets = [
             [199, 222, 205],
@@ -431,25 +432,31 @@ export class Scene {
             return mat;
         });
 
+        if (lines.length === 0) return;
         const meshContainer: BABYLON.Mesh[][] = [[], [], []];
         lines.forEach((e, i) => {
             const materialIndex = CommonUtility.getRandomIntInRange(0, 2);
             const line = BABYLON.MeshBuilder.CreateTube(`line${i}`, {
                 path: [e.from, e.to],
                 radius: 0.03,
-                updatable: false,
-                instance: null
+                updatable: true,
+                instance: oldLineMeshes[i] || null
             }, this.scene);
-
-            line.material = materials[materialIndex];
-            meshContainer[materialIndex].push(line);
+            line.material = oldLineMeshes[i] ? line.material : materials[materialIndex];
+            // meshContainer[materialIndex].push(line);
+            this.lineMeshes.push(line);
         });
-        meshContainer.forEach(ms => {
-            const merged = BABYLON.Mesh.MergeMeshes(ms, true, false);
-            highlightForLine.addMesh(merged, glowColor);
-        });
+        /*         meshContainer.forEach(group => {
+                    if (group.length === 0) return;
+                    const merged = BABYLON.Mesh.MergeMeshes(group, false, false);
+                    this.lineMeshes.push(merged);
+                    highlightForLine.addMesh(merged, glowColor);
+                }); */
     };
 
+
+
+    private textNodes: BABYLON.Vector3[] = [];
 
     getTexts() {
         var img = new Image();
@@ -472,13 +479,13 @@ export class Scene {
             var imgData = context.getImageData(startX, startY, takeWidth, takeHeight);
 
 
-            var threshold = 50;
             var pixels: {
                 x: number,
                 y: number,
                 r: number,
                 g: number,
                 b: number,
+                brightness: number
             }[] = [];
             var len = imgData.data.length;
             for (var i = 0; i < len; i += 4) {
@@ -488,24 +495,30 @@ export class Scene {
                 var b = imgData.data[i + 2];
                 var brightness = (0.299 * r) + (0.587 * g) + (0.114 * b);
 
-                if (brightness > threshold) {
-                    var pixelNumber = (i / 4) + 1;
-                    var rowNumber = Math.floor(pixelNumber / takeWidth);
-                    var culNumber = pixelNumber % takeWidth;
-                    pixels.push({
-                        x: culNumber,
-                        y: rowNumber,
-                        r: r,
-                        g: g,
-                        b: b,
-                    });
-                }
+                var pixelNumber = (i / 4) + 1;
+                var rowNumber = Math.floor(pixelNumber / takeWidth);
+                var culNumber = pixelNumber % takeWidth;
+                pixels.push({
+                    x: culNumber,
+                    y: rowNumber,
+                    r: r,
+                    g: g,
+                    b: b,
+                    brightness: brightness
+                });
             }
-            pixels.forEach((p, i) => {
-                const rate = 3;
-                const s = BABYLON.Mesh.CreateSphere(`pixels-${i}`, 2, 0.2, this.scene);
-                s.position = new BABYLON.Vector3((p.x - 32) / rate, (p.y - 32) / rate, 10);
-            });
+            this.textNodes = CommonUtility.sort(pixels, p => p.brightness).reverse()
+                .slice(0, this.lineCountLimit)
+                .map((p, i) => {
+                    const rate = 0.5;
+                    // const s = BABYLON.Mesh.CreateSphere(`pixels-${i}`, 2, 0.2, this.scene);
+                    const position = new BABYLON.Vector3(
+                        (p.x - 32) * rate,
+                        (p.y - 32) * -1 * rate,
+                        10 + CommonUtility.getRandomNumberInRange(0, 5, 2)
+                    );
+                    return position;
+                });
         };
     };
 
@@ -522,12 +535,4 @@ export class Scene {
         const points = curve.getPoints();
         this.cameraLocations = points;
     };
-};
-
-
-interface Line {
-    key: string,
-    from: BABYLON.Vector3,
-    to: BABYLON.Vector3,
-    distance: number
 };
