@@ -322,11 +322,33 @@ export class Scene {
         });
     };
 
+
+    private linesystem: BABYLON.LinesMesh = null;
+    private translateFactor = 0;
     private translateLinesForTextNodes() {
         if (this.textNodes.length === 0) return;
-        const lines = BabylonUtility.getLineToEachOther(this.textNodes);
-        const linesToDraw = CommonUtility.sort(lines, l => l.distance).slice(0, this.lineCountLimit);
-        this.drawLine(linesToDraw);
+        const textNodes = this.textNodes.map(node => {
+            node.z = node.z + Math.cos(this.translateFactor);
+            this.translateFactor += 0.1;
+            return node;
+        });
+        const lines = BabylonUtility.getLineToEachOther(textNodes);
+        // 濾掉太遠的
+        // 效能因素 選少量畫
+        const linesToSelect = CommonUtility.sort(lines, l => l.distance)
+            .slice(100, 2000);
+        const linesToDraw = CommonUtility.shuffle(linesToSelect)
+            .slice(0, 600)
+            .map(l => [l.from, l.to]);
+
+        this.linesystem = BABYLON.MeshBuilder.CreateLineSystem("linesystem", {
+            lines: linesToDraw,
+            updatable: true,
+            instance: this.linesystem || null
+        }, this.scene);
+        const color = this.colorSetForLines[2];
+        this.linesystem.color = new BABYLON.Color3(color[0], color[1], color[2]);
+
     };
 
     private translateParticles() {
@@ -399,7 +421,13 @@ export class Scene {
 
 
     private highlightForLine: BABYLON.HighlightLayer = null;
+    private colorSetForLines = [
+        [199, 222, 205],
+        [192, 231, 164],
+        [168, 213, 133]
+    ].map(set => set.map(n => n / 255));
     private lineMeshes: BABYLON.Mesh[] = [];
+
 
     private drawLine(lines: Line[]) {
         const oldLineMeshes = this.lineMeshes.splice(0, lines.length);
@@ -418,14 +446,9 @@ export class Scene {
             }.bind(this)();
 
 
-        const colorSets = [
-            [199, 222, 205],
-            [192, 231, 164],
-            [168, 213, 133]
-        ].map(set => set.map(n => n / 255));
 
 
-        const materials = colorSets.map((colorInRGB, i) => {
+        const materials = this.colorSetForLines.map((colorInRGB, i) => {
             const color = new BABYLON.Color3(colorInRGB[0], colorInRGB[1], colorInRGB[2]);
             const mat = new BABYLON.StandardMaterial(`lineMat${i}`, this.scene);
             mat.diffuseColor = color;
@@ -507,8 +530,8 @@ export class Scene {
                     brightness: brightness
                 });
             }
-            this.textNodes = CommonUtility.sort(pixels, p => p.brightness).reverse()
-                .slice(0, this.lineCountLimit)
+            this.textNodes = pixels
+                .filter(p => p.brightness > 100)
                 .map((p, i) => {
                     const rate = 0.5;
                     // const s = BABYLON.Mesh.CreateSphere(`pixels-${i}`, 2, 0.2, this.scene);
