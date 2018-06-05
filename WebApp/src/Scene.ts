@@ -348,14 +348,29 @@ export class Scene {
     private translateLinesForTextNodes() {
         if (this.linesForLinesystem.length === 0) return;
 
+        let inited = false;
+        if (this.linesystem) inited = true;
+
         this.linesystem = BABYLON.MeshBuilder.CreateLineSystem("linesystem", {
             lines: this.linesForLinesystem,
             updatable: true,
             instance: this.linesystem || null
         }, this.scene);
-        const color = this.colorSetForLines[2];
-        this.linesystem.color = new BABYLON.Color3(color[0], color[1], color[2]);
+        this.linesystem.color = BABYLON.Color3.White();
 
+/*         if (inited = false) {
+            const color = this.colorSetForLines[2];
+            this.linesystem.color = new BABYLON.Color3(color[0], color[1], color[2]);
+
+            const highlightForLine: BABYLON.HighlightLayer = this.highlightForLine =
+                this.highlightForLine ||
+                function () {
+                    const highlightForLine = new BABYLON.HighlightLayer("highlightForLine", this.scene);
+                    highlightForLine.innerGlow = false;
+                    return highlightForLine;
+                }.bind(this)();
+            highlightForLine.addMesh(this.linesystem, this.glowColor);
+        } */
     };
 
     private translateParticles() {
@@ -426,13 +441,16 @@ export class Scene {
     private lineMeshes: BABYLON.Mesh[] = [];
 
 
+    private glowColor = function () {
+        const glowColorInRGB = [246 / 255, 255 / 255, 201 / 255, 0.84];
+        return new BABYLON.Color3(glowColorInRGB[0], glowColorInRGB[1], glowColorInRGB[2])
+    }();
+
     private drawLine(lines: Line[]) {
         const oldLineMeshes = this.lineMeshes.splice(0, lines.length);
         oldLineMeshes.forEach(mesh => mesh.material.alpha = 1);
         this.lineMeshes.forEach(mesh => mesh.material.alpha = 0);
 
-        const glowColorInRGB = [246 / 255, 255 / 255, 201 / 255, 0.84];
-        const glowColor = new BABYLON.Color3(glowColorInRGB[0], glowColorInRGB[1], glowColorInRGB[2])
 
         const highlightForLine = this.highlightForLine =
             this.highlightForLine ||
@@ -470,7 +488,7 @@ export class Scene {
                     if (group.length === 0) return;
                     const merged = BABYLON.Mesh.MergeMeshes(group, false, false);
                     this.lineMeshes.push(merged);
-                    highlightForLine.addMesh(merged, glowColor);
+                    highlightForLine.addMesh(merged, this.glowColor);
                 }); */
     };
 
