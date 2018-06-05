@@ -1,3 +1,4 @@
+import { CommonUtility } from './CommonUtility';
 
 export class BabylonUtility {
 
@@ -8,6 +9,22 @@ export class BabylonUtility {
         var dz = v1.z - v2.z;
 
         return Math.sqrt(dx * dx + dy * dy + dz * dz);
+    };
+
+
+    static getRandomVector3(randomOnX = true, randomOnY = true, randomOnZ = true) {
+        return new BABYLON.Vector3(
+            randomOnX ? CommonUtility.getRandomInt() : 0,
+            randomOnY ? CommonUtility.getRandomInt() : 0,
+            randomOnZ ? CommonUtility.getRandomInt() : 0
+        ).normalize();
+    };
+
+
+    static updatePosition(position: BABYLON.Vector3, translateVector: BABYLON.Vector3, scale: number) {
+        position.x += (translateVector.x * scale);
+        position.y += (translateVector.y * scale);
+        position.z += (translateVector.z * scale);
     };
 
 

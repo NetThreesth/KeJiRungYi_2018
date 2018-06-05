@@ -12,7 +12,7 @@ export class CommonUtility {
     };
 
     static getRandomIntInRange(min: number, max: number) {
-        return Math.floor(Math.random() * (max - min + 1) + min) + min;
+        return Math.floor(Math.random() * (max - min + 1)) + min;
     };
 
     static getRandomInt(digits?: number) {
@@ -44,10 +44,10 @@ export class CommonUtility {
         });
         return array;
     };
-    
+
     static shuffle<T>(array: T[]) {
         let currentIndex = array.length;
-        let temporaryValue; 
+        let temporaryValue;
         let randomIndex;
 
         // While there remain elements to shuffle...

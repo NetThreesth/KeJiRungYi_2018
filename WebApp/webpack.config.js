@@ -1,7 +1,10 @@
 const path = require('path');
 
 module.exports = {
-  entry: './src/main.ts',
+  entry: {
+    'main': './src/main.ts',
+    'UpdateTextNode.worker': './src/UpdateTextNode.worker.ts'
+  },
   module: {
     rules: [
       {

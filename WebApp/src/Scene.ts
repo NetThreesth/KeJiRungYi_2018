@@ -18,7 +18,7 @@ export class Scene {
 
 
     private camera: BABYLON.UniversalCamera;
-    private lightOfCamera: BABYLON.Light;
+    private lightOfCamera: BABYLON.PointLight;
     private cameraLocations: BABYLON.Vector3[] = [];
 
 
@@ -175,7 +175,7 @@ export class Scene {
                     this.camera.setTarget(BABYLON.Vector3.Zero());
             }
 
-            this.lightOfCamera['position'] = this.camera.position;
+            this.lightOfCamera.position = this.camera.position;
             this.translateLinesForTextNodes();
             this.translateParticles();
             this.bubbleSprays.forEach(e => e.setParticles());
@@ -314,7 +314,7 @@ export class Scene {
         this.glowLayerForParticle.addIncludedOnlyMesh(core);
 
 
-        const translateVector = this.getRandomVector3();
+        const translateVector = BabylonUtility.getRandomVector3();
         this.particles.push({
             mesh: core,
             translateVector: translateVector,
@@ -322,27 +322,34 @@ export class Scene {
         });
     };
 
-
+    private linesForLinesystem: BABYLON.Vector3[][] = [];
     private linesystem: BABYLON.LinesMesh = null;
     private translateFactor = 0;
+    private startUpdateTextNodeWorker() {
+        if (!window['Worker']) return;
+        const worker = new Worker("dist/UpdateTextNode.worker.js");
+        const next = () => {
+            const textNodes = this.textNodes.map(node => {
+                BabylonUtility.updatePosition(node.position, node.translateVector, node.scale * Math.cos(this.translateFactor));
+                return node.position;
+            });
+            this.translateFactor += 0.01;
+
+            worker.postMessage(textNodes);
+        };
+        worker.onmessage = (message) => {
+            this.linesForLinesystem = message.data;
+            if (this.textNodes.length === 0) return;
+            next();
+        };
+        worker.postMessage(this.textNodes);
+    };
+
     private translateLinesForTextNodes() {
-        if (this.textNodes.length === 0) return;
-        const textNodes = this.textNodes.map(node => {
-            node.z = node.z + Math.cos(this.translateFactor);
-            this.translateFactor += 0.1;
-            return node;
-        });
-        const lines = BabylonUtility.getLineToEachOther(textNodes);
-        // 濾掉太遠的
-        // 效能因素 選少量畫
-        const linesToSelect = CommonUtility.sort(lines, l => l.distance)
-            .slice(100, 2000);
-        const linesToDraw = CommonUtility.shuffle(linesToSelect)
-            .slice(0, 600)
-            .map(l => [l.from, l.to]);
+        if (this.linesForLinesystem.length === 0) return;
 
         this.linesystem = BABYLON.MeshBuilder.CreateLineSystem("linesystem", {
-            lines: linesToDraw,
+            lines: this.linesForLinesystem,
             updatable: true,
             instance: this.linesystem || null
         }, this.scene);
@@ -356,24 +363,14 @@ export class Scene {
         const scale = 0.003;
         this.particles.forEach(p => {
             if (p.duration <= 0) {
-                p.translateVector = this.getRandomVector3();
+                p.translateVector = BabylonUtility.getRandomVector3();
                 p.duration = this.getDurationForParticle();
             }
-            const translateVector = p.translateVector;
-            p.mesh.position.x += (translateVector.x * scale);
-            p.mesh.position.y += (translateVector.y * scale);
-            p.mesh.position.z += (translateVector.z * scale);
+            BabylonUtility.updatePosition(p.mesh.position, p.translateVector, scale);
             p.duration -= 1;
         });
     };
 
-    private getRandomVector3() {
-        return new BABYLON.Vector3(
-            CommonUtility.getRandomInt(),
-            CommonUtility.getRandomInt(),
-            CommonUtility.getRandomInt()
-        ).normalize();
-    };
 
     // unit: frame number
     private getDurationForParticle() {
@@ -479,7 +476,11 @@ export class Scene {
 
 
 
-    private textNodes: BABYLON.Vector3[] = [];
+    private textNodes: {
+        position: BABYLON.Vector3,
+        scale: number,
+        translateVector: BABYLON.Vector3
+    }[] = [];
 
     getTexts() {
         var img = new Image();
@@ -533,15 +534,20 @@ export class Scene {
             this.textNodes = pixels
                 .filter(p => p.brightness > 100)
                 .map((p, i) => {
-                    const rate = 0.5;
+                    const rate = 0.15;
                     // const s = BABYLON.Mesh.CreateSphere(`pixels-${i}`, 2, 0.2, this.scene);
                     const position = new BABYLON.Vector3(
                         (p.x - 32) * rate,
                         (p.y - 32) * -1 * rate,
-                        10 + CommonUtility.getRandomNumberInRange(0, 5, 2)
+                        -15 + CommonUtility.getRandomNumberInRange(0, 2, 2)
                     );
-                    return position;
+                    return {
+                        position: position,
+                        scale: CommonUtility.getRandomNumberInRange(-0.05, 0.05, 3),
+                        translateVector: BabylonUtility.getRandomVector3(false, false)
+                    };
                 });
+            this.startUpdateTextNodeWorker();
         };
     };
 
