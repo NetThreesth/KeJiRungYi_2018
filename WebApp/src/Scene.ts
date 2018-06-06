@@ -7,7 +7,6 @@ import { ControlPanel } from './ControlPanel';
 
 export class Scene {
 
-    private lineCountLimit = 8 * 10; // 8個聊天室
     private texts: BABYLON.Mesh[] = [];
 
 
@@ -31,7 +30,7 @@ export class Scene {
 
         this.initScene();
         this.getTexts();
-        // this.getPoints();
+        this.getPoints();
 
         this.registerRunRenderLoop();
         // new ControlPanel().initPanel(this.onTextAdd.bind(this), this.onImageAdd.bind(this));
@@ -357,19 +356,19 @@ export class Scene {
         }, this.scene);
         this.linesystem.color = BABYLON.Color3.White();
 
-/*         if (inited = false) {
-            const color = this.colorSetForLines[2];
-            this.linesystem.color = new BABYLON.Color3(color[0], color[1], color[2]);
-
-            const highlightForLine: BABYLON.HighlightLayer = this.highlightForLine =
-                this.highlightForLine ||
-                function () {
-                    const highlightForLine = new BABYLON.HighlightLayer("highlightForLine", this.scene);
-                    highlightForLine.innerGlow = false;
-                    return highlightForLine;
-                }.bind(this)();
-            highlightForLine.addMesh(this.linesystem, this.glowColor);
-        } */
+        /*         if (inited = false) {
+                    const color = this.colorSetForLines[2];
+                    this.linesystem.color = new BABYLON.Color3(color[0], color[1], color[2]);
+        
+                    const highlightForLine: BABYLON.HighlightLayer = this.highlightForLine =
+                        this.highlightForLine ||
+                        function () {
+                            const highlightForLine = new BABYLON.HighlightLayer("highlightForLine", this.scene);
+                            highlightForLine.innerGlow = false;
+                            return highlightForLine;
+                        }.bind(this)();
+                    highlightForLine.addMesh(this.linesystem, this.glowColor);
+                } */
     };
 
     private translateParticles() {
@@ -406,7 +405,7 @@ export class Scene {
                 });
                 let lines: Line[] = [];
 
-                const take = this.lineCountLimit / 8;
+                const take = 120;
                 pointInGroups.forEach(points => {
                     const linesInGroup = BabylonUtility.getLineToEachOther(points);
                     const maxLine = CommonUtility.sort(linesInGroup, e => e.distance)[linesInGroup.length - 1];
@@ -417,7 +416,7 @@ export class Scene {
                     this.chatRooms.push(center);
                     this.createBubbleSpray(center);
 
-                    for (let i = 0; i < 30; i++) {
+                    for (let i = 0; i < 10; i++) {
                         this.createParticle(center);
                     }
                     lines = lines.concat(linesInGroup.slice(0, take));
@@ -437,7 +436,6 @@ export class Scene {
         [192, 231, 164],
         [168, 213, 133]
     ].map(set => set.map(n => n / 255));
-    private lineMeshes: BABYLON.Mesh[] = [];
 
 
     private glowColor = function () {
@@ -446,10 +444,8 @@ export class Scene {
     }();
 
     private drawLine(lines: Line[]) {
-        const oldLineMeshes = this.lineMeshes.splice(0, lines.length);
-        oldLineMeshes.forEach(mesh => mesh.material.alpha = 1);
-        this.lineMeshes.forEach(mesh => mesh.material.alpha = 0);
 
+        if (lines.length === 0) return;
 
         const highlightForLine = this.highlightForLine =
             this.highlightForLine ||
@@ -459,9 +455,6 @@ export class Scene {
                 return highlightForLine;
             }.bind(this)();
 
-
-
-
         const materials = this.colorSetForLines.map((colorInRGB, i) => {
             const color = new BABYLON.Color3(colorInRGB[0], colorInRGB[1], colorInRGB[2]);
             const mat = new BABYLON.StandardMaterial(`lineMat${i}`, this.scene);
@@ -469,26 +462,22 @@ export class Scene {
             return mat;
         });
 
-        if (lines.length === 0) return;
         const meshContainer: BABYLON.Mesh[][] = [[], [], []];
         lines.forEach((e, i) => {
             const materialIndex = CommonUtility.getRandomIntInRange(0, 2);
             const line = BABYLON.MeshBuilder.CreateTube(`line${i}`, {
                 path: [e.from, e.to],
                 radius: 0.03,
-                updatable: true,
-                instance: oldLineMeshes[i] || null
+                updatable: false
             }, this.scene);
-            line.material = oldLineMeshes[i] ? line.material : materials[materialIndex];
-            // meshContainer[materialIndex].push(line);
-            this.lineMeshes.push(line);
+            line.material = materials[materialIndex];
+            meshContainer[materialIndex].push(line);
         });
-        /*         meshContainer.forEach(group => {
-                    if (group.length === 0) return;
-                    const merged = BABYLON.Mesh.MergeMeshes(group, false, false);
-                    this.lineMeshes.push(merged);
-                    highlightForLine.addMesh(merged, this.glowColor);
-                }); */
+        meshContainer.forEach(group => {
+            if (group.length === 0) return;
+            const merged = BABYLON.Mesh.MergeMeshes(group, true, false);
+            highlightForLine.addMesh(merged, this.glowColor);
+        });
     };
 
 
