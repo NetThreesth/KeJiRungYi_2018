@@ -327,7 +327,7 @@ export class Scene {
     private translateFactor = 0;
     private startUpdateTextNodeWorker() {
         if (!window['Worker']) return;
-        const worker = new Worker("dist/UpdateTextNode.worker.js");
+        const worker = new Worker("dist/UpdateTextNodeWorker.js");
         const next = () => {
             const textNodes = this.textNodes.map(node => {
                 BabylonUtility.updatePosition(node.position, node.translateVector, node.scale * Math.cos(this.translateFactor));

@@ -8,6 +8,45 @@ export class LoginPanel {
 
     init() {
         gapi.load('client', this.initClient.bind(this));
+        this.wordCardsAnimation();
+    };
+
+    private wordCardsAnimation() {
+        const fadeAnimation = (
+            ele: HTMLElement,
+            times: {
+                fadeIn: number,
+                sustain?: number,
+                fadeOut?: number
+            },
+            onComplete: () => void
+        ) => {
+
+            const $ele = $(ele)
+            $ele.fadeIn(times.fadeIn, undefined, () => {
+                if (!times.fadeOut) return;
+                setTimeout(() => {
+                    $ele.fadeOut(times.fadeOut, undefined, () => {
+                        onComplete();
+                    });
+
+                }, times.sustain || 0);
+            });
+        };
+        const fadeSequence = (eleArray: HTMLElement[]) => {
+            if (eleArray.length === 0) return;
+
+            const times = {
+                fadeIn: 3000,
+                sustain: 1000,
+                fadeOut: (eleArray.length > 1) ? 2000 : null
+            }
+            fadeAnimation(eleArray.shift(), times, () => {
+                fadeSequence(eleArray);
+            });
+        };
+        const $wordCards = $('#loginPanel > div');
+        fadeSequence($wordCards.toArray());
     };
 
     private initClient() {
@@ -26,7 +65,7 @@ export class LoginPanel {
 
     private setSignInButton() {
         gapi.auth2.getAuthInstance().isSignedIn.listen(this.login.bind(this));
-        $('#signInWrapper').show();
+        // $('#signInWrapper').show();
         $('#signinButton').on('click', () => gapi.auth2.getAuthInstance().signIn());
     };
 
@@ -43,7 +82,7 @@ export class LoginPanel {
     };
 
     private setLoiginButton(name) {
-        $('#signInWrapper').show();
+        // $('#signInWrapper').show();
         $('#signInWrapper .buttonText').text(name);
         $('#signinButton').on('click', this.login.bind(this));
     };

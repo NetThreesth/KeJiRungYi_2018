@@ -3,7 +3,8 @@
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Scene Test</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <title>KeJiRungYi</title>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-beta.40/css/uikit.min.css" />
     <style>
@@ -99,25 +100,25 @@
             padding: 3px;
         }
 
+
+
+
         #loginPanel {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.2);
+            background-color: rgba(0, 0, 0, 0.3);
             overflow: auto;
         }
 
-        #loginPanel .contentContainer {
-            width: 80%;
-            max-width: 600px;
-            padding: 50px 0;
+
+        #loginPanel>div {
+            display: none;
+            white-space: nowrap;
         }
 
-        #centerByMargin {
-            margin: 0 auto;
-        }
 
         #signinButton {
             display: inline-block;
@@ -135,10 +136,7 @@
             cursor: pointer;
         }
 
-        #signInWrapper {
-            display: none;
-            text-align: center;
-        }
+
 
         #signInWrapper .label {
             font-family: serif;
@@ -153,6 +151,12 @@
             height: 30px;
         }
 
+
+
+
+        #centerByMargin {
+            margin: 0 auto;
+        }
 
         .flex {
             display: flex;
@@ -171,9 +175,14 @@
             justify-content: center;
         }
 
+
         .white-text {
             color: #fff;
             text-shadow: 0px 0px 6px #404040;
+        }
+
+        .text-center {
+            text-align: center;
         }
     </style>
 </head>
@@ -210,18 +219,32 @@
     </div>
 
     <div id="loginPanel" class="flex flex-center">
-        <div class="contentContainer">
-            <p id="intro" class="white-text">
-            </p>
 
-            <div id="signInWrapper">
-                <span class="label white-text">Sign in with Google Account:&nbsp;</span>
-                <div id="signinButton">
-                    <span class="icon"></span>
-                    <span class="buttonText">Google</span>
-                </div>
+        <div class="white-text text-center">
+            概念有名而成數據，
+            <br> 物體無形而成概念，
+            <br> 彼自成空間；
+        </div>
+        <div class="white-text text-center">
+            萬物竄流宇宙，
+            <br> 在邊隙處落下，
+            <br> 於彼端再現；
+        </div>
+        <div class="white-text text-center">
+            千萬形貌，
+            <br> 終歸涅槃，
+            <br> 生生不息，
+            <br> 周而復始。
+        </div>
+        <div id="signInWrapper">
+            <span class="label white-text">Sign in with Google Account:&nbsp;</span>
+            <div id="signinButton">
+                <span class="icon"></span>
+                <span class="buttonText">Google</span>
             </div>
         </div>
+
+
     </div>
 
 

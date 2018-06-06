@@ -3,7 +3,7 @@ const path = require('path');
 module.exports = {
   entry: {
     'main': './src/main.ts',
-    'UpdateTextNode.worker': './src/UpdateTextNode.worker.ts'
+    'UpdateTextNodeWorker': './src/UpdateTextNodeWorker.ts'
   },
   module: {
     rules: [
