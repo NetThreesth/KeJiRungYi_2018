@@ -6,7 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
     <title>KeJiRungYi</title>
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-beta.40/css/uikit.min.css" />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp"
+        crossorigin="anonymous">
+
     <style>
         html,
         body {
@@ -17,20 +19,17 @@
             padding: 0;
         }
 
+
+        /* renderCanvas */
+
         #renderCanvas {
             width: 100%;
             height: 100%;
             touch-action: none;
         }
 
-        .mask {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-        }
+
+        /* flash */
 
         .flash {
             -webkit-animation-name: flash-animation;
@@ -58,6 +57,9 @@
             }
         }
 
+
+        /* mark */
+
         .mark {
             position: fixed;
             top: 0;
@@ -68,24 +70,58 @@
             border: 1px solid thistle;
             padding: 6px;
             display: none;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
         }
+
+
+        /* control-panel */
 
         .control-panel {
             position: fixed;
             bottom: 0;
-            right: 0;
+            left: 0;
             width: 100%;
-            border-top: 1px solid lightgray;
-            padding: 3px 0;
         }
 
-        .control-panel>* {
-            padding: 0px;
+
+        .control-panel .buttons button {
+            font-size: 1.8em;
+            border: 0;
         }
 
-        .control-panel button {
-            padding: 0px 12px;
+
+        .control-panel .buttons button {
+            font-size: 1.8em;
+            border: 0;
         }
+
+        .control-panel #textInput {
+            width: 100%;
+            max-width: 35em;
+        }
+
+        .control-panel #textInput>* {
+            height: 1.8em;
+        }
+
+        .control-panel #textInput input {
+            background-color: transparent;
+            border: solid 1px white;
+            border-radius: 1px;
+            width: 80%;
+        }
+
+        .control-panel #textInput #sent {
+            border: solid 1px white;
+            border-radius: 1px;
+            margin: 0;
+        }
+
+
+
+        /* devPanel */
 
         #devPanel {
             display: none;
@@ -102,6 +138,7 @@
 
 
 
+        /* loginPanel */
 
         #loginPanel {
             position: fixed;
@@ -153,6 +190,12 @@
 
 
 
+        /* utility */
+
+        button {
+            background-color: transparent;
+            cursor: pointer;
+        }
 
         #centerByMargin {
             margin: 0 auto;
@@ -177,46 +220,32 @@
 
 
         .white-text {
-            color: #fff;
+            color: white;
             text-shadow: 0px 0px 6px #404040;
         }
 
         .text-center {
             text-align: center;
         }
+
+        .visible {
+            opacity: 1;
+        }
+
+        .invisible {
+            opacity: 0;
+        }
+
+        .transition-all {
+            -webkit-transition: all 0.3s ease;
+            -moz-transition: all 0.3s ease;
+            -o-transition: all 0.3s ease;
+            transition: all 0.3s ease;
+        }
     </style>
 </head>
 
 <body>
-
-    <canvas id="renderCanvas" touch-action="none"></canvas>
-    <!--     <div class="mask"></div>
-    <div class="mark">HTML based Text</div>
-
-    <div class="control-panel uk-grid uk-background-muted">
-        <input type="text" class="uk-input uk-width-expand js-input">
-        <button id="js-sent" class="uk-button uk-button-default uk-width-auto">Sent</button>
-        <div class="uk-width-auto" uk-form-custom>
-            <input id="js-upload" type="file" accept="image/*">
-            <button class="uk-button uk-button-default" type="button" tabindex="-1">
-                <span uk-icon="camera"></span>
-            </button>
-        </div>
-    </div> -->
-    <div id="devPanel">
-        <table>
-            <tbody>
-                <tr>
-                    <td>FPS</td>
-                    <td id="fps"></td>
-                </tr>
-                <tr>
-                    <td>Coordinate</td>
-                    <td id="coordinate"></td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
 
     <div id="loginPanel" class="flex flex-center">
 
@@ -243,8 +272,48 @@
                 <span class="buttonText">Google</span>
             </div>
         </div>
+    </div>
 
 
+    <div id="devPanel">
+        <table>
+            <tbody>
+                <tr>
+                    <td>FPS</td>
+                    <td id="fps"></td>
+                </tr>
+                <tr>
+                    <td>Coordinate</td>
+                    <td id="coordinate"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <canvas id="renderCanvas" touch-action="none"></canvas>
+
+
+    <div class="mask"></div>
+    <!-- <div class="mark">HTML based Text</div> -->
+
+    <div class="control-panel flex flex-column flex-center">
+        <div class="buttons">
+            <button id="textInputSwitch" class="white-text" type="button">
+                <i class="far fa-comment-dots"></i>
+            </button>
+            <button class="white-text" type="button">
+                <i class="fas fa-camera-retro"></i>
+            </button>
+            <input id="fileUpload" type="file" accept="image/*" style="display: none">
+        </div>
+
+
+        <span id="textInput" class="flex flex-center transition-all invisible">
+            <input type="text">
+            <button id="sent" class="white-text">
+                <i class="fas fa-share"></i>
+            </button>
+        </span>
     </div>
 
 

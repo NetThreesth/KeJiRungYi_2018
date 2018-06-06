@@ -2,14 +2,13 @@ import * as BABYLON from 'babylonjs';
 import * as $ from 'jquery';
 import { CommonUtility } from './CommonUtility';
 import { BabylonUtility, Line } from './BabylonUtility';
-import { Panel } from './Panel';
+import { ControlPanel } from './ControlPanel';
 
 
 export class Scene {
 
     private lineCountLimit = 8 * 10; // 8個聊天室
     private texts: BABYLON.Mesh[] = [];
-    private panel: Panel = new Panel();
 
 
     private canvas = document.getElementById("renderCanvas");
@@ -35,7 +34,7 @@ export class Scene {
         // this.getPoints();
 
         this.registerRunRenderLoop();
-        this.panel.initPanel(this.addText.bind(this), this.addImage.bind(this));
+        // new ControlPanel().initPanel(this.onTextAdd.bind(this), this.onImageAdd.bind(this));
 
 
         $('#devPanel').show();
@@ -215,7 +214,7 @@ export class Scene {
         $coordinate.innerHTML = BabylonUtility.positionToString(this.camera.position);
     };
 
-    private addText(text: string, x: number, y: number, z: number) {
+    private onTextAdd(text: string, x: number, y: number, z: number) {
         const outputplaneTexture = new BABYLON.DynamicTexture(
             "dynamic texture",
             { width: 500, height: 80 },
@@ -244,7 +243,7 @@ export class Scene {
     };
 
 
-    private addImage(image: string, x: number, y: number, z: number) {
+    private onImageAdd(image: string, x: number, y: number, z: number) {
         const outputplaneTexture = BABYLON.Texture.CreateFromBase64String(
             image,
             'image-' + Date.now,
