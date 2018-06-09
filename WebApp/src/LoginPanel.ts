@@ -11,42 +11,62 @@ export class LoginPanel {
         this.wordCardsAnimation();
     };
 
-    private wordCardsAnimation() {
-        const fadeAnimation = (
-            ele: HTMLElement,
-            times: {
-                fadeIn: number,
-                sustain?: number,
-                fadeOut?: number
-            },
-            onComplete: () => void
-        ) => {
+    afterWordCardsAnimation = () => { };
 
-            const $ele = $(ele)
-            $ele.fadeIn(times.fadeIn, undefined, () => {
-                if (!times.fadeOut) return;
-                setTimeout(() => {
-                    $ele.fadeOut(times.fadeOut, undefined, () => {
-                        onComplete();
-                    });
+    private fadeAnimation(
+        ele: HTMLElement,
+        times: {
+            fadeIn: number,
+            sustain?: number,
+            fadeOut?: number
+        },
+        onComplete: () => void
+    ) {
 
-                }, times.sustain || 0);
-            });
-        };
-        const fadeSequence = (eleArray: HTMLElement[]) => {
-            if (eleArray.length === 0) return;
-
-            const times = {
-                fadeIn: 3000,
-                sustain: 1000,
-                fadeOut: (eleArray.length > 1) ? 2000 : null
+        const $ele = $(ele)
+        $ele.fadeIn(times.fadeIn, undefined, () => {
+            if (!times.fadeOut) {
+                onComplete();
+                return;
             }
-            fadeAnimation(eleArray.shift(), times, () => {
-                fadeSequence(eleArray);
-            });
-        };
+            setTimeout(() => {
+                $ele.fadeOut(times.fadeOut, undefined, () => {
+                    onComplete();
+                });
+
+            }, times.sustain || 0);
+        });
+    };
+
+    private fadeSequence(
+        eleArray: HTMLElement[],
+        setting: {
+            fadeIn: number,
+            sustain: number,
+            fadeOut: number
+        },
+        afterFunc: () => void) {
+
+        if (eleArray.length === 0) {
+            afterFunc();
+            return;
+        }
+
+        setting.fadeOut = (eleArray.length > 1) ? setting.fadeOut : null;
+        this.fadeAnimation(eleArray.shift(), setting, () => {
+            this.fadeSequence(eleArray, setting, afterFunc);
+        });
+    };
+
+    private wordCardsAnimation() {
+
         const $wordCards = $('#loginPanel > div');
-        fadeSequence($wordCards.toArray());
+        const times = {
+            fadeIn: 3000,
+            sustain: 1000,
+            fadeOut: 2000
+        };
+        this.fadeSequence($wordCards.toArray(), times, this.afterWordCardsAnimation);
     };
 
     private initClient() {

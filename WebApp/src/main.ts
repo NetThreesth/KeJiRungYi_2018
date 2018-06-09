@@ -5,10 +5,11 @@ import { MessageBoard } from './MessageBoard';
 
 
 const loginPanel = new LoginPanel();
-loginPanel.init();
 const scene = new Scene();
-scene.init();
+loginPanel.afterWordCardsAnimation = scene.transformation.bind(scene);
 loginPanel.afterLogin = scene.zoomIn.bind(scene);
+loginPanel.init();
+scene.init();
 
 const messageBoard = new MessageBoard();
 // new ControlPanel().initPanel();

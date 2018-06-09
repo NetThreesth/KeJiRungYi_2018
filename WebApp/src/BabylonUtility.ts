@@ -11,7 +11,22 @@ export class BabylonUtility {
         return Math.sqrt(dx * dx + dy * dy + dz * dz);
     };
 
+    static addVector(v1: BABYLON.Vector3, v2: BABYLON.Vector3) {
+        return new BABYLON.Vector3(
+            v1.x + v2.x,
+            v1.y + v2.y,
+            v1.z + v2.z
+        );
+    };
 
+    static subtractVector(v1: BABYLON.Vector3, v2: BABYLON.Vector3) {
+        return new BABYLON.Vector3(
+            v1.x - v2.x,
+            v1.y - v2.y,
+            v1.z - v2.z
+        );
+    };
+    
     static getRandomVector3(randomOnX = true, randomOnY = true, randomOnZ = true) {
         return new BABYLON.Vector3(
             randomOnX ? CommonUtility.getRandomInt() : 0,

@@ -169,8 +169,11 @@ export class Scene {
 
             if (this.cameraLocations.length > 0) {
                 const position = this.camera.position = this.cameraLocations.shift();
-                if (this.cameraLocations.length >= 1)
+                if (this.cameraLocations.length >= 1) {
                     this.camera.setTarget(BABYLON.Vector3.Zero());
+                    if (this.cameraLocations.length === 1)
+                        this.createBubbleSprayAndParticles();
+                }
             }
 
             this.lightOfCamera.position = this.camera.position;
@@ -186,21 +189,21 @@ export class Scene {
             /** render after */
             this.updateDevPanel();
 
-            const text = this.texts[0];
-            if (!text) return;
-            const transformationMatrix = this.camera.getViewMatrix().multiply(this.camera.getProjectionMatrix());
-            const projectedPosition = BABYLON.Vector3.Project(origin, text.computeWorldMatrix(false), transformationMatrix, viewport);
-
-            if (projectedPosition.z > 1) {
-                $mark.hide();
-                return;
-            }
-            $mark.show();
-            $mark.css('top', projectedPosition.y + 60);
-            $mark.css('left', projectedPosition.x);
-            const scale = 1 / (1 - projectedPosition.z);
-            // $mark.css('transform', 'translate(-50%, -50%) scale(' + scale + ',' + scale + ')');
-            $mark.text(JSON.stringify(projectedPosition));
+            /*             const text = this.texts[0];
+                        if (!text) return;
+                        const transformationMatrix = this.camera.getViewMatrix().multiply(this.camera.getProjectionMatrix());
+                        const projectedPosition = BABYLON.Vector3.Project(origin, text.computeWorldMatrix(false), transformationMatrix, viewport);
+            
+                        if (projectedPosition.z > 1) {
+                            $mark.hide();
+                            return;
+                        }
+                        $mark.show();
+                        $mark.css('top', projectedPosition.y + 60);
+                        $mark.css('left', projectedPosition.x);
+                        const scale = 1 / (1 - projectedPosition.z);
+                        // $mark.css('transform', 'translate(-50%, -50%) scale(' + scale + ',' + scale + ')');
+                        $mark.text(JSON.stringify(projectedPosition)); */
             /** render after end */
         });
     };
@@ -323,21 +326,43 @@ export class Scene {
     private linesForLinesystem: BABYLON.Vector3[][] = [];
     private linesystem: BABYLON.LinesMesh = null;
     private translateFactor = 0;
+    private translateType: 'Simple' | 'ToOrigin' | 'ToChatRoomNode' = 'Simple';
     private startUpdateTextNodeWorker() {
         if (!window['Worker']) return;
         const worker = new Worker("dist/UpdateTextNodeWorker.js");
         const next = () => {
-            const textNodes = this.textNodes.map(node => {
-                BabylonUtility.updatePosition(node.position, node.translateVector, node.scale * Math.cos(this.translateFactor));
-                return node.position;
-            });
-            this.translateFactor += 0.01;
-
-            worker.postMessage(textNodes);
+            let nodes: BABYLON.Vector3[] = [];
+            if (this.translateType === 'Simple') {
+                nodes = this.textNodes.map(node => {
+                    BabylonUtility.updatePosition(node.position, node.translateVector, node.scale * Math.cos(this.translateFactor));
+                    return node.position;
+                });
+                this.translateFactor += 0.01;
+            }
+            else if (this.translateType === 'ToOrigin') {
+                nodes = this.textNodes.map(node => {
+                    const vector = new BABYLON.Vector3(-node.position.x, -node.position.y, -node.position.z).normalize();
+                    BabylonUtility.updatePosition(node.position, vector, 0.5);
+                    return node.position;
+                });
+            }
+            else if (this.translateType === 'ToChatRoomNode') {
+                this.textNodes = this.textNodes.slice(0, this.chatRoomsNodes.length);
+                nodes = this.textNodes.map((node, i) => {
+                    const vector = BabylonUtility.subtractVector(this.chatRoomsNodes[i], node.position).normalize();
+                    BabylonUtility.updatePosition(node.position, vector, 0.5);
+                    return node.position;
+                });
+            }
+            worker.postMessage(nodes);
         };
         worker.onmessage = (message) => {
+            if (this.textNodes.length === 0) {
+                this.linesForLinesystem.length = 0;
+                this.linesystem.dispose();
+                return;
+            }
             this.linesForLinesystem = message.data;
-            if (this.textNodes.length === 0) return;
             next();
         };
         worker.postMessage(this.textNodes);
@@ -346,29 +371,12 @@ export class Scene {
     private translateLinesForTextNodes() {
         if (this.linesForLinesystem.length === 0) return;
 
-        let inited = false;
-        if (this.linesystem) inited = true;
-
         this.linesystem = BABYLON.MeshBuilder.CreateLineSystem("linesystem", {
             lines: this.linesForLinesystem,
             updatable: true,
             instance: this.linesystem || null
         }, this.scene);
         this.linesystem.color = BABYLON.Color3.White();
-
-        /*         if (inited = false) {
-                    const color = this.colorSetForLines[2];
-                    this.linesystem.color = new BABYLON.Color3(color[0], color[1], color[2]);
-        
-                    const highlightForLine: BABYLON.HighlightLayer = this.highlightForLine =
-                        this.highlightForLine ||
-                        function () {
-                            const highlightForLine = new BABYLON.HighlightLayer("highlightForLine", this.scene);
-                            highlightForLine.innerGlow = false;
-                            return highlightForLine;
-                        }.bind(this)();
-                    highlightForLine.addMesh(this.linesystem, this.glowColor);
-                } */
     };
 
     private translateParticles() {
@@ -390,7 +398,9 @@ export class Scene {
         return CommonUtility.getRandomIntInRange(60 * 3, 60 * 6);
     };
 
-    private chatRooms: BABYLON.Vector3[] = [];
+    private chatRoomsNodes: BABYLON.Vector3[] = [];
+    private chatRoomsCenter: BABYLON.Vector3[] = [];
+    private linesForChatRooms: Line[] = [];
 
     private getPoints() {
         $.getJSON(
@@ -401,6 +411,7 @@ export class Scene {
                     const pointInGroup = data[key].map(p =>
                         new BABYLON.Vector3(p.x, p.y, CommonUtility.getRandomNumber(3) * 0.006)
                     );
+                    this.chatRoomsNodes = this.chatRoomsNodes.concat(pointInGroup);
                     pointInGroups[i] = pointInGroup;
                 });
                 let lines: Line[] = [];
@@ -413,20 +424,26 @@ export class Scene {
                     Object.keys(center).forEach(axis => {
                         center[axis] = (maxLine.from[axis] + maxLine.to[axis]) / 2
                     });
-                    this.chatRooms.push(center);
-                    this.createBubbleSpray(center);
-
-                    for (let i = 0; i < 10; i++) {
-                        this.createParticle(center);
-                    }
+                    this.chatRoomsCenter.push(center);
                     lines = lines.concat(linesInGroup.slice(0, take));
                 });
                 console.log(`line count: ${lines.length}`);
-                this.drawLine(lines);
+                this.linesForChatRooms = lines;
             }
         );
     };
 
+
+    private createBubbleSprayAndParticles() {
+        this.chatRoomsCenter.forEach(center => {
+
+            this.createBubbleSpray(center);
+
+            for (let i = 0; i < 10; i++) {
+                this.createParticle(center);
+            }
+        });
+    };
 
 
 
@@ -443,9 +460,9 @@ export class Scene {
         return new BABYLON.Color3(glowColorInRGB[0], glowColorInRGB[1], glowColorInRGB[2])
     }();
 
-    private drawLine(lines: Line[]) {
+    private drawLine() {
 
-        if (lines.length === 0) return;
+        if (this.linesForChatRooms.length === 0) return;
 
         const highlightForLine = this.highlightForLine =
             this.highlightForLine ||
@@ -463,7 +480,7 @@ export class Scene {
         });
 
         const meshContainer: BABYLON.Mesh[][] = [[], [], []];
-        lines.forEach((e, i) => {
+        this.linesForChatRooms.forEach((e, i) => {
             const materialIndex = CommonUtility.getRandomIntInRange(0, 2);
             const line = BABYLON.MeshBuilder.CreateTube(`line${i}`, {
                 path: [e.from, e.to],
@@ -488,7 +505,7 @@ export class Scene {
         translateVector: BABYLON.Vector3
     }[] = [];
 
-    getTexts() {
+    private getTexts() {
         var img = new Image();
         img.src = 'assets/textImage/image.png';
         img.onload = () => {
@@ -550,7 +567,7 @@ export class Scene {
                     return {
                         position: position,
                         scale: CommonUtility.getRandomNumberInRange(-0.05, 0.05, 3),
-                        translateVector: BabylonUtility.getRandomVector3(false, false)
+                        translateVector: BabylonUtility.getRandomVector3(false, false).normalize()
                     };
                 });
             this.startUpdateTextNodeWorker();
@@ -558,15 +575,32 @@ export class Scene {
     };
 
 
+    transformation() {
+        this.translateType = 'ToOrigin';
+        setTimeout(() => {
+            this.translateType = 'ToChatRoomNode';
+        }, 5 * 1000);
+        setTimeout(() => {
+            this.translateType = null;
+            this.textNodes.length = 0;
+            this.drawLine();
+        }, 10 * 1000);
+    };
 
     zoomIn() {
-        const orgin = new BABYLON.Vector3(0, 0, 0);
-        const chatRoom = this.chatRooms[CommonUtility.getRandomIntInRange(0, this.chatRooms.length - 1)];
-        const dist = chatRoom ?
+        const randomChatRoomIndex = CommonUtility.getRandomIntInRange(0, this.chatRoomsCenter.length - 1);
+        const chatRoom = this.chatRoomsCenter[randomChatRoomIndex];
+        const destination = chatRoom ?
             new BABYLON.Vector3(chatRoom.x * 3, chatRoom.y * 3, 0) :
             BABYLON.Vector3.Zero();
 
-        const curve = BABYLON.Curve3.CreateHermiteSpline(this.camera.position, orgin, dist, orgin, 60 * 5);
+        const curve = BABYLON.Curve3.CreateHermiteSpline(
+            this.camera.position,
+            BABYLON.Vector3.Zero(),
+            destination,
+            BABYLON.Vector3.Zero(),
+            60 * 5
+        );
         const points = curve.getPoints();
         this.cameraLocations = points;
     };
