@@ -2,27 +2,27 @@ const path = require('path');
 
 module.exports = {
   entry: {
-    'main': './src/main.ts',
+    'main': './src/main.tsx',
     'UpdateTextNodeWorker': './src/UpdateTextNodeWorker.ts'
-  },
-  module: {
-    rules: [
-      {
-        test: /\.tsx?$/,
-        use: 'ts-loader',
-        exclude: /node_modules/
-      }
-    ]
-  },
-  resolve: {
-    extensions: ['.tsx', '.ts', '.js']
   },
   output: {
     filename: '[name].js',
     path: path.resolve(__dirname, 'dist')
   },
+  devtool: "source-map",
+  resolve: {
+    extensions: ['.tsx', '.ts', '.js']
+  },
+  module: {
+    rules: [
+      { test: /\.tsx?$/, loader: "awesome-typescript-loader" },
+      { enforce: "pre", test: /\.js$/, loader: "source-map-loader" }
+    ]
+  },
   externals: {
     "jquery": "$",
-    "babylonjs": "BABYLON"
+    "babylonjs": "BABYLON",
+    "react": "React",
+    "react-dom": "ReactDOM"
   }
 };

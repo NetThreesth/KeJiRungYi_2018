@@ -35,7 +35,7 @@ export class ControlPanel {
 
         this.onTextAdd(text);
 
-        const $mask = $('.mask');
+        const $mask = $('.flashMask');
         $mask.addClass('flash');
         setTimeout(() => {
             $mask.removeClass('flash');
