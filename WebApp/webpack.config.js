@@ -1,6 +1,7 @@
 const path = require('path');
 
 module.exports = {
+  mode: 'development',
   entry: {
     'main': './src/main.tsx',
     'UpdateTextNodeWorker': './src/UpdateTextNodeWorker.ts'
@@ -9,10 +10,10 @@ module.exports = {
     filename: '[name].js',
     path: path.resolve(__dirname, 'dist')
   },
-  devtool: "source-map",
   resolve: {
     extensions: ['.tsx', '.ts', '.js']
   },
+  devtool: "source-map",
   module: {
     rules: [
       { test: /\.tsx?$/, loader: "awesome-typescript-loader" },

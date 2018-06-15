@@ -1,23 +1,41 @@
 import * as React from "react";
 
+import { MessageCenter, Content, ContentType } from './main';
 
-export class MessageBoard extends React.Component<MessageBoardProps, {}> {
+
+export class MessageBoard
+    extends React.Component<{ messageCenter: MessageCenter }, { contents: Content[] }>
+{
+
+    constructor(props) {
+        super(props);
+        const messageCenter = this.props.messageCenter;
+        this.state = { contents: messageCenter.contents.slice() };
+        this.props.messageCenter.observable.on('add', this.refresh.bind(this));
+    };
 
     render() {
-        return <h1>Len: {this.props.contents.length}</h1>;
-    }
-};
+        const contents = this.state.contents;
+        const tmpls = contents.map(this.createTemplates.bind(this));
+        return tmpls;
+    };
 
+    private createTemplates(content: Content) {
+        if (content.type === ContentType.Text)
+            return this.createTextMessage(content.content);
+        else if (content.type === ContentType.Image)
+            return this.createImageMessage(content.content);
+    };
 
-export enum ContentType {
-    Text, Image
-};
+    private createTextMessage(text: string) {
+        return <div>{text}</div>;
+    };
 
-export interface Content {
-    type: ContentType;
-    content: string;
-};
+    private createImageMessage(base64string: string) {
+        return <img src={"data:image/jpeg;" + base64string} />;
+    };
 
-interface MessageBoardProps {
-    contents: Content[];
+    private refresh() {
+        this.setState({ contents: this.props.messageCenter.contents.slice() });
+    };
 };

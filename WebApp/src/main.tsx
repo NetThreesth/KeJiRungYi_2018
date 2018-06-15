@@ -4,7 +4,7 @@ import * as ReactDOM from "react-dom";
 import { Scene } from './Scene';
 import { LoginPanel } from './LoginPanel';
 import { ControlPanel } from './ControlPanel';
-import { MessageBoard, Content, ContentType } from './MessageBoard';
+import { MessageBoard } from './MessageBoard';
 
 
 const loginPanel = new LoginPanel();
@@ -15,14 +15,39 @@ loginPanel.init();
 scene.init();
 
 
-const contents: Content[] = [{ type: ContentType.Text, content: 'asdasd' }];
+export enum ContentType {
+    Text, Image
+};
+
+export interface Content {
+    type: ContentType;
+    content: string;
+};
+
+export class MessageCenter {
+
+    contents: Content[] = [{ type: ContentType.Text, content: 'asdasd' }];
+    observable = $({});
+
+
+    addText(text) {
+        this.contents.push({ type: ContentType.Text, content: text });
+        this.observable.trigger('add');
+    };
+    addImage(b64String) {
+        this.contents.push({ type: ContentType.Image, content: b64String });
+        this.observable.trigger('add');
+    };
+};
+
+const messageCenter = new MessageCenter();
 new ControlPanel().initPanel(
-    text => contents.push({ type: ContentType.Text, content: text }),
-    b64String => contents.push({ type: ContentType.Image, content: b64String }),
+    messageCenter.addText.bind(messageCenter),
+    messageCenter.addImage.bind(messageCenter)
 );
 
 
 ReactDOM.render(
-    <MessageBoard contents={contents} />,
-    document.getElementById("MessageBoard")
+    <MessageBoard messageCenter={messageCenter} />,
+    document.getElementById("messageBoard")
 );
