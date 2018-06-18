@@ -32,7 +32,17 @@ export class MessageBoard
     };
 
     private createImageMessage(base64string: string) {
-        return <img src={"data:image/jpeg;" + base64string} />;
+        const style = {
+            width: '60%',
+            maxWidth: '600px'
+        };
+        return <div><img src={base64string} style={style} /></div>;
+        /* 
+                const style = {
+                    width: "500px",
+                    backgroundImage: `url(${base64string})`
+                };
+                return <div style={style}></div>; */
     };
 
     private refresh() {

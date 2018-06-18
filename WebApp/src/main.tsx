@@ -10,7 +10,10 @@ import { MessageBoard } from './MessageBoard';
 const loginPanel = new LoginPanel();
 const scene = new Scene();
 loginPanel.afterWordCardsAnimation = scene.transformation.bind(scene);
-loginPanel.afterLogin = scene.zoomIn.bind(scene);
+loginPanel.afterLogin = () => {
+    $('.control-panel').removeClass('invisible').addClass('visible');
+    scene.zoomIn.bind(scene)();
+};
 loginPanel.init();
 scene.init();
 
@@ -26,7 +29,7 @@ export interface Content {
 
 export class MessageCenter {
 
-    contents: Content[] = [{ type: ContentType.Text, content: 'asdasd' }];
+    contents: Content[] = [];
     observable = $({});
 
 

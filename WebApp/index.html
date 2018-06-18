@@ -75,6 +75,9 @@
             pointer-events: none;
         }
 
+        .untouchable {
+            pointer-events: none;
+        }
 
         /* control-panel */
 
@@ -86,13 +89,13 @@
         }
 
 
-        .control-panel .buttons button {
+        .control-panel .buttons .button {
             font-size: 1.8em;
             border: 0;
         }
 
 
-        .control-panel .buttons button {
+        .control-panel .buttons .button {
             font-size: 1.8em;
             border: 0;
         }
@@ -185,7 +188,17 @@
             overflow: hidden;
         }
 
+        #messageBoard>div {
+            color: #404040;
+            padding: 3px;
+            margin: 2px;
+            border: 1px solid #eeeeee;
+            border-radius: 5px;
+            width: 60%;
+        }
 
+
+        /* signInWrapper */
 
         #signInWrapper .label {
             font-family: serif;
@@ -204,7 +217,7 @@
 
         /* utility */
 
-        button {
+        .button {
             background-color: transparent;
             cursor: pointer;
         }
@@ -307,23 +320,23 @@
 
     <div class="flashMask"></div>
     <!-- <div class="mark">HTML based Text</div> -->
-    <div id="messageBoard"></div>
+    <div id="messageBoard" class="untouchable"></div>
 
-    <div class="control-panel flex flex-column flex-center">
+    <div class="control-panel flex flex-column flex-center invisible">
         <div class="buttons">
-            <button id="textInputSwitch" class="white-text" type="button">
+            <button id="textInputSwitch" class="button white-text" type="button">
                 <i class="far fa-comment-dots"></i>
             </button>
-            <button class="white-text" type="button">
+            <label for="fileUpload" class="button white-text" type="button">
                 <i class="fas fa-camera-retro"></i>
-            </button>
-            <input id="fileUpload" type="file" accept="image/*" style="display: none">
+            </label>
+            <input id="fileUpload" type="file" accept="image/*" style="display:none;">
         </div>
 
 
         <span id="textInput" class="flex flex-center transition-all invisible">
             <input type="text">
-            <button id="sent" class="white-text">
+            <button id="sent" class="button white-text">
                 <i class="fas fa-share"></i>
             </button>
         </span>

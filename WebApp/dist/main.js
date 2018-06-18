@@ -467,7 +467,18 @@ var MessageBoard = /** @class */ (function (_super) {
     };
     ;
     MessageBoard.prototype.createImageMessage = function (base64string) {
-        return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("img", { src: "data:image/jpeg;" + base64string });
+        var style = {
+            width: '60%',
+            maxWidth: '600px'
+        };
+        return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", null,
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("img", { src: base64string, style: style }));
+        /*
+                const style = {
+                    width: "500px",
+                    backgroundImage: `url(${base64string})`
+                };
+                return <div style={style}></div>; */
     };
     ;
     MessageBoard.prototype.refresh = function () {
@@ -1013,7 +1024,10 @@ __webpack_require__.r(__webpack_exports__);
 var loginPanel = new _LoginPanel__WEBPACK_IMPORTED_MODULE_3__["LoginPanel"]();
 var scene = new _Scene__WEBPACK_IMPORTED_MODULE_2__["Scene"]();
 loginPanel.afterWordCardsAnimation = scene.transformation.bind(scene);
-loginPanel.afterLogin = scene.zoomIn.bind(scene);
+loginPanel.afterLogin = function () {
+    $('.control-panel').removeClass('invisible').addClass('visible');
+    scene.zoomIn.bind(scene)();
+};
 loginPanel.init();
 scene.init();
 var ContentType;
@@ -1025,7 +1039,7 @@ var ContentType;
 ;
 var MessageCenter = /** @class */ (function () {
     function MessageCenter() {
-        this.contents = [{ type: ContentType.Text, content: 'asdasd' }];
+        this.contents = [];
         this.observable = $({});
     }
     MessageCenter.prototype.addText = function (text) {
