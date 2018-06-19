@@ -1,0 +1,39 @@
+/* control-panel */
+
+.control-panel {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+}
+
+
+.control-panel .buttons .button {
+    font-size: 1.8em;
+    border: 0;
+}
+
+
+.control-panel .buttons .button {
+    font-size: 1.8em;
+    border: 0;
+}
+
+.control-panel #textInput {
+    width: 100%;
+    max-width: 35em;
+}
+
+.control-panel #textInput input {
+    background-color: transparent;
+    border: solid 1px white;
+    border-radius: 1px;
+    width: 80%;
+}
+
+.control-panel #textInput #sent {
+    border: solid 1px white;
+    border-radius: 1px;
+    margin: 0;
+}
+
