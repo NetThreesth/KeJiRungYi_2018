@@ -320,7 +320,8 @@ var LoginPanel = /** @class */ (function () {
         this.afterLogin = function () { };
     }
     LoginPanel.prototype.init = function () {
-        gapi.load('client', this.initClient.bind(this));
+        this.setSignInButton();
+        //gapi.load('client', this.initGoogleClient.bind(this));
         this.wordCardsAnimation();
     };
     ;
@@ -354,14 +355,23 @@ var LoginPanel = /** @class */ (function () {
     LoginPanel.prototype.wordCardsAnimation = function () {
         var $wordCards = $('#loginPanel > div');
         var times = {
-            fadeIn: 3000,
+            fadeIn: 5000,
             sustain: 1000,
             fadeOut: 2000
         };
         this.fadeSequence($wordCards.toArray(), times, this.afterWordCardsAnimation);
     };
     ;
-    LoginPanel.prototype.initClient = function () {
+    LoginPanel.prototype.setSignInButton = function () {
+        var _this = this;
+        $('.sign-in-button').on('click', function (e) {
+            var signInName = $('#signInName').val();
+            if (signInName.length > 0)
+                _this.login();
+        });
+    };
+    ;
+    LoginPanel.prototype.initGoogleClient = function () {
         var _this = this;
         gapi.client.init({
             clientId: clientId,
@@ -371,13 +381,13 @@ var LoginPanel = /** @class */ (function () {
         }).then(function () {
             var isSignedIn = gapi.auth2.getAuthInstance().isSignedIn.get();
             if (!isSignedIn)
-                _this.setSignInButton();
+                _this.setGoogleSignInButton();
             else
                 _this.queryUser();
         });
     };
     ;
-    LoginPanel.prototype.setSignInButton = function () {
+    LoginPanel.prototype.setGoogleSignInButton = function () {
         gapi.auth2.getAuthInstance().isSignedIn.listen(this.login.bind(this));
         // $('#signInWrapper').show();
         $('#signinButton').on('click', function () { return gapi.auth2.getAuthInstance().signIn(); });
@@ -923,8 +933,8 @@ var Scene = /** @class */ (function () {
             var context = canvas.getContext('2d');
             context.drawImage(img, 0, 0, width, height);
             // inputs
-            var startX = 64;
-            var startY = 64;
+            var startX = 64 * _CommonUtility__WEBPACK_IMPORTED_MODULE_2__["CommonUtility"].getRandomIntInRange(0, 6);
+            var startY = 64 * _CommonUtility__WEBPACK_IMPORTED_MODULE_2__["CommonUtility"].getRandomIntInRange(0, 6);
             var takeWidth = 64;
             var rateOfWoverH = 1 / 1;
             var takeHeight = takeWidth / rateOfWoverH;
@@ -948,15 +958,15 @@ var Scene = /** @class */ (function () {
                     brightness: brightness
                 });
             }
-            _this.textNodes = pixels
-                .filter(function (p) { return p.brightness > 100; })
+            _this.textNodes = _CommonUtility__WEBPACK_IMPORTED_MODULE_2__["CommonUtility"].sort(pixels, function (p) { return p.brightness; }).reverse()
+                .slice(0, 200)
                 .map(function (p, i) {
-                var rate = 0.15;
+                var rate = 0.12;
                 // const s = BABYLON.Mesh.CreateSphere(`pixels-${i}`, 2, 0.2, this.scene);
-                var position = new babylonjs__WEBPACK_IMPORTED_MODULE_0__["Vector3"]((p.x - 32) * rate, (p.y - 32) * -1 * rate, -15 + _CommonUtility__WEBPACK_IMPORTED_MODULE_2__["CommonUtility"].getRandomNumberInRange(0, 2, 2));
+                var position = new babylonjs__WEBPACK_IMPORTED_MODULE_0__["Vector3"]((p.x - 32) * rate, (p.y - 32) * -1 * rate, -15 + _CommonUtility__WEBPACK_IMPORTED_MODULE_2__["CommonUtility"].getRandomNumberInRange(0, 2, 3));
                 return {
                     position: position,
-                    scale: _CommonUtility__WEBPACK_IMPORTED_MODULE_2__["CommonUtility"].getRandomNumberInRange(-0.05, 0.05, 3),
+                    scale: _CommonUtility__WEBPACK_IMPORTED_MODULE_2__["CommonUtility"].getRandomNumberInRange(-0.03, 0.03, 3),
                     translateVector: _BabylonUtility__WEBPACK_IMPORTED_MODULE_3__["BabylonUtility"].getRandomVector3(false, false).normalize()
                 };
             });
@@ -969,12 +979,12 @@ var Scene = /** @class */ (function () {
         this.translateType = 'ToOrigin';
         setTimeout(function () {
             _this.translateType = 'ToChatRoomNode';
-        }, 5 * 1000);
+        }, 1 * 1000);
         setTimeout(function () {
             _this.translateType = null;
             _this.textNodes.length = 0;
             _this.drawLine();
-        }, 10 * 1000);
+        }, 1.8 * 1000);
     };
     ;
     Scene.prototype.zoomIn = function () {

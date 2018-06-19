@@ -7,7 +7,8 @@ const apiKey = 'AIzaSyBmozdLmtDDry_ah4NhYPqOTeZ2wr9Er2A';
 export class LoginPanel {
 
     init() {
-        gapi.load('client', this.initClient.bind(this));
+        this.setSignInButton();
+        //gapi.load('client', this.initGoogleClient.bind(this));
         this.wordCardsAnimation();
     };
 
@@ -62,14 +63,25 @@ export class LoginPanel {
 
         const $wordCards = $('#loginPanel > div');
         const times = {
-            fadeIn: 3000,
+            fadeIn: 5000,
             sustain: 1000,
             fadeOut: 2000
         };
         this.fadeSequence($wordCards.toArray(), times, this.afterWordCardsAnimation);
     };
 
-    private initClient() {
+
+    private setSignInButton() {
+
+        $('.sign-in-button').on('click', e => {
+            const signInName = $('#signInName').val() as string;
+            if (signInName.length > 0)
+                this.login();
+        });
+    };
+
+
+    private initGoogleClient() {
         gapi.client.init({
             clientId: clientId,
             apiKey: apiKey,
@@ -77,13 +89,12 @@ export class LoginPanel {
             scope: 'profile'
         }).then(() => {
             const isSignedIn = gapi.auth2.getAuthInstance().isSignedIn.get();
-            if (!isSignedIn) this.setSignInButton();
+            if (!isSignedIn) this.setGoogleSignInButton();
             else this.queryUser();
         });
     };
 
-
-    private setSignInButton() {
+    private setGoogleSignInButton() {
         gapi.auth2.getAuthInstance().isSignedIn.listen(this.login.bind(this));
         // $('#signInWrapper').show();
         $('#signinButton').on('click', () => gapi.auth2.getAuthInstance().signIn());

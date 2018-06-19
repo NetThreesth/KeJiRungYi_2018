@@ -105,10 +105,6 @@
             max-width: 35em;
         }
 
-        .control-panel #textInput>* {
-            height: 1.8em;
-        }
-
         .control-panel #textInput input {
             background-color: transparent;
             border: solid 1px white;
@@ -213,9 +209,26 @@
             height: 30px;
         }
 
+        .sign-in-button {
+            background: transparent;
+            padding: 0;
+            border: none;
+            color: #ecffec;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
 
 
         /* utility */
+
+        input[type=text] {
+            background-color: transparent;
+            border: 1px solid #ffffff;
+            border-radius: 3px;
+            height: 24px;
+            color: #ffffff;
+        }
 
         .button {
             background-color: transparent;
@@ -291,11 +304,15 @@
             <br> 周而復始。
         </div>
         <div id="signInWrapper">
-            <span class="label white-text">Sign in with Google Account:&nbsp;</span>
-            <div id="signinButton">
+            <span class="label white-text">Sign in with:&nbsp;</span>
+            <input type="text" id=signInName />
+            <button type="button" class="sign-in-button">
+                <i class="fas fa-arrow-circle-right"></i>
+            </button>
+            <!--             <div id="signinButton">
                 <span class="icon"></span>
                 <span class="buttonText">Google</span>
-            </div>
+            </div> -->
         </div>
     </div>
 
@@ -322,7 +339,7 @@
     <!-- <div class="mark">HTML based Text</div> -->
     <div id="messageBoard" class="untouchable"></div>
 
-    <div class="control-panel flex flex-column flex-center invisible">
+    <div class="control-panel flex flex-column flex-center transition-all invisible">
         <div class="buttons">
             <button id="textInputSwitch" class="button white-text" type="button">
                 <i class="far fa-comment-dots"></i>

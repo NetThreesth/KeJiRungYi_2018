@@ -506,27 +506,27 @@ export class Scene {
     }[] = [];
 
     private getTexts() {
-        var img = new Image();
+        const img = new Image();
         img.src = 'assets/textImage/image.png';
         img.onload = () => {
-            var canvas = document.createElement('canvas');
-            var height = canvas.height = img.height;
-            var width = canvas.width = img.width;
-            var context = canvas.getContext('2d');
+            const canvas = document.createElement('canvas');
+            const height = canvas.height = img.height;
+            const width = canvas.width = img.width;
+            const context = canvas.getContext('2d');
             context.drawImage(img, 0, 0, width, height);
 
 
             // inputs
-            var startX = 64;
-            var startY = 64;
-            var takeWidth = 64;
-            var rateOfWoverH = 1 / 1;
+            const startX = 64 * CommonUtility.getRandomIntInRange(0, 6);
+            const startY = 64 * CommonUtility.getRandomIntInRange(0, 6);
+            const takeWidth = 64;
+            const rateOfWoverH = 1 / 1;
 
-            var takeHeight = takeWidth / rateOfWoverH;
-            var imgData = context.getImageData(startX, startY, takeWidth, takeHeight);
+            const takeHeight = takeWidth / rateOfWoverH;
+            const imgData = context.getImageData(startX, startY, takeWidth, takeHeight);
 
 
-            var pixels: {
+            const pixels: {
                 x: number,
                 y: number,
                 r: number,
@@ -534,17 +534,17 @@ export class Scene {
                 b: number,
                 brightness: number
             }[] = [];
-            var len = imgData.data.length;
-            for (var i = 0; i < len; i += 4) {
+            const len = imgData.data.length;
+            for (let i = 0; i < len; i += 4) {
 
-                var r = imgData.data[i];
-                var g = imgData.data[i + 1];
-                var b = imgData.data[i + 2];
-                var brightness = (0.299 * r) + (0.587 * g) + (0.114 * b);
+                const r = imgData.data[i];
+                const g = imgData.data[i + 1];
+                const b = imgData.data[i + 2];
+                const brightness = (0.299 * r) + (0.587 * g) + (0.114 * b);
 
-                var pixelNumber = (i / 4) + 1;
-                var rowNumber = Math.floor(pixelNumber / takeWidth);
-                var culNumber = pixelNumber % takeWidth;
+                const pixelNumber = (i / 4) + 1;
+                const rowNumber = Math.floor(pixelNumber / takeWidth);
+                const culNumber = pixelNumber % takeWidth;
                 pixels.push({
                     x: culNumber,
                     y: rowNumber,
@@ -554,19 +554,20 @@ export class Scene {
                     brightness: brightness
                 });
             }
-            this.textNodes = pixels
-                .filter(p => p.brightness > 100)
+
+            this.textNodes = CommonUtility.sort(pixels, p => p.brightness).reverse()
+                .slice(0, 200)
                 .map((p, i) => {
-                    const rate = 0.15;
+                    const rate = 0.12;
                     // const s = BABYLON.Mesh.CreateSphere(`pixels-${i}`, 2, 0.2, this.scene);
                     const position = new BABYLON.Vector3(
                         (p.x - 32) * rate,
                         (p.y - 32) * -1 * rate,
-                        -15 + CommonUtility.getRandomNumberInRange(0, 2, 2)
+                        -15 + CommonUtility.getRandomNumberInRange(0, 2, 3)
                     );
                     return {
                         position: position,
-                        scale: CommonUtility.getRandomNumberInRange(-0.05, 0.05, 3),
+                        scale: CommonUtility.getRandomNumberInRange(-0.03, 0.03, 3),
                         translateVector: BabylonUtility.getRandomVector3(false, false).normalize()
                     };
                 });
@@ -579,12 +580,12 @@ export class Scene {
         this.translateType = 'ToOrigin';
         setTimeout(() => {
             this.translateType = 'ToChatRoomNode';
-        }, 5 * 1000);
+        }, 1 * 1000);
         setTimeout(() => {
             this.translateType = null;
             this.textNodes.length = 0;
             this.drawLine();
-        }, 10 * 1000);
+        }, 1.8 * 1000);
     };
 
     zoomIn() {
