@@ -52,5 +52,5 @@ new ControlPanel().initPanel(
 
 ReactDOM.render(
     <MessageBoard messageCenter={messageCenter} />,
-    document.getElementById("messageBoard")
+    document.getElementById("app")
 );

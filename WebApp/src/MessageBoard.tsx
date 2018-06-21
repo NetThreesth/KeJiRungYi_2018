@@ -16,11 +16,11 @@ export class MessageBoard
 
     render() {
         const contents = this.state.contents;
-        const tmpls = contents.map(this.createTemplates.bind(this));
-        return tmpls;
+        const contentElements = contents.map(this.createContent.bind(this));
+        return <div className="untouchable">{contentElements}</div>;
     };
 
-    private createTemplates(content: Content) {
+    private createContent(content: Content) {
         if (content.type === ContentType.Text)
             return this.createTextMessage(content.content);
         else if (content.type === ContentType.Image)

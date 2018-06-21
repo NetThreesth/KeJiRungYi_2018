@@ -461,11 +461,11 @@ var MessageBoard = /** @class */ (function (_super) {
     ;
     MessageBoard.prototype.render = function () {
         var contents = this.state.contents;
-        var tmpls = contents.map(this.createTemplates.bind(this));
-        return tmpls;
+        var contentElements = contents.map(this.createContent.bind(this));
+        return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "untouchable" }, contentElements);
     };
     ;
-    MessageBoard.prototype.createTemplates = function (content) {
+    MessageBoard.prototype.createContent = function (content) {
         if (content.type === _main__WEBPACK_IMPORTED_MODULE_1__["ContentType"].Text)
             return this.createTextMessage(content.content);
         else if (content.type === _main__WEBPACK_IMPORTED_MODULE_1__["ContentType"].Image)
@@ -1068,7 +1068,7 @@ var MessageCenter = /** @class */ (function () {
 ;
 var messageCenter = new MessageCenter();
 new _ControlPanel__WEBPACK_IMPORTED_MODULE_4__["ControlPanel"]().initPanel(messageCenter.addText.bind(messageCenter), messageCenter.addImage.bind(messageCenter));
-react_dom__WEBPACK_IMPORTED_MODULE_1__["render"](react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_MessageBoard__WEBPACK_IMPORTED_MODULE_5__["MessageBoard"], { messageCenter: messageCenter }), document.getElementById("messageBoard"));
+react_dom__WEBPACK_IMPORTED_MODULE_1__["render"](react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_MessageBoard__WEBPACK_IMPORTED_MODULE_5__["MessageBoard"], { messageCenter: messageCenter }), document.getElementById("app"));
 
 
 /***/ }),
