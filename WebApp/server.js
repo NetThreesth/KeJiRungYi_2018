@@ -2,10 +2,15 @@
 
 // [START app]
 const express = require('express');
-var bodyParser = require('body-parser')
+const bodyParser = require('body-parser');
+const fs = require('fs')
+const morgan = require('morgan')
+const path = require('path')
 
 const app = express();
 
+var accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), {flags: 'a'});
+app.use(morgan('combined', {stream: accessLogStream}))
 app.use(express.static(__dirname));
 const setting = { limit: '50mb' };
 app.use(bodyParser.urlencoded(Object.assign({ extended: false }, setting)));
@@ -62,7 +67,7 @@ app.route('/apis/getPoints').get((req, res) => {
     'X-Powered-By': 'nodejs'
   });
 
-  var fs = require('fs');
+  const fs = require('fs');
   fs.readFile('MockPoints.json', (err, content) => {
     res.write(content);
     res.end();
