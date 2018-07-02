@@ -57,15 +57,18 @@ export class ControlPanel {
         FR.addEventListener("load", e => {
             const base64Image: string = e.target['result'];
             this.onImageAdd(base64Image);
-        });
 
+            $.ajax({
+                url: 'apis/uploadImage',
+                type: "post",
+                contentType: "application/json",
+                data: JSON.stringify({ base64Image: base64Image })
+            }).done(resp => {
+                console.log(resp);
+            }).fail(err => {
+                console.log(err);
+            });
+        });
         FR.readAsDataURL(image);
-
-
-        $.get('apis/uploadImage').done(function (resp) {
-            console.log(resp);
-        }).fail(function (err) {
-            console.log(err);
-        });
     };
 };

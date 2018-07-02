@@ -66,22 +66,22 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = "./src/UpdateTextNodeWorker.ts");
+/******/ 	return __webpack_require__(__webpack_require__.s = "./app_src/UpdateTextNodeWorker.ts");
 /******/ })
 /************************************************************************/
 /******/ ({
 
-/***/ "./src/BabylonUtility.ts":
-/*!*******************************!*\
-  !*** ./src/BabylonUtility.ts ***!
-  \*******************************/
+/***/ "./app_src/BabylonUtility.ts":
+/*!***********************************!*\
+  !*** ./app_src/BabylonUtility.ts ***!
+  \***********************************/
 /*! exports provided: BabylonUtility */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "BabylonUtility", function() { return BabylonUtility; });
-/* harmony import */ var _CommonUtility__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./CommonUtility */ "./src/CommonUtility.ts");
+/* harmony import */ var _CommonUtility__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./CommonUtility */ "./app_src/CommonUtility.ts");
 
 var BabylonUtility = /** @class */ (function () {
     function BabylonUtility() {
@@ -149,10 +149,10 @@ var BabylonUtility = /** @class */ (function () {
 
 /***/ }),
 
-/***/ "./src/CommonUtility.ts":
-/*!******************************!*\
-  !*** ./src/CommonUtility.ts ***!
-  \******************************/
+/***/ "./app_src/CommonUtility.ts":
+/*!**********************************!*\
+  !*** ./app_src/CommonUtility.ts ***!
+  \**********************************/
 /*! exports provided: CommonUtility */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -229,17 +229,17 @@ var CommonUtility = /** @class */ (function () {
 
 /***/ }),
 
-/***/ "./src/UpdateTextNodeWorker.ts":
-/*!*************************************!*\
-  !*** ./src/UpdateTextNodeWorker.ts ***!
-  \*************************************/
+/***/ "./app_src/UpdateTextNodeWorker.ts":
+/*!*****************************************!*\
+  !*** ./app_src/UpdateTextNodeWorker.ts ***!
+  \*****************************************/
 /*! no exports provided */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _CommonUtility__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./CommonUtility */ "./src/CommonUtility.ts");
-/* harmony import */ var _BabylonUtility__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./BabylonUtility */ "./src/BabylonUtility.ts");
+/* harmony import */ var _CommonUtility__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./CommonUtility */ "./app_src/CommonUtility.ts");
+/* harmony import */ var _BabylonUtility__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./BabylonUtility */ "./app_src/BabylonUtility.ts");
 
 
 self.onmessage = function (message) {

@@ -66,22 +66,22 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = "./src/main.tsx");
+/******/ 	return __webpack_require__(__webpack_require__.s = "./app_src/main.tsx");
 /******/ })
 /************************************************************************/
 /******/ ({
 
-/***/ "./src/BabylonUtility.ts":
-/*!*******************************!*\
-  !*** ./src/BabylonUtility.ts ***!
-  \*******************************/
+/***/ "./app_src/BabylonUtility.ts":
+/*!***********************************!*\
+  !*** ./app_src/BabylonUtility.ts ***!
+  \***********************************/
 /*! exports provided: BabylonUtility */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "BabylonUtility", function() { return BabylonUtility; });
-/* harmony import */ var _CommonUtility__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./CommonUtility */ "./src/CommonUtility.ts");
+/* harmony import */ var _CommonUtility__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./CommonUtility */ "./app_src/CommonUtility.ts");
 
 var BabylonUtility = /** @class */ (function () {
     function BabylonUtility() {
@@ -149,10 +149,10 @@ var BabylonUtility = /** @class */ (function () {
 
 /***/ }),
 
-/***/ "./src/CommonUtility.ts":
-/*!******************************!*\
-  !*** ./src/CommonUtility.ts ***!
-  \******************************/
+/***/ "./app_src/CommonUtility.ts":
+/*!**********************************!*\
+  !*** ./app_src/CommonUtility.ts ***!
+  \**********************************/
 /*! exports provided: CommonUtility */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -229,10 +229,10 @@ var CommonUtility = /** @class */ (function () {
 
 /***/ }),
 
-/***/ "./src/ControlPanel.ts":
-/*!*****************************!*\
-  !*** ./src/ControlPanel.ts ***!
-  \*****************************/
+/***/ "./app_src/ControlPanel.ts":
+/*!*********************************!*\
+  !*** ./app_src/ControlPanel.ts ***!
+  \*********************************/
 /*! exports provided: ControlPanel */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -285,13 +285,18 @@ var ControlPanel = /** @class */ (function () {
         FR.addEventListener("load", function (e) {
             var base64Image = e.target['result'];
             _this.onImageAdd(base64Image);
+            $.ajax({
+                url: 'apis/uploadImage',
+                type: "post",
+                contentType: "application/json",
+                data: JSON.stringify({ base64Image: base64Image })
+            }).done(function (resp) {
+                console.log(resp);
+            }).fail(function (err) {
+                console.log(err);
+            });
         });
         FR.readAsDataURL(image);
-        $.get('apis/uploadImage').done(function (resp) {
-            console.log(resp);
-        }).fail(function (err) {
-            console.log(err);
-        });
     };
     ;
     return ControlPanel;
@@ -302,10 +307,10 @@ var ControlPanel = /** @class */ (function () {
 
 /***/ }),
 
-/***/ "./src/LoginPanel.ts":
-/*!***************************!*\
-  !*** ./src/LoginPanel.ts ***!
-  \***************************/
+/***/ "./app_src/LoginPanel.ts":
+/*!*******************************!*\
+  !*** ./app_src/LoginPanel.ts ***!
+  \*******************************/
 /*! exports provided: LoginPanel */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -424,10 +429,10 @@ var LoginPanel = /** @class */ (function () {
 
 /***/ }),
 
-/***/ "./src/MessageBoard.tsx":
-/*!******************************!*\
-  !*** ./src/MessageBoard.tsx ***!
-  \******************************/
+/***/ "./app_src/MessageBoard.tsx":
+/*!**********************************!*\
+  !*** ./app_src/MessageBoard.tsx ***!
+  \**********************************/
 /*! exports provided: MessageBoard */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -436,7 +441,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MessageBoard", function() { return MessageBoard; });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _main__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./main */ "./src/main.tsx");
+/* harmony import */ var _main__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./main */ "./app_src/main.tsx");
 var __extends = (undefined && undefined.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -503,10 +508,10 @@ var MessageBoard = /** @class */ (function (_super) {
 
 /***/ }),
 
-/***/ "./src/Scene.ts":
-/*!**********************!*\
-  !*** ./src/Scene.ts ***!
-  \**********************/
+/***/ "./app_src/Scene.ts":
+/*!**************************!*\
+  !*** ./app_src/Scene.ts ***!
+  \**************************/
 /*! exports provided: Scene */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -517,8 +522,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var babylonjs__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(babylonjs__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! jquery */ "jquery");
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _CommonUtility__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./CommonUtility */ "./src/CommonUtility.ts");
-/* harmony import */ var _BabylonUtility__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./BabylonUtility */ "./src/BabylonUtility.ts");
+/* harmony import */ var _CommonUtility__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./CommonUtility */ "./app_src/CommonUtility.ts");
+/* harmony import */ var _BabylonUtility__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./BabylonUtility */ "./app_src/BabylonUtility.ts");
 
 
 
@@ -778,7 +783,7 @@ var Scene = /** @class */ (function () {
         var _this = this;
         if (!window['Worker'])
             return;
-        var worker = new Worker("dist/UpdateTextNodeWorker.js");
+        var worker = new Worker("app/UpdateTextNodeWorker.js");
         var next = function () {
             var nodes = [];
             if (_this.translateType === 'Simple') {
@@ -1006,10 +1011,10 @@ var Scene = /** @class */ (function () {
 
 /***/ }),
 
-/***/ "./src/main.tsx":
-/*!**********************!*\
-  !*** ./src/main.tsx ***!
-  \**********************/
+/***/ "./app_src/main.tsx":
+/*!**************************!*\
+  !*** ./app_src/main.tsx ***!
+  \**************************/
 /*! exports provided: ContentType, MessageCenter */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -1021,10 +1026,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-dom */ "react-dom");
 /* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react_dom__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _Scene__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Scene */ "./src/Scene.ts");
-/* harmony import */ var _LoginPanel__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./LoginPanel */ "./src/LoginPanel.ts");
-/* harmony import */ var _ControlPanel__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./ControlPanel */ "./src/ControlPanel.ts");
-/* harmony import */ var _MessageBoard__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./MessageBoard */ "./src/MessageBoard.tsx");
+/* harmony import */ var _Scene__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Scene */ "./app_src/Scene.ts");
+/* harmony import */ var _LoginPanel__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./LoginPanel */ "./app_src/LoginPanel.ts");
+/* harmony import */ var _ControlPanel__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./ControlPanel */ "./app_src/ControlPanel.ts");
+/* harmony import */ var _MessageBoard__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./MessageBoard */ "./app_src/MessageBoard.tsx");
 
 
 

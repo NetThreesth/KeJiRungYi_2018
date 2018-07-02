@@ -329,7 +329,7 @@ export class Scene {
     private translateType: 'Simple' | 'ToOrigin' | 'ToChatRoomNode' = 'Simple';
     private startUpdateTextNodeWorker() {
         if (!window['Worker']) return;
-        const worker = new Worker("dist/UpdateTextNodeWorker.js");
+        const worker = new Worker("app/UpdateTextNodeWorker.js");
         const next = () => {
             let nodes: BABYLON.Vector3[] = [];
             if (this.translateType === 'Simple') {
