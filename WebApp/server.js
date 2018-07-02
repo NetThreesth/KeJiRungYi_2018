@@ -44,7 +44,7 @@ app.route('/apis/uploadImage').post((req, res, next) => {
   const client = new vision.ImageAnnotatorClient();
   const query = {
     image: {
-      content: content.base64Image,
+      content: content.base64Image.split(',')[1],
     },
     features: [
       {
