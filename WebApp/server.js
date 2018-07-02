@@ -3,18 +3,25 @@
 // [START app]
 const express = require('express');
 const bodyParser = require('body-parser');
-const fs = require('fs')
-const morgan = require('morgan')
-const path = require('path')
+const fs = require('fs');
+const morgan = require('morgan');
+const path = require('path');
 
 const app = express();
 
-var accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), {flags: 'a'});
-app.use(morgan('combined', {stream: accessLogStream}))
+var accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' });
+app.use(morgan('combined', { stream: accessLogStream }))
 app.use(express.static(__dirname));
 const setting = { limit: '50mb' };
 app.use(bodyParser.urlencoded(Object.assign({ extended: false }, setting)));
 app.use(bodyParser.json(setting));
+app.use((err, req, res, next) => {
+  res.status(err.status || 500);
+  res.render('error', {
+    message: err.message,
+    error: err
+  });
+});
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
@@ -22,13 +29,13 @@ app.listen(PORT, () => {
   console.log('Press Ctrl+C to quit.');
 });
 
-app.route('/apis/uploadImage').post((req, res) => {
+app.route('/apis/uploadImage').post((req, res, next) => {
 
   console.log(`${new Date()} uploadImage fired`);
   console.log(req.body);
   const content = req.body;
   if (!content) {
-    res.end();
+    res.status(404).send('image not exist');
     return;
   }
 
@@ -54,7 +61,8 @@ app.route('/apis/uploadImage').post((req, res) => {
       res.end();
     })
     .catch(err => {
-      console.error('ERROR:', err);
+      console.error(err);
+      next(err);
     });
 
 });
