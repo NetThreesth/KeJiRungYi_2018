@@ -44,6 +44,26 @@ app.route('/apis/getPoints')
       res.end();
     });
   });
+
+const Sequelize = require('sequelize');
+const sequelize = new Sequelize('mysql://root:threesththreesththreesth@35.236.188.139:3306/threesth');
+sequelize
+  .authenticate()
+  .then(() => {
+    console.log('Connection has been established successfully.');
+  })
+  .catch(err => {
+    console.error('Unable to connect to the database:', err);
+  });
+
+const Message = sequelize.define('messagelog', {
+  id: { type: Sequelize.STRING, primaryKey: true },
+  time: { type: Sequelize.STRING },
+  message: { type: Sequelize.STRING },
+});
+Message.findAll().then(messages => {
+  console.log(messages);
+})
 // [END app]
 
 
