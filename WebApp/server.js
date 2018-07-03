@@ -3,19 +3,18 @@
 // [START app]
 const express = require('express');
 const bodyParser = require('body-parser');
-const fs = require('fs');
 const morgan = require('morgan');
-const path = require('path');
+const logger = require('./server/logger');
 
 const app = express();
 
-var accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' });
-app.use(morgan('combined', { stream: accessLogStream }))
+app.use(morgan('combined', { stream: logger.accessLogStream }));
 app.use(express.static(__dirname));
 const setting = { limit: '50mb' };
 app.use(bodyParser.urlencoded(Object.assign({ extended: false }, setting)));
 app.use(bodyParser.json(setting));
 app.use((err, req, res, next) => {
+  logger.info(err);
   res.status(err.status || 500);
   res.render('error', {
     message: err.message,
@@ -25,17 +24,17 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
-  console.log(`App listening on port ${PORT}`);
-  console.log('Press Ctrl+C to quit.');
+  logger.info(`App listening on port ${PORT}`);
+  logger.info('Press Ctrl+C to quit.');
 });
 
 app.route('/apis/uploadImage').post((req, res, next) => {
 
-  console.log(`${new Date()} uploadImage fired`);
-  console.log(req.body);
+  logger.info(`${new Date()} uploadImage fired`);
   const content = req.body;
   if (!content) {
-    res.status(404).send('image not exist');
+    logger.error(`image not exist`);
+    res.status(400).send('image not exist');
     return;
   }
 
@@ -44,28 +43,30 @@ app.route('/apis/uploadImage').post((req, res, next) => {
   const client = new vision.ImageAnnotatorClient();
   const query = {
     image: {
-      content: content.base64Image.split(',')[1],
+      content: content.base64Image.split(',')[1]
     },
     features: [
       {
-        "type": "LABEL_DETECTION"
+        "type": "LABEL_DETECTION",
+        "maxResults": 1
       }
     ]
   };
   client.annotateImage(query)
     .then(results => {
       const labels = results[0].labelAnnotations;
-      console.log('Labels:');
-      labels.forEach(label => console.log(label));
+      logger.info('Labels:');
+      labels.forEach(label => logger.info(label));
       res.json(labels);
       res.end();
     })
     .catch(err => {
-      console.error(err);
+      logger.error(err.message);
       next(err);
     });
-
 });
+
+
 
 app.route('/apis/getPoints').get((req, res) => {
 
