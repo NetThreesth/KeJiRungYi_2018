@@ -1,6 +1,7 @@
 import * as React from "react";
 
 import { MessageCenter, Content, ContentType } from './main';
+import { AppSetting } from './AppSetting';
 
 
 export class MessageBoard
@@ -17,7 +18,9 @@ export class MessageBoard
     render() {
         const contents = this.state.contents;
         const contentElements = contents.map(this.createContent.bind(this));
-        return <div className="untouchable">{contentElements}</div>;
+        return <div id="messageBoard" className="untouchable full-page flex flex-center">
+            <div className="message-board-content">{contentElements}</div>
+        </div>;
     };
 
     private createContent(content: Content) {
@@ -28,7 +31,11 @@ export class MessageBoard
     };
 
     private createTextMessage(text: string) {
-        return <div>{text}</div>;
+        return <div>
+            <img src="assets/avatar_pink.png" className="avatar" />
+            <span>{AppSetting.userName}</span>
+            <div>{text}</div>
+        </div>;
     };
 
     private createImageMessage(base64string: string) {
@@ -36,13 +43,17 @@ export class MessageBoard
             width: '60%',
             maxWidth: '600px'
         };
-        return <div><img src={base64string} style={style} /></div>;
-        /* 
-                const style = {
-                    width: "500px",
-                    backgroundImage: `url(${base64string})`
-                };
-                return <div style={style}></div>; */
+        return <div>
+            <img src="assets/avatar_pink.png" className="avatar" />
+            <span>{AppSetting.userName}</span>
+            <img src={base64string} style={style} />
+        </div>;
+        /*
+            const style = {
+            width: "500px",
+                backgroundImage: `url(${base64string})`
+    };
+            return <div style={style}></div>; */
     };
 
     private refresh() {

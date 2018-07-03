@@ -71,6 +71,36 @@
 /************************************************************************/
 /******/ ({
 
+/***/ "./app_src/AppSetting.ts":
+/*!*******************************!*\
+  !*** ./app_src/AppSetting.ts ***!
+  \*******************************/
+/*! exports provided: AppSetting, Roles */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "AppSetting", function() { return AppSetting; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Roles", function() { return Roles; });
+var AppSetting = /** @class */ (function () {
+    function AppSetting() {
+    }
+    AppSetting.userName = '';
+    return AppSetting;
+}());
+
+;
+var Roles;
+(function (Roles) {
+    Roles[Roles["User"] = 1] = "User";
+    Roles[Roles["AI"] = 2] = "AI";
+    Roles[Roles["Algae"] = 3] = "Algae";
+})(Roles || (Roles = {}));
+;
+
+
+/***/ }),
+
 /***/ "./app_src/BabylonUtility.ts":
 /*!***********************************!*\
   !*** ./app_src/BabylonUtility.ts ***!
@@ -291,9 +321,7 @@ var ControlPanel = /** @class */ (function () {
                 contentType: "application/json",
                 data: JSON.stringify({ base64Image: base64Image })
             }).done(function (resp) {
-                console.log(resp);
-            }).fail(function (err) {
-                console.log(err);
+                _this.onTextAdd(resp.map(function (e) { return e.description + ": " + e.score.toFixed(3); }).join('; '));
             });
         });
         FR.readAsDataURL(image);
@@ -317,6 +345,8 @@ var ControlPanel = /** @class */ (function () {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "LoginPanel", function() { return LoginPanel; });
+/* harmony import */ var _AppSetting__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./AppSetting */ "./app_src/AppSetting.ts");
+
 var clientId = '380947346613-l6gvf9laj9fuko3ljph9ej99olo5qa3k.apps.googleusercontent.com';
 var apiKey = 'AIzaSyBmozdLmtDDry_ah4NhYPqOTeZ2wr9Er2A';
 var LoginPanel = /** @class */ (function () {
@@ -371,8 +401,10 @@ var LoginPanel = /** @class */ (function () {
         var _this = this;
         $('.sign-in-button').on('click', function (e) {
             var signInName = $('#signInName').val();
-            if (signInName.length > 0)
-                _this.login();
+            if (signInName.length === 0)
+                return;
+            _AppSetting__WEBPACK_IMPORTED_MODULE_0__["AppSetting"].userName = signInName;
+            _this.login();
         });
     };
     ;
@@ -442,6 +474,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _main__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./main */ "./app_src/main.tsx");
+/* harmony import */ var _AppSetting__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./AppSetting */ "./app_src/AppSetting.ts");
 var __extends = (undefined && undefined.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -452,6 +485,7 @@ var __extends = (undefined && undefined.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+
 
 
 var MessageBoard = /** @class */ (function (_super) {
@@ -467,7 +501,8 @@ var MessageBoard = /** @class */ (function (_super) {
     MessageBoard.prototype.render = function () {
         var contents = this.state.contents;
         var contentElements = contents.map(this.createContent.bind(this));
-        return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "untouchable" }, contentElements);
+        return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { id: "messageBoard", className: "untouchable full-page flex flex-center" },
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "message-board-content" }, contentElements));
     };
     ;
     MessageBoard.prototype.createContent = function (content) {
@@ -478,7 +513,10 @@ var MessageBoard = /** @class */ (function (_super) {
     };
     ;
     MessageBoard.prototype.createTextMessage = function (text) {
-        return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", null, text);
+        return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", null,
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("img", { src: "assets/avatar_pink.png", className: "avatar" }),
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("span", null, _AppSetting__WEBPACK_IMPORTED_MODULE_2__["AppSetting"].userName),
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", null, text));
     };
     ;
     MessageBoard.prototype.createImageMessage = function (base64string) {
@@ -487,13 +525,15 @@ var MessageBoard = /** @class */ (function (_super) {
             maxWidth: '600px'
         };
         return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", null,
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("img", { src: "assets/avatar_pink.png", className: "avatar" }),
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("span", null, _AppSetting__WEBPACK_IMPORTED_MODULE_2__["AppSetting"].userName),
             react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("img", { src: base64string, style: style }));
         /*
-                const style = {
-                    width: "500px",
-                    backgroundImage: `url(${base64string})`
-                };
-                return <div style={style}></div>; */
+            const style = {
+            width: "500px",
+                backgroundImage: `url(${base64string})`
+    };
+            return <div style={style}></div>; */
     };
     ;
     MessageBoard.prototype.refresh = function () {
@@ -1026,18 +1066,20 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-dom */ "react-dom");
 /* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react_dom__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _Scene__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Scene */ "./app_src/Scene.ts");
-/* harmony import */ var _LoginPanel__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./LoginPanel */ "./app_src/LoginPanel.ts");
-/* harmony import */ var _ControlPanel__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./ControlPanel */ "./app_src/ControlPanel.ts");
-/* harmony import */ var _MessageBoard__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./MessageBoard */ "./app_src/MessageBoard.tsx");
+/* harmony import */ var _AppSetting__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./AppSetting */ "./app_src/AppSetting.ts");
+/* harmony import */ var _Scene__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Scene */ "./app_src/Scene.ts");
+/* harmony import */ var _LoginPanel__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./LoginPanel */ "./app_src/LoginPanel.ts");
+/* harmony import */ var _ControlPanel__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./ControlPanel */ "./app_src/ControlPanel.ts");
+/* harmony import */ var _MessageBoard__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./MessageBoard */ "./app_src/MessageBoard.tsx");
 
 
 
 
 
 
-var loginPanel = new _LoginPanel__WEBPACK_IMPORTED_MODULE_3__["LoginPanel"]();
-var scene = new _Scene__WEBPACK_IMPORTED_MODULE_2__["Scene"]();
+
+var loginPanel = new _LoginPanel__WEBPACK_IMPORTED_MODULE_4__["LoginPanel"]();
+var scene = new _Scene__WEBPACK_IMPORTED_MODULE_3__["Scene"]();
 loginPanel.afterWordCardsAnimation = scene.transformation.bind(scene);
 loginPanel.afterLogin = function () {
     $('.control-panel').removeClass('invisible').addClass('visible');
@@ -1057,13 +1099,13 @@ var MessageCenter = /** @class */ (function () {
         this.contents = [];
         this.observable = $({});
     }
-    MessageCenter.prototype.addText = function (text) {
-        this.contents.push({ type: ContentType.Text, content: text });
+    MessageCenter.prototype.addText = function (role, text) {
+        this.contents.push({ role: role, type: ContentType.Text, content: text });
         this.observable.trigger('add');
     };
     ;
-    MessageCenter.prototype.addImage = function (b64String) {
-        this.contents.push({ type: ContentType.Image, content: b64String });
+    MessageCenter.prototype.addImage = function (role, b64String) {
+        this.contents.push({ role: role, type: ContentType.Image, content: b64String });
         this.observable.trigger('add');
     };
     ;
@@ -1072,8 +1114,8 @@ var MessageCenter = /** @class */ (function () {
 
 ;
 var messageCenter = new MessageCenter();
-new _ControlPanel__WEBPACK_IMPORTED_MODULE_4__["ControlPanel"]().initPanel(messageCenter.addText.bind(messageCenter), messageCenter.addImage.bind(messageCenter));
-react_dom__WEBPACK_IMPORTED_MODULE_1__["render"](react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_MessageBoard__WEBPACK_IMPORTED_MODULE_5__["MessageBoard"], { messageCenter: messageCenter }), document.getElementById("app"));
+new _ControlPanel__WEBPACK_IMPORTED_MODULE_5__["ControlPanel"]().initPanel(function (text) { return messageCenter.addText(_AppSetting__WEBPACK_IMPORTED_MODULE_2__["Roles"].User, text); }, function (text) { return messageCenter.addImage(_AppSetting__WEBPACK_IMPORTED_MODULE_2__["Roles"].User, text); });
+react_dom__WEBPACK_IMPORTED_MODULE_1__["render"](react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_MessageBoard__WEBPACK_IMPORTED_MODULE_6__["MessageBoard"], { messageCenter: messageCenter }), document.getElementById("app"));
 
 
 /***/ }),

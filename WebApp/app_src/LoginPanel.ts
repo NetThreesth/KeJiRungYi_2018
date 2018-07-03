@@ -1,3 +1,4 @@
+import { AppSetting } from './AppSetting';
 declare const gapi: any;
 
 
@@ -75,8 +76,9 @@ export class LoginPanel {
 
         $('.sign-in-button').on('click', e => {
             const signInName = $('#signInName').val() as string;
-            if (signInName.length > 0)
-                this.login();
+            if (signInName.length === 0) return;
+            AppSetting.userName = signInName;
+            this.login();
         });
     };
 

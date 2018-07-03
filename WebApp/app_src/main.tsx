@@ -1,6 +1,7 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 
+import { Roles } from './AppSetting';
 import { Scene } from './Scene';
 import { LoginPanel } from './LoginPanel';
 import { ControlPanel } from './ControlPanel';
@@ -23,6 +24,7 @@ export enum ContentType {
 };
 
 export interface Content {
+    role: Roles;
     type: ContentType;
     content: string;
 };
@@ -33,20 +35,20 @@ export class MessageCenter {
     observable = $({});
 
 
-    addText(text) {
-        this.contents.push({ type: ContentType.Text, content: text });
+    addText(role: Roles, text: string) {
+        this.contents.push({ role: role, type: ContentType.Text, content: text });
         this.observable.trigger('add');
     };
-    addImage(b64String) {
-        this.contents.push({ type: ContentType.Image, content: b64String });
+    addImage(role: Roles, b64String: string) {
+        this.contents.push({ role: role, type: ContentType.Image, content: b64String });
         this.observable.trigger('add');
     };
 };
 
 const messageCenter = new MessageCenter();
 new ControlPanel().initPanel(
-    messageCenter.addText.bind(messageCenter),
-    messageCenter.addImage.bind(messageCenter)
+    text => messageCenter.addText(Roles.User, text),
+    text => messageCenter.addImage(Roles.User, text)
 );
 
 

@@ -1,19 +1,22 @@
-/* messageBoard */
-
-#messageBoard {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
+.message-board-content {
     height: 100%;
-    overflow: hidden;
+    width: 100%;
+    .avatar {
+        height: 30px;
+    }
 }
 
-#messageBoard>div {
+.message-board-content>div {
     color: #404040;
     padding: 3px;
     margin: 2px;
-    border: 1px solid #eeeeee;
+    border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 5px;
     width: 60%;
+}
+
+@media only screen and (min-width: 768px) {
+    .message-board-content {
+        width: 60%;
+    }
 }

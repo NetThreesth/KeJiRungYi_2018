@@ -64,9 +64,7 @@ export class ControlPanel {
                 contentType: "application/json",
                 data: JSON.stringify({ base64Image: base64Image })
             }).done(resp => {
-                console.log(resp);
-            }).fail(err => {
-                console.log(err);
+                this.onTextAdd(resp.map(e => `${e.description}: ${e.score.toFixed(3)}`).join('; '));
             });
         });
         FR.readAsDataURL(image);
