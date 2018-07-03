@@ -48,7 +48,7 @@ app.route('/apis/uploadImage').post((req, res, next) => {
     features: [
       {
         "type": "LABEL_DETECTION",
-        "maxResults": 1
+        "maxResults": 6
       }
     ]
   };
