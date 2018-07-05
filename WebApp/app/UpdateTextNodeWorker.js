@@ -221,6 +221,12 @@ var CommonUtility = /** @class */ (function () {
         }
         return array;
     };
+    ;
+    CommonUtility.createArray = function (length) {
+        var array = Array.apply(null, { length: length });
+        return array;
+    };
+    ;
     return CommonUtility;
 }());
 

@@ -6,6 +6,7 @@ import { Scene } from './Scene';
 import { LoginPanel } from './LoginPanel';
 import { ControlPanel } from './ControlPanel';
 import { MessageBoard } from './MessageBoard';
+import { CommonUtility } from './CommonUtility';
 
 
 const loginPanel = new LoginPanel();
@@ -49,6 +50,23 @@ const messageCenter = new MessageCenter();
 new ControlPanel().initPanel(
     text => messageCenter.addText(Roles.User, text),
     text => messageCenter.addImage(Roles.User, text)
+);
+
+messageCenter.addText(
+    Roles.User,
+    CommonUtility.createArray(30).map(e => 'and').join(' ')
+);
+messageCenter.addText(
+    Roles.ChatBot,
+    CommonUtility.createArray(10).map(e => '@@@').join(' ')
+);
+messageCenter.addText(
+    Roles.Algae,
+    CommonUtility.createArray(20).map(e => 'FFF').join(' ')
+);
+messageCenter.addText(
+    Roles.User,
+    CommonUtility.createArray(30).map(e => 'xxx').join(' ')
 );
 
 

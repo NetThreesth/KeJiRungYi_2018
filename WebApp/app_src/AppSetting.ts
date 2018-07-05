@@ -1,9 +1,10 @@
 export class AppSetting {
-    static userName = '';
+    static userName = 'TestUser';
 };
 
 export enum Roles {
-    User = 1,
-    AI = 2,
-    Algae = 3
+    User,
+    ChatBot,
+    Algae,
+    AI,
 };

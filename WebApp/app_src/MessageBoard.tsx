@@ -1,7 +1,7 @@
 import * as React from "react";
 
 import { MessageCenter, Content, ContentType } from './main';
-import { AppSetting } from './AppSetting';
+import { AppSetting, Roles } from './AppSetting';
 
 
 export class MessageBoard
@@ -18,45 +18,52 @@ export class MessageBoard
     render() {
         const contents = this.state.contents;
         const contentElements = contents.map(this.createContent.bind(this));
-        return <div id="messageBoard" className="untouchable full-page flex flex-center">
+        return <div id="messageBoard" className="untouchable full-page flex flex-center flex-end">
             <div className="message-board-content">{contentElements}</div>
         </div>;
     };
 
     private createContent(content: Content) {
         if (content.type === ContentType.Text)
-            return this.createTextMessage(content.content);
+            return this.createTextMessage(content);
         else if (content.type === ContentType.Image)
-            return this.createImageMessage(content.content);
+            return this.createImageMessage(content);
     };
 
-    private createTextMessage(text: string) {
-        return <div>
-            <img src="assets/avatar_pink.png" className="avatar" />
-            <span>{AppSetting.userName}</span>
-            <div>{text}</div>
+    private createTextMessage(content: Content) {
+        const isUser = content.role === Roles.User;
+        const name = isUser ? AppSetting.userName : '';
+        return <div className="messageBox" style={!isUser ? { justifyContent: 'flex-end' } : {}}>
+            <img src={this.getAvatar(content.role)} className="avatar" />
+            <div className="name">{name}</div>
+            <div className="content">{content.content}</div>
         </div>;
     };
 
-    private createImageMessage(base64string: string) {
+    private createImageMessage(content: Content) {
         const style = {
             width: '60%',
             maxWidth: '600px'
         };
-        return <div>
-            <img src="assets/avatar_pink.png" className="avatar" />
-            <span>{AppSetting.userName}</span>
-            <img src={base64string} style={style} />
+        const isUser = content.role === Roles.User;
+        const name = isUser ? AppSetting.userName : '';
+        return <div className="messageBox" style={!isUser ? { justifyContent: 'flex-end' } : {}}>
+            <img src={this.getAvatar(content.role)} className="avatar" />
+            <div className="name">{name}</div>
+            <div className="content"><img src={content.content} style={style} /></div>
         </div>;
-        /*
-            const style = {
-            width: "500px",
-                backgroundImage: `url(${base64string})`
-    };
-            return <div style={style}></div>; */
     };
 
     private refresh() {
         this.setState({ contents: this.props.messageCenter.contents.slice() });
+    };
+
+    private getAvatar(role: Roles) {
+        if (role === Roles.User)
+            return 'assets/avatar_white.png';
+        if (role === Roles.Algae)
+            return 'assets/avatar_yellow.png';
+        if (role === Roles.ChatBot)
+            return 'assets/avatar_pink.png';
     };
 };

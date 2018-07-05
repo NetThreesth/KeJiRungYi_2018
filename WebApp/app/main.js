@@ -85,16 +85,17 @@ __webpack_require__.r(__webpack_exports__);
 var AppSetting = /** @class */ (function () {
     function AppSetting() {
     }
-    AppSetting.userName = '';
+    AppSetting.userName = 'TestUser';
     return AppSetting;
 }());
 
 ;
 var Roles;
 (function (Roles) {
-    Roles[Roles["User"] = 1] = "User";
-    Roles[Roles["AI"] = 2] = "AI";
-    Roles[Roles["Algae"] = 3] = "Algae";
+    Roles[Roles["User"] = 0] = "User";
+    Roles[Roles["ChatBot"] = 1] = "ChatBot";
+    Roles[Roles["Algae"] = 2] = "Algae";
+    Roles[Roles["AI"] = 3] = "AI";
 })(Roles || (Roles = {}));
 ;
 
@@ -251,6 +252,12 @@ var CommonUtility = /** @class */ (function () {
         }
         return array;
     };
+    ;
+    CommonUtility.createArray = function (length) {
+        var array = Array.apply(null, { length: length });
+        return array;
+    };
+    ;
     return CommonUtility;
 }());
 
@@ -501,43 +508,51 @@ var MessageBoard = /** @class */ (function (_super) {
     MessageBoard.prototype.render = function () {
         var contents = this.state.contents;
         var contentElements = contents.map(this.createContent.bind(this));
-        return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { id: "messageBoard", className: "untouchable full-page flex flex-center" },
+        return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { id: "messageBoard", className: "untouchable full-page flex flex-center flex-end" },
             react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "message-board-content" }, contentElements));
     };
     ;
     MessageBoard.prototype.createContent = function (content) {
         if (content.type === _main__WEBPACK_IMPORTED_MODULE_1__["ContentType"].Text)
-            return this.createTextMessage(content.content);
+            return this.createTextMessage(content);
         else if (content.type === _main__WEBPACK_IMPORTED_MODULE_1__["ContentType"].Image)
-            return this.createImageMessage(content.content);
+            return this.createImageMessage(content);
     };
     ;
-    MessageBoard.prototype.createTextMessage = function (text) {
-        return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", null,
-            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("img", { src: "assets/avatar_pink.png", className: "avatar" }),
-            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("span", null, _AppSetting__WEBPACK_IMPORTED_MODULE_2__["AppSetting"].userName),
-            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", null, text));
+    MessageBoard.prototype.createTextMessage = function (content) {
+        var isUser = content.role === _AppSetting__WEBPACK_IMPORTED_MODULE_2__["Roles"].User;
+        var name = isUser ? _AppSetting__WEBPACK_IMPORTED_MODULE_2__["AppSetting"].userName : '';
+        return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "messageBox", style: !isUser ? { justifyContent: 'flex-end' } : {} },
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("img", { src: this.getAvatar(content.role), className: "avatar" }),
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "name" }, name),
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "content" }, content.content));
     };
     ;
-    MessageBoard.prototype.createImageMessage = function (base64string) {
+    MessageBoard.prototype.createImageMessage = function (content) {
         var style = {
             width: '60%',
             maxWidth: '600px'
         };
-        return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", null,
-            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("img", { src: "assets/avatar_pink.png", className: "avatar" }),
-            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("span", null, _AppSetting__WEBPACK_IMPORTED_MODULE_2__["AppSetting"].userName),
-            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("img", { src: base64string, style: style }));
-        /*
-            const style = {
-            width: "500px",
-                backgroundImage: `url(${base64string})`
-    };
-            return <div style={style}></div>; */
+        var isUser = content.role === _AppSetting__WEBPACK_IMPORTED_MODULE_2__["Roles"].User;
+        var name = isUser ? _AppSetting__WEBPACK_IMPORTED_MODULE_2__["AppSetting"].userName : '';
+        return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "messageBox", style: !isUser ? { justifyContent: 'flex-end' } : {} },
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("img", { src: this.getAvatar(content.role), className: "avatar" }),
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "name" }, name),
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "content" },
+                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("img", { src: content.content, style: style })));
     };
     ;
     MessageBoard.prototype.refresh = function () {
         this.setState({ contents: this.props.messageCenter.contents.slice() });
+    };
+    ;
+    MessageBoard.prototype.getAvatar = function (role) {
+        if (role === _AppSetting__WEBPACK_IMPORTED_MODULE_2__["Roles"].User)
+            return 'assets/avatar_white.png';
+        if (role === _AppSetting__WEBPACK_IMPORTED_MODULE_2__["Roles"].Algae)
+            return 'assets/avatar_yellow.png';
+        if (role === _AppSetting__WEBPACK_IMPORTED_MODULE_2__["Roles"].ChatBot)
+            return 'assets/avatar_pink.png';
     };
     ;
     return MessageBoard;
@@ -1071,6 +1086,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _LoginPanel__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./LoginPanel */ "./app_src/LoginPanel.ts");
 /* harmony import */ var _ControlPanel__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./ControlPanel */ "./app_src/ControlPanel.ts");
 /* harmony import */ var _MessageBoard__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./MessageBoard */ "./app_src/MessageBoard.tsx");
+/* harmony import */ var _CommonUtility__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./CommonUtility */ "./app_src/CommonUtility.ts");
+
 
 
 
@@ -1115,6 +1132,10 @@ var MessageCenter = /** @class */ (function () {
 ;
 var messageCenter = new MessageCenter();
 new _ControlPanel__WEBPACK_IMPORTED_MODULE_5__["ControlPanel"]().initPanel(function (text) { return messageCenter.addText(_AppSetting__WEBPACK_IMPORTED_MODULE_2__["Roles"].User, text); }, function (text) { return messageCenter.addImage(_AppSetting__WEBPACK_IMPORTED_MODULE_2__["Roles"].User, text); });
+messageCenter.addText(_AppSetting__WEBPACK_IMPORTED_MODULE_2__["Roles"].User, _CommonUtility__WEBPACK_IMPORTED_MODULE_7__["CommonUtility"].createArray(30).map(function (e) { return 'and'; }).join(' '));
+messageCenter.addText(_AppSetting__WEBPACK_IMPORTED_MODULE_2__["Roles"].ChatBot, _CommonUtility__WEBPACK_IMPORTED_MODULE_7__["CommonUtility"].createArray(10).map(function (e) { return '@@@'; }).join(' '));
+messageCenter.addText(_AppSetting__WEBPACK_IMPORTED_MODULE_2__["Roles"].Algae, _CommonUtility__WEBPACK_IMPORTED_MODULE_7__["CommonUtility"].createArray(20).map(function (e) { return 'FFF'; }).join(' '));
+messageCenter.addText(_AppSetting__WEBPACK_IMPORTED_MODULE_2__["Roles"].User, _CommonUtility__WEBPACK_IMPORTED_MODULE_7__["CommonUtility"].createArray(30).map(function (e) { return 'xxx'; }).join(' '));
 react_dom__WEBPACK_IMPORTED_MODULE_1__["render"](react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_MessageBoard__WEBPACK_IMPORTED_MODULE_6__["MessageBoard"], { messageCenter: messageCenter }), document.getElementById("app"));
 
 

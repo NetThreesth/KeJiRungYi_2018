@@ -64,6 +64,10 @@ export class CommonUtility {
         }
 
         return array;
-    }
+    };
 
+    static createArray<T>(length: number) {
+        const array = Array.apply(null, { length: length });
+        return array as T[];
+    };
 };
