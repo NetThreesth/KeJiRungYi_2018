@@ -1,12 +1,11 @@
 import * as React from "react";
 
-import { MessageCenter, Content, ContentType } from './main';
+import { MessageCenter, Content, ContentType } from './MessageCenter';
 import { AppSetting, Roles } from './AppSetting';
 
 
 export class MessageBoard
-    extends React.Component<{ messageCenter: MessageCenter }, { contents: Content[] }>
-{
+    extends React.Component<{ messageCenter: MessageCenter }, { contents: Content[] }>{
 
     constructor(props) {
         super(props);
@@ -33,7 +32,8 @@ export class MessageBoard
     private createTextMessage(content: Content) {
         const isUser = content.role === Roles.User;
         const name = isUser ? AppSetting.userName : '';
-        return <div className="messageBox" style={!isUser ? { justifyContent: 'flex-end' } : {}}>
+        const float = isUser ? 'left' : 'right';
+        return <div className="messageBox" style={{ float: float }}>
             <img src={this.getAvatar(content.role)} className="avatar" />
             <div className="name">{name}</div>
             <div className="content">{content.content}</div>
@@ -42,12 +42,13 @@ export class MessageBoard
 
     private createImageMessage(content: Content) {
         const style = {
-            width: '60%',
+            width: '100%',
             maxWidth: '600px'
         };
         const isUser = content.role === Roles.User;
         const name = isUser ? AppSetting.userName : '';
-        return <div className="messageBox" style={!isUser ? { justifyContent: 'flex-end' } : {}}>
+        const float = isUser ? 'left' : 'right';
+        return <div className="messageBox" style={{ float: float }}>
             <img src={this.getAvatar(content.role)} className="avatar" />
             <div className="name">{name}</div>
             <div className="content"><img src={content.content} style={style} /></div>

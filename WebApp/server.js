@@ -1,6 +1,6 @@
 'use strict';
 
-// [START app]
+// [Setup]
 const express = require('express');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
@@ -16,10 +16,11 @@ app.use(bodyParser.json(setting));
 app.use((err, req, res, next) => {
   logger.info(err);
   res.status(err.status || 500);
-  res.render('error', {
+  res.json({
     message: err.message,
     error: err
   });
+  res.end();
 });
 
 const PORT = process.env.PORT || 8080;
@@ -27,7 +28,11 @@ app.listen(PORT, () => {
   logger.info(`App listening on port ${PORT}`);
   logger.info('Press Ctrl+C to quit.');
 });
+// [END Setup]
 
+
+
+// [APIs]
 app.route('/apis/uploadImage').post((req, res, next) => {
 
   logger.info(`${new Date()} uploadImage fired`);
@@ -62,7 +67,37 @@ app.route('/apis/uploadImage').post((req, res, next) => {
     })
     .catch(err => {
       logger.error(err.message);
+      logger.error(err);
       next(err);
+    });
+});
+
+
+
+app.route('/apis/uploadText').post((req, res, next) => {
+  const message = req.body.text;
+  const response = message.split('').join('...');
+
+  const axios = require('axios');
+  axios.post('http://35.236.167.99:5000/3sth/api/v1.0/chatbots/', {
+    msg: message,
+    rid: 1
+  })
+    .then(res => {
+      res.json(res);
+      res.end();
+    })
+    .catch(err => {
+      logger.error(err.message);
+      logger.error(err);
+      res.json({
+        "active": "chatbots",
+        "roomId": 1,
+        "chatbotResponse": response,
+        "algaeResponse": 'al...gae......',
+        "inputMsg": message
+      });
+      res.end();
     });
 });
 
@@ -82,7 +117,7 @@ app.route('/apis/getPoints').get((req, res) => {
     res.end();
   });
 });
-// [END app]
+// [END APIs]
 
 
 

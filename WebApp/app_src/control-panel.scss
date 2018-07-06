@@ -1,39 +1,39 @@
-/* control-panel */
-
+@import './base.scss';
 .control-panel {
+    @extend .flex;
+    @extend .flex-column;
+    @extend .flex-center;
+    @extend .transition-all;
     position: fixed;
-    bottom: 0;
+    bottom: 30px;
     left: 0;
     width: 100%;
+    .buttons .button {
+        font-size: 1.8em;
+        border: 0;
+    }
+    .textInput {
+        @extend .flex;
+        @extend .flex-center;
+        @extend .transition-all;
+        width: 100%;
+        max-width: 35em;
+    }
+    .textInput input {
+        background-color: transparent;
+        border: solid 1px white;
+        border-radius: 1px;
+        width: 80%;
+    }
+    .textInput button {
+        @extend .white-text;
+        border: solid 1px white;
+        border-radius: 1px;
+        margin: 0;
+    }
 }
 
-
-.control-panel .buttons .button {
-    font-size: 1.8em;
-    border: 0;
+.flashMask {
+    @extend .full-page;
+    @extend .untouchable;
 }
-
-
-.control-panel .buttons .button {
-    font-size: 1.8em;
-    border: 0;
-}
-
-.control-panel #textInput {
-    width: 100%;
-    max-width: 35em;
-}
-
-.control-panel #textInput input {
-    background-color: transparent;
-    border: solid 1px white;
-    border-radius: 1px;
-    width: 80%;
-}
-
-.control-panel #textInput #sent {
-    border: solid 1px white;
-    border-radius: 1px;
-    margin: 0;
-}
-

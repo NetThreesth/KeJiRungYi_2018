@@ -266,40 +266,71 @@ var CommonUtility = /** @class */ (function () {
 
 /***/ }),
 
-/***/ "./app_src/ControlPanel.ts":
-/*!*********************************!*\
-  !*** ./app_src/ControlPanel.ts ***!
-  \*********************************/
+/***/ "./app_src/ControlPanel.tsx":
+/*!**********************************!*\
+  !*** ./app_src/ControlPanel.tsx ***!
+  \**********************************/
 /*! exports provided: ControlPanel */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ControlPanel", function() { return ControlPanel; });
-var ControlPanel = /** @class */ (function () {
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _AppSetting__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./AppSetting */ "./app_src/AppSetting.ts");
+var __extends = (undefined && undefined.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+
+
+var ControlPanel = /** @class */ (function (_super) {
+    __extends(ControlPanel, _super);
     function ControlPanel() {
-        this.onTextAdd = null;
-        this.onImageAdd = null;
+        return _super !== null && _super.apply(this, arguments) || this;
     }
-    ControlPanel.prototype.initPanel = function (onTextAdd, onImageAdd) {
-        this.onTextAdd = onTextAdd;
-        this.onImageAdd = onImageAdd;
-        $('#textInputSwitch').on('click', this.switchTextInput.bind(this));
-        $('#sent').on('click', this.handleText.bind(this));
-        $('#fileUpload').on('change', this.handleFiles.bind(this));
+    ControlPanel.prototype.render = function () {
+        var _this = this;
+        return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "control-panel invisible" },
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("span", { className: "textInput invisible" },
+                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("input", { type: "text" }),
+                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("button", { className: "button", onClick: function () { return _this.handleText(); } },
+                    react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("i", { className: "fas fa-share" }))),
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "buttons" },
+                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("button", { id: "textInputSwitch", className: "button white-text", onClick: function () { return _this.switchTextInput(); } },
+                    react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("i", { className: "far fa-comment-dots" })),
+                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("label", { htmlFor: "fileUpload", className: "button white-text" },
+                    react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("i", { className: "fas fa-camera-retro" })),
+                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("input", { id: "fileUpload", type: "file", accept: "image/*", style: { display: 'none' }, onChange: function (e) { return _this.handleFiles(e); } })),
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "flashMask" }));
+    };
+    ;
+    ControlPanel.prototype.onTextAdd = function (text) {
+        this.props.messageCenter.addText(_AppSetting__WEBPACK_IMPORTED_MODULE_1__["Roles"].User, text);
+    };
+    ;
+    ControlPanel.prototype.onImageAdd = function (image) {
+        this.props.messageCenter.addImage(_AppSetting__WEBPACK_IMPORTED_MODULE_1__["Roles"].User, image);
     };
     ;
     ControlPanel.prototype.switchTextInput = function () {
-        var $textInput = $('#textInput');
+        var $textInput = $('.textInput');
         $textInput.toggleClass('visible').toggleClass('invisible');
     };
     ;
     ControlPanel.prototype.handleText = function () {
-        var _this = this;
-        var $input = $('#textInput>input');
-        var text = String($input.val());
+        var $input = $('.textInput>input');
+        var text = $input.val();
         if (!text)
             return;
+        text = String(text);
         $input.val('').focus();
         this.onTextAdd(text);
         var $mask = $('.flashMask');
@@ -307,10 +338,6 @@ var ControlPanel = /** @class */ (function () {
         setTimeout(function () {
             $mask.removeClass('flash');
         }, 500);
-        // mock response
-        window.setTimeout(function () {
-            _this.onTextAdd(text + '! ' + text + '! ' + text + '!!!');
-        }, 700);
     };
     ;
     ControlPanel.prototype.handleFiles = function ($ele) {
@@ -322,47 +349,84 @@ var ControlPanel = /** @class */ (function () {
         FR.addEventListener("load", function (e) {
             var base64Image = e.target['result'];
             _this.onImageAdd(base64Image);
-            $.ajax({
-                url: 'apis/uploadImage',
-                type: "post",
-                contentType: "application/json",
-                data: JSON.stringify({ base64Image: base64Image })
-            }).done(function (resp) {
-                _this.onTextAdd(resp.map(function (e) { return e.description + ": " + e.score.toFixed(3); }).join('; '));
-            });
         });
         FR.readAsDataURL(image);
     };
     ;
     return ControlPanel;
-}());
+}(react__WEBPACK_IMPORTED_MODULE_0__["Component"]));
 
 ;
 
 
 /***/ }),
 
-/***/ "./app_src/LoginPanel.ts":
-/*!*******************************!*\
-  !*** ./app_src/LoginPanel.ts ***!
-  \*******************************/
+/***/ "./app_src/LoginPanel.tsx":
+/*!********************************!*\
+  !*** ./app_src/LoginPanel.tsx ***!
+  \********************************/
 /*! exports provided: LoginPanel */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "LoginPanel", function() { return LoginPanel; });
-/* harmony import */ var _AppSetting__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./AppSetting */ "./app_src/AppSetting.ts");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _AppSetting__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./AppSetting */ "./app_src/AppSetting.ts");
+var __extends = (undefined && undefined.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 
-var clientId = '380947346613-l6gvf9laj9fuko3ljph9ej99olo5qa3k.apps.googleusercontent.com';
-var apiKey = 'AIzaSyBmozdLmtDDry_ah4NhYPqOTeZ2wr9Er2A';
-var LoginPanel = /** @class */ (function () {
+
+// declare const gapi: any;
+/*
+const clientId = '380947346613-l6gvf9laj9fuko3ljph9ej99olo5qa3k.apps.googleusercontent.com';
+const apiKey = 'AIzaSyBmozdLmtDDry_ah4NhYPqOTeZ2wr9Er2A';
+*/
+var LoginPanel = /** @class */ (function (_super) {
+    __extends(LoginPanel, _super);
     function LoginPanel() {
-        this.afterWordCardsAnimation = function () { };
-        this.afterLogin = function () { };
+        return _super !== null && _super.apply(this, arguments) || this;
     }
-    LoginPanel.prototype.init = function () {
-        this.setSignInButton();
+    LoginPanel.prototype.render = function () {
+        var _this = this;
+        return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { id: "loginPanel", className: "flex flex-center" },
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "white-text text-center" },
+                "\u6982\u5FF5\u6709\u540D\u800C\u6210\u6578\u64DA\uFF0C",
+                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("br", null),
+                " \u7269\u9AD4\u7121\u5F62\u800C\u6210\u6982\u5FF5\uFF0C",
+                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("br", null),
+                " \u5F7C\u81EA\u6210\u7A7A\u9593\uFF1B"),
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "white-text text-center" },
+                "\u842C\u7269\u7AC4\u6D41\u5B87\u5B99\uFF0C",
+                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("br", null),
+                " \u5728\u908A\u9699\u8655\u843D\u4E0B\uFF0C",
+                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("br", null),
+                " \u65BC\u5F7C\u7AEF\u518D\u73FE\uFF1B"),
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "white-text text-center" },
+                "\u5343\u842C\u5F62\u8C8C\uFF0C",
+                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("br", null),
+                " \u7D42\u6B78\u6D85\u69C3\uFF0C",
+                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("br", null),
+                " \u751F\u751F\u4E0D\u606F\uFF0C",
+                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("br", null),
+                " \u5468\u800C\u5FA9\u59CB\u3002"),
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { id: "signInWrapper" },
+                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("span", { className: "label white-text" }, "Sign in with:\u00A0"),
+                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("input", { type: "text", id: "signInName" }),
+                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("button", { type: "button", className: "sign-in-button", onClick: function (e) { _this.signInButtonClickHandler(e); } },
+                    react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("i", { className: "fas fa-arrow-circle-right" }))));
+    };
+    ;
+    LoginPanel.prototype.componentDidMount = function () {
         //gapi.load('client', this.initGoogleClient.bind(this));
         this.wordCardsAnimation();
     };
@@ -401,67 +465,63 @@ var LoginPanel = /** @class */ (function () {
             sustain: 1000,
             fadeOut: 2000
         };
-        this.fadeSequence($wordCards.toArray(), times, this.afterWordCardsAnimation);
+        this.fadeSequence($wordCards.toArray(), times, this.props.afterWordCardsAnimation);
     };
     ;
-    LoginPanel.prototype.setSignInButton = function () {
-        var _this = this;
-        $('.sign-in-button').on('click', function (e) {
-            var signInName = $('#signInName').val();
-            if (signInName.length === 0)
-                return;
-            _AppSetting__WEBPACK_IMPORTED_MODULE_0__["AppSetting"].userName = signInName;
-            _this.login();
-        });
+    LoginPanel.prototype.signInButtonClickHandler = function (e) {
+        var signInName = $('#signInName').val();
+        if (signInName.length === 0)
+            return;
+        _AppSetting__WEBPACK_IMPORTED_MODULE_1__["AppSetting"].userName = signInName;
+        this.login();
     };
     ;
-    LoginPanel.prototype.initGoogleClient = function () {
-        var _this = this;
-        gapi.client.init({
-            clientId: clientId,
-            apiKey: apiKey,
-            discoveryDocs: ['https://people.googleapis.com/$discovery/rest?version=v1'],
-            scope: 'profile'
-        }).then(function () {
-            var isSignedIn = gapi.auth2.getAuthInstance().isSignedIn.get();
-            if (!isSignedIn)
-                _this.setGoogleSignInButton();
-            else
-                _this.queryUser();
-        });
-    };
-    ;
-    LoginPanel.prototype.setGoogleSignInButton = function () {
-        gapi.auth2.getAuthInstance().isSignedIn.listen(this.login.bind(this));
-        // $('#signInWrapper').show();
-        $('#signinButton').on('click', function () { return gapi.auth2.getAuthInstance().signIn(); });
-    };
-    ;
-    LoginPanel.prototype.queryUser = function () {
-        var _this = this;
-        gapi.client.people.people.get({
-            'resourceName': 'people/me',
-            'requestMask.includeField': 'person.names'
-        }).then(function (resp) {
-            var name = resp.result.names[0].displayName;
-            _this.setLoiginButton(name);
-        });
-    };
-    ;
-    LoginPanel.prototype.setLoiginButton = function (name) {
-        // $('#signInWrapper').show();
-        $('#signInWrapper .buttonText').text(name);
-        $('#signinButton').on('click', this.login.bind(this));
-    };
-    ;
+    /*
+        private initGoogleClient() {
+            gapi.client.init({
+                clientId: clientId,
+                apiKey: apiKey,
+                discoveryDocs: ['https://people.googleapis.com/$discovery/rest?version=v1'],
+                scope: 'profile'
+            }).then(() => {
+                const isSignedIn = gapi.auth2.getAuthInstance().isSignedIn.get();
+                if (!isSignedIn) this.setGoogleSignInButton();
+                else this.queryUser();
+            });
+        };
+    
+        private setGoogleSignInButton() {
+            gapi.auth2.getAuthInstance().isSignedIn.listen(this.login.bind(this));
+            // $('#signInWrapper').show();
+            $('#signinButton').on('click', () => gapi.auth2.getAuthInstance().signIn());
+        };
+    
+    
+    
+         private queryUser() {
+            gapi.client.people.people.get({
+                'resourceName': 'people/me',
+                'requestMask.includeField': 'person.names'
+            }).then(resp => {
+                const name = resp.result.names[0].displayName;
+                this.setLoiginButton(name);
+            });
+        };
+    
+        private setLoiginButton(name) {
+            // $('#signInWrapper').show();
+            $('#signInWrapper .buttonText').text(name);
+            $('#signinButton').on('click', this.login.bind(this));
+        };
+    */
     LoginPanel.prototype.login = function () {
         var $loginPanel = $('#loginPanel');
         $loginPanel.animate({ opacity: 0 }, 2000, function () { return $loginPanel.hide(); });
-        this.afterLogin();
+        this.props.afterLogin();
     };
     ;
     return LoginPanel;
-}());
+}(react__WEBPACK_IMPORTED_MODULE_0__["Component"]));
 
 ;
 
@@ -480,7 +540,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MessageBoard", function() { return MessageBoard; });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _main__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./main */ "./app_src/main.tsx");
+/* harmony import */ var _MessageCenter__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./MessageCenter */ "./app_src/MessageCenter.ts");
 /* harmony import */ var _AppSetting__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./AppSetting */ "./app_src/AppSetting.ts");
 var __extends = (undefined && undefined.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
@@ -513,16 +573,17 @@ var MessageBoard = /** @class */ (function (_super) {
     };
     ;
     MessageBoard.prototype.createContent = function (content) {
-        if (content.type === _main__WEBPACK_IMPORTED_MODULE_1__["ContentType"].Text)
+        if (content.type === _MessageCenter__WEBPACK_IMPORTED_MODULE_1__["ContentType"].Text)
             return this.createTextMessage(content);
-        else if (content.type === _main__WEBPACK_IMPORTED_MODULE_1__["ContentType"].Image)
+        else if (content.type === _MessageCenter__WEBPACK_IMPORTED_MODULE_1__["ContentType"].Image)
             return this.createImageMessage(content);
     };
     ;
     MessageBoard.prototype.createTextMessage = function (content) {
         var isUser = content.role === _AppSetting__WEBPACK_IMPORTED_MODULE_2__["Roles"].User;
         var name = isUser ? _AppSetting__WEBPACK_IMPORTED_MODULE_2__["AppSetting"].userName : '';
-        return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "messageBox", style: !isUser ? { justifyContent: 'flex-end' } : {} },
+        var float = isUser ? 'left' : 'right';
+        return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "messageBox", style: { float: float } },
             react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("img", { src: this.getAvatar(content.role), className: "avatar" }),
             react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "name" }, name),
             react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "content" }, content.content));
@@ -530,12 +591,13 @@ var MessageBoard = /** @class */ (function (_super) {
     ;
     MessageBoard.prototype.createImageMessage = function (content) {
         var style = {
-            width: '60%',
+            width: '100%',
             maxWidth: '600px'
         };
         var isUser = content.role === _AppSetting__WEBPACK_IMPORTED_MODULE_2__["Roles"].User;
         var name = isUser ? _AppSetting__WEBPACK_IMPORTED_MODULE_2__["AppSetting"].userName : '';
-        return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "messageBox", style: !isUser ? { justifyContent: 'flex-end' } : {} },
+        var float = isUser ? 'left' : 'right';
+        return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "messageBox", style: { float: float } },
             react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("img", { src: this.getAvatar(content.role), className: "avatar" }),
             react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "name" }, name),
             react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "content" },
@@ -557,6 +619,69 @@ var MessageBoard = /** @class */ (function (_super) {
     ;
     return MessageBoard;
 }(react__WEBPACK_IMPORTED_MODULE_0__["Component"]));
+
+;
+
+
+/***/ }),
+
+/***/ "./app_src/MessageCenter.ts":
+/*!**********************************!*\
+  !*** ./app_src/MessageCenter.ts ***!
+  \**********************************/
+/*! exports provided: ContentType, MessageCenter */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ContentType", function() { return ContentType; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MessageCenter", function() { return MessageCenter; });
+/* harmony import */ var _AppSetting__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./AppSetting */ "./app_src/AppSetting.ts");
+
+var ContentType;
+(function (ContentType) {
+    ContentType[ContentType["Text"] = 0] = "Text";
+    ContentType[ContentType["Image"] = 1] = "Image";
+})(ContentType || (ContentType = {}));
+;
+;
+var MessageCenter = /** @class */ (function () {
+    function MessageCenter() {
+        this.contents = [];
+        this.observable = $({});
+    }
+    MessageCenter.prototype.addText = function (role, text) {
+        var _this = this;
+        this.contents.push({ role: role, type: ContentType.Text, content: text });
+        this.observable.trigger('add');
+        if (role !== _AppSetting__WEBPACK_IMPORTED_MODULE_0__["Roles"].User)
+            return;
+        $.ajax({
+            url: 'apis/uploadText',
+            type: "post",
+            contentType: "application/json",
+            data: JSON.stringify({ text: text })
+        }).done(function (resp) {
+            _this.addText(_AppSetting__WEBPACK_IMPORTED_MODULE_0__["Roles"].ChatBot, resp);
+        });
+    };
+    ;
+    MessageCenter.prototype.addImage = function (role, b64String) {
+        var _this = this;
+        this.contents.push({ role: role, type: ContentType.Image, content: b64String });
+        this.observable.trigger('add');
+        $.ajax({
+            url: 'apis/uploadImage',
+            type: "post",
+            contentType: "application/json",
+            data: JSON.stringify({ base64Image: b64String })
+        }).done(function (resp) {
+            _this.addText(_AppSetting__WEBPACK_IMPORTED_MODULE_0__["Roles"].ChatBot, resp.map(function (e) { return e.description + ": " + e.score.toFixed(3); }).join('; '));
+        });
+    };
+    ;
+    return MessageCenter;
+}());
 
 ;
 
@@ -1070,23 +1195,20 @@ var Scene = /** @class */ (function () {
 /*!**************************!*\
   !*** ./app_src/main.tsx ***!
   \**************************/
-/*! exports provided: ContentType, MessageCenter */
+/*! no exports provided */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ContentType", function() { return ContentType; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MessageCenter", function() { return MessageCenter; });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-dom */ "react-dom");
 /* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react_dom__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _AppSetting__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./AppSetting */ "./app_src/AppSetting.ts");
+/* harmony import */ var _MessageCenter__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./MessageCenter */ "./app_src/MessageCenter.ts");
 /* harmony import */ var _Scene__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Scene */ "./app_src/Scene.ts");
-/* harmony import */ var _LoginPanel__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./LoginPanel */ "./app_src/LoginPanel.ts");
-/* harmony import */ var _ControlPanel__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./ControlPanel */ "./app_src/ControlPanel.ts");
+/* harmony import */ var _LoginPanel__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./LoginPanel */ "./app_src/LoginPanel.tsx");
+/* harmony import */ var _ControlPanel__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./ControlPanel */ "./app_src/ControlPanel.tsx");
 /* harmony import */ var _MessageBoard__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./MessageBoard */ "./app_src/MessageBoard.tsx");
-/* harmony import */ var _CommonUtility__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./CommonUtility */ "./app_src/CommonUtility.ts");
 
 
 
@@ -1094,49 +1216,16 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-
-var loginPanel = new _LoginPanel__WEBPACK_IMPORTED_MODULE_4__["LoginPanel"]();
 var scene = new _Scene__WEBPACK_IMPORTED_MODULE_3__["Scene"]();
-loginPanel.afterWordCardsAnimation = scene.transformation.bind(scene);
-loginPanel.afterLogin = function () {
-    $('.control-panel').removeClass('invisible').addClass('visible');
-    scene.zoomIn.bind(scene)();
-};
-loginPanel.init();
 scene.init();
-var ContentType;
-(function (ContentType) {
-    ContentType[ContentType["Text"] = 0] = "Text";
-    ContentType[ContentType["Image"] = 1] = "Image";
-})(ContentType || (ContentType = {}));
-;
-;
-var MessageCenter = /** @class */ (function () {
-    function MessageCenter() {
-        this.contents = [];
-        this.observable = $({});
-    }
-    MessageCenter.prototype.addText = function (role, text) {
-        this.contents.push({ role: role, type: ContentType.Text, content: text });
-        this.observable.trigger('add');
-    };
-    ;
-    MessageCenter.prototype.addImage = function (role, b64String) {
-        this.contents.push({ role: role, type: ContentType.Image, content: b64String });
-        this.observable.trigger('add');
-    };
-    ;
-    return MessageCenter;
-}());
-
-;
-var messageCenter = new MessageCenter();
-new _ControlPanel__WEBPACK_IMPORTED_MODULE_5__["ControlPanel"]().initPanel(function (text) { return messageCenter.addText(_AppSetting__WEBPACK_IMPORTED_MODULE_2__["Roles"].User, text); }, function (text) { return messageCenter.addImage(_AppSetting__WEBPACK_IMPORTED_MODULE_2__["Roles"].User, text); });
-messageCenter.addText(_AppSetting__WEBPACK_IMPORTED_MODULE_2__["Roles"].User, _CommonUtility__WEBPACK_IMPORTED_MODULE_7__["CommonUtility"].createArray(30).map(function (e) { return 'and'; }).join(' '));
-messageCenter.addText(_AppSetting__WEBPACK_IMPORTED_MODULE_2__["Roles"].ChatBot, _CommonUtility__WEBPACK_IMPORTED_MODULE_7__["CommonUtility"].createArray(10).map(function (e) { return '@@@'; }).join(' '));
-messageCenter.addText(_AppSetting__WEBPACK_IMPORTED_MODULE_2__["Roles"].Algae, _CommonUtility__WEBPACK_IMPORTED_MODULE_7__["CommonUtility"].createArray(20).map(function (e) { return 'FFF'; }).join(' '));
-messageCenter.addText(_AppSetting__WEBPACK_IMPORTED_MODULE_2__["Roles"].User, _CommonUtility__WEBPACK_IMPORTED_MODULE_7__["CommonUtility"].createArray(30).map(function (e) { return 'xxx'; }).join(' '));
-react_dom__WEBPACK_IMPORTED_MODULE_1__["render"](react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_MessageBoard__WEBPACK_IMPORTED_MODULE_6__["MessageBoard"], { messageCenter: messageCenter }), document.getElementById("app"));
+var messageCenter = new _MessageCenter__WEBPACK_IMPORTED_MODULE_2__["MessageCenter"]();
+react_dom__WEBPACK_IMPORTED_MODULE_1__["render"](react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", null,
+    react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_LoginPanel__WEBPACK_IMPORTED_MODULE_4__["LoginPanel"], { afterWordCardsAnimation: scene.transformation.bind(scene), afterLogin: function () {
+            $('.control-panel').removeClass('invisible').addClass('visible');
+            scene.zoomIn.bind(scene)();
+        } }),
+    react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_MessageBoard__WEBPACK_IMPORTED_MODULE_6__["MessageBoard"], { messageCenter: messageCenter }),
+    react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_ControlPanel__WEBPACK_IMPORTED_MODULE_5__["ControlPanel"], { messageCenter: messageCenter })), document.getElementById("app"));
 
 
 /***/ }),
