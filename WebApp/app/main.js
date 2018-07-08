@@ -662,7 +662,8 @@ var MessageCenter = /** @class */ (function () {
             contentType: "application/json",
             data: JSON.stringify({ text: text })
         }).done(function (resp) {
-            _this.addText(_AppSetting__WEBPACK_IMPORTED_MODULE_0__["Roles"].ChatBot, resp);
+            _this.addText(_AppSetting__WEBPACK_IMPORTED_MODULE_0__["Roles"].Algae, resp.algaeResponse);
+            _this.addText(_AppSetting__WEBPACK_IMPORTED_MODULE_0__["Roles"].ChatBot, resp.chatbotResponse);
         });
     };
     ;

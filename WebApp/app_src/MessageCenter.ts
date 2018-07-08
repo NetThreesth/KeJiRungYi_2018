@@ -27,7 +27,8 @@ export class MessageCenter {
             contentType: "application/json",
             data: JSON.stringify({ text: text })
         }).done(resp => {
-            this.addText(Roles.ChatBot, resp);
+            this.addText(Roles.Algae, resp.algaeResponse);
+            this.addText(Roles.ChatBot, resp.chatbotResponse);
         });
     };
     addImage(role: Roles, b64String: string) {

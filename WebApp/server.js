@@ -59,18 +59,43 @@ app.route('/apis/uploadImage').post((req, res, next) => {
   };
   client.annotateImage(query)
     .then(results => {
+      logger.info('Vision Api result:' + JSON.stringify(results));
       const labels = results[0].labelAnnotations;
-      logger.info('Labels:');
       labels.forEach(label => logger.info(label));
+
+
+      /*       const Translate = require('@google-cloud/translate');
+            const translate = new Translate();
+            translate
+              .translate(text, target)
+              .then(results => {
+                let translations = results[0];
+                translations = Array.isArray(translations)
+                  ? translations
+                  : [translations];
+      
+                console.log('Translations:');
+                translations.forEach((translation, i) => {
+                  console.log(`${text[i]} => (${target}) ${translation}`);
+                });
+              })
+              .catch(err => {
+                console.error('ERROR:', err);
+              }); */
+
       res.json(labels);
       res.end();
     })
-    .catch(err => {
-      logger.error(err.message);
-      logger.error(err);
-      next(err);
-    });
+    .catch(errorHandler);
+
+
+  function errorHandler(err) {
+    logger.error(err);
+    logger.error(err.message);
+    next(err);
+  };
 });
+
 
 
 
@@ -83,13 +108,14 @@ app.route('/apis/uploadText').post((req, res, next) => {
     msg: message,
     rid: 1
   })
-    .then(res => {
-      res.json(res);
+    .then(result => {
+      logger.info(result.data);
+      res.json(result.data);
       res.end();
     })
     .catch(err => {
-      logger.error(err.message);
       logger.error(err);
+      logger.error(err.message);
       res.json({
         "active": "chatbots",
         "roomId": 1,
