@@ -61,30 +61,27 @@ app.route('/apis/uploadImage').post((req, res, next) => {
     .then(results => {
       logger.info('Vision Api result:' + JSON.stringify(results));
       const labels = results[0].labelAnnotations;
-      labels.forEach(label => logger.info(label));
+      const descriptions = labels.map(label => label.description).join(' ');
 
 
-      /*       const Translate = require('@google-cloud/translate');
-            const translate = new Translate();
-            translate
-              .translate(text, target)
-              .then(results => {
-                let translations = results[0];
-                translations = Array.isArray(translations)
-                  ? translations
-                  : [translations];
-      
-                console.log('Translations:');
-                translations.forEach((translation, i) => {
-                  console.log(`${text[i]} => (${target}) ${translation}`);
-                });
-              })
-              .catch(err => {
-                console.error('ERROR:', err);
-              }); */
-
-      res.json(labels);
-      res.end();
+      const Translate = require('@google-cloud/translate');
+      const translate = new Translate();
+      translate
+        .translate(descriptions, 'zh-TW')
+        .then(results => {
+          let translations = results[0];
+          translations = Array.isArray(translations)
+            ? translations
+            : [translations];
+          const translationResult = translations.join('');
+          logger.info('Translations: ' + translationResult);
+          res.json(translationResult);
+          res.end();
+        })
+        .catch(errorHandler);
+      /* 
+           res.json(labels);
+           res.end();*/
     })
     .catch(errorHandler);
 

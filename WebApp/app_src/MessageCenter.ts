@@ -41,7 +41,7 @@ export class MessageCenter {
             contentType: "application/json",
             data: JSON.stringify({ base64Image: b64String })
         }).done(resp => {
-            this.addText(Roles.ChatBot, resp.map(e => `${e.description}: ${e.score.toFixed(3)}`).join('; '));
+            this.addText(Roles.ChatBot, JSON.stringify(resp));
         });
     };
 };

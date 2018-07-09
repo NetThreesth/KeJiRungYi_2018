@@ -677,7 +677,7 @@ var MessageCenter = /** @class */ (function () {
             contentType: "application/json",
             data: JSON.stringify({ base64Image: b64String })
         }).done(function (resp) {
-            _this.addText(_AppSetting__WEBPACK_IMPORTED_MODULE_0__["Roles"].ChatBot, resp.map(function (e) { return e.description + ": " + e.score.toFixed(3); }).join('; '));
+            _this.addText(_AppSetting__WEBPACK_IMPORTED_MODULE_0__["Roles"].ChatBot, JSON.stringify(resp));
         });
     };
     ;
