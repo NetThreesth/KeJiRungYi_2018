@@ -14,12 +14,12 @@ const repo = module.exports = {};
 repo.Message = sequelize.define(
     'message', {
         id: { type: Sequelize.STRING, primaryKey: true },
-        time: { type: Sequelize.STRING },
+        time: { type: Sequelize.TIME },
         message: { type: Sequelize.STRING },
         name: { type: Sequelize.STRING }, 
         chatroomId : { type: Sequelize.STRING },
     }, {
-        timestamps: false, freezeTableName: true,
+        timestamps: false, 
         freezeTableName: true,
         tableName: 'messagelog',
     }

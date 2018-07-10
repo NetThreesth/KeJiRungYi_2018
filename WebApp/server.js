@@ -22,13 +22,42 @@ app.use((err, req, res, next) => {
   });
   res.end();
 });
-
-const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => {
-  logger.info(`App listening on port ${PORT}`);
-  logger.info('Press Ctrl+C to quit.');
-});
 // [END Setup]
+
+
+
+// [GraphQL]
+const express_graphql = require('express-graphql');
+const graphql = require('graphql');
+const repo = require('./server/repository.js');
+
+const MessageType = new graphql.GraphQLObjectType({
+  name: 'Message',
+  fields: {
+    id: { type: graphql.GraphQLString },
+    time: { type: graphql.GraphQLString },
+    message: { type: graphql.GraphQLString },
+    name: { type: graphql.GraphQLString },
+    chatroomId: { type: graphql.GraphQLString },
+  }
+});
+
+const rootQuery = new graphql.GraphQLObjectType({
+  name: 'Query',
+  fields: {
+    messages: {
+      type: new graphql.GraphQLList(MessageType),
+      resolve: () => repo.Message.findAll()
+    }
+  }
+});
+
+
+app.use('/graphql', express_graphql({
+  schema: new graphql.GraphQLSchema({ query: rootQuery }),
+  graphiql: true
+}));
+// [END GraphQL]
 
 
 
@@ -144,3 +173,9 @@ app.route('/apis/getPoints').get((req, res) => {
 
 
 
+
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => {
+  logger.info(`App listening on port ${PORT}`);
+  logger.info('Press Ctrl+C to quit.');
+});
