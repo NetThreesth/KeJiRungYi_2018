@@ -2,29 +2,33 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 
 
-import { MessageCenter } from './MessageCenter';
+import { MessageCenter, EventCenter,Event } from './MessageCenter';
 
 import { Scene } from './Scene';
+import { DevPanel } from './DevPanel';
 import { LoginPanel } from './LoginPanel';
 import { ControlPanel } from './ControlPanel';
 import { MessageBoard } from './MessageBoard';
 
 
-const scene = new Scene();
-scene.init();
 const messageCenter = new MessageCenter();
+const eventCenter = new EventCenter();
 
+// this.observable.trigger('add');
+
+/* afterWordCardsAnimation={scene.transformation.bind(scene)}
+afterLogin={() => {
+    $('.control-panel').removeClass('invisible').addClass('visible');
+    scene.zoomIn.bind(scene)();
+}} /> */
 
 ReactDOM.render(
     <div>
-        <LoginPanel
-            afterWordCardsAnimation={scene.transformation.bind(scene)}
-            afterLogin={() => {
-                $('.control-panel').removeClass('invisible').addClass('visible');
-                scene.zoomIn.bind(scene)();
-            }} />
+        <Scene eventCenter={eventCenter} />
+        <DevPanel eventCenter={eventCenter} />
+        <LoginPanel eventCenter={eventCenter} />
         <MessageBoard messageCenter={messageCenter} />
-        <ControlPanel messageCenter={messageCenter} />
+        <ControlPanel messageCenter={messageCenter} eventCenter={eventCenter} />
     </div>,
     document.getElementById("app")
 );

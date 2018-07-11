@@ -1,17 +1,22 @@
+
+import * as React from "react";
 import * as BABYLON from 'babylonjs';
 import * as $ from 'jquery';
 import { CommonUtility } from './CommonUtility';
 import { BabylonUtility, Line } from './BabylonUtility';
-import { ControlPanel } from './ControlPanel';
+import { DevPanelData } from './DevPanel';
+
+import { EventCenter, Event } from './MessageCenter';
 
 
-export class Scene {
+
+export class Scene extends React.Component<{ eventCenter: EventCenter }> {
 
     private texts: BABYLON.Mesh[] = [];
 
 
-    private canvas = document.getElementById("renderCanvas");
-    private engine = new BABYLON.Engine(this.canvas as HTMLCanvasElement, true);
+    private canvas: HTMLElement;
+    private engine: BABYLON.Engine;
     private scene: BABYLON.Scene;
 
 
@@ -23,10 +28,12 @@ export class Scene {
     private glowLayerForParticle: BABYLON.GlowLayer;
     private bubbleSprays: BABYLON.SolidParticleSystem[] = [];
 
+    render() {
+        return <canvas id="renderCanvas" touch-action="none"></canvas>;
+    };
 
 
-    /******* Add the create scene function ******/
-    init() {
+    componentDidMount() {
 
         this.initScene();
         this.getTexts();
@@ -35,14 +42,16 @@ export class Scene {
         this.registerRunRenderLoop();
         // new ControlPanel().initPanel(this.onTextAdd.bind(this), this.onImageAdd.bind(this));
 
-
-        $('#devPanel').show();
+        this.props.eventCenter.on(Event.afterWordCardsAnimation, this.transformation.bind(this));
+        this.props.eventCenter.on(Event.afterLogin, this.zoomIn.bind(this));
         window.addEventListener("resize", () => {
             this.engine.resize();
         });
     };
 
     private initScene() {
+        this.canvas = document.getElementById("renderCanvas");
+        this.engine = new BABYLON.Engine(this.canvas as HTMLCanvasElement, true);
         const scene = this.scene = new BABYLON.Scene(this.engine);
 
         const camera = this.camera = new BABYLON.UniversalCamera("Camera", new BABYLON.Vector3(0, 0, -25), this.scene);
@@ -187,7 +196,7 @@ export class Scene {
 
 
             /** render after */
-            this.updateDevPanel();
+            this.publishDevData();
 
             /*             const text = this.texts[0];
                         if (!text) return;
@@ -208,15 +217,14 @@ export class Scene {
         });
     };
 
-    private updateDevPanel() {
-
-        const $fps = document.getElementById('fps');
-        $fps.innerHTML = this.engine.getFps().toFixed() + ' fps';
-        const $coordinate = document.getElementById('coordinate');
-        $coordinate.innerHTML = BabylonUtility.positionToString(this.camera.position);
+    private publishDevData() {
+        this.props.eventCenter.trigger(Event.updateDevPanelData, {
+            fps: this.engine.getFps().toFixed() + ' fps',
+            coordinate: BabylonUtility.positionToString(this.camera.position)
+        });
     };
 
-    private onTextAdd(text: string, x: number, y: number, z: number) {
+    /* private onTextAdd(text: string, x: number, y: number, z: number) {
         const outputplaneTexture = new BABYLON.DynamicTexture(
             "dynamic texture",
             { width: 500, height: 80 },
@@ -263,7 +271,7 @@ export class Scene {
         material.specularColor = new BABYLON.Color3(0, 0, 0);
         material.emissiveColor = new BABYLON.Color3(1, 1, 1);
         material.backFaceCulling = false;
-    };
+    }; */
 
 
     private colorsSetForParticle = [
@@ -275,6 +283,8 @@ export class Scene {
         set.glowColor = set.glowColor.map((n, i) => i !== 3 ? n / 255 : n);
         return set;
     });
+
+
     private particles: {
         mesh: BABYLON.Mesh,
         translateVector: BABYLON.Vector3,
@@ -322,6 +332,7 @@ export class Scene {
             duration: this.getDurationForParticle()
         });
     };
+
 
     private linesForLinesystem: BABYLON.Vector3[][] = [];
     private linesystem: BABYLON.LinesMesh = null;
@@ -576,7 +587,7 @@ export class Scene {
     };
 
 
-    transformation() {
+    private transformation() {
         this.translateType = 'ToOrigin';
         setTimeout(() => {
             this.translateType = 'ToChatRoomNode';
@@ -588,7 +599,7 @@ export class Scene {
         }, 1.8 * 1000);
     };
 
-    zoomIn() {
+    private zoomIn() {
         const randomChatRoomIndex = CommonUtility.getRandomIntInRange(0, this.chatRoomsCenter.length - 1);
         const chatRoom = this.chatRoomsCenter[randomChatRoomIndex];
         const destination = chatRoom ?

@@ -45,3 +45,19 @@ export class MessageCenter {
         });
     };
 };
+
+export class EventCenter {
+    private eventCenter = $({});
+    on<T>(event: Event, handler: (data: T) => void) {
+        this.eventCenter.on(String(event), (event, data) => handler(data));
+    };
+    trigger<T>(event: Event, data?: T) {
+        this.eventCenter.trigger(String(event), data);
+    };
+};
+
+export enum Event {
+    updateDevPanelData,
+    afterWordCardsAnimation,
+    afterLogin,
+}

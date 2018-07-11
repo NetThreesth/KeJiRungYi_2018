@@ -1,0 +1,12 @@
+#devPanel {
+    display: none;
+    position: fixed;
+    top: 0;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+#devPanel td {
+    width: 50px;
+    padding: 3px;
+}

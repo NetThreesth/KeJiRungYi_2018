@@ -9,13 +9,15 @@ sequelize.authenticate()
 const repo = module.exports = {};
 
 repo.Message = sequelize.define(
-    'message', {
+    'message',
+    {
         id: { type: Sequelize.STRING, primaryKey: true },
         time: { type: Sequelize.TIME },
         message: { type: Sequelize.STRING },
         name: { type: Sequelize.STRING },
         chatroomId: { type: Sequelize.STRING },
-    }, {
+    },
+    {
         timestamps: false,
         freezeTableName: true,
         tableName: 'messagelog',

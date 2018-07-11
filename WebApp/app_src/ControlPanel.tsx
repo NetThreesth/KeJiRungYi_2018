@@ -1,9 +1,9 @@
 import * as React from "react";
-import { MessageCenter } from './MessageCenter';
+import { MessageCenter, EventCenter, Event } from './MessageCenter';
 import { Roles } from './AppSetting';
 
 export class ControlPanel
-    extends React.Component<{ messageCenter: MessageCenter }>
+    extends React.Component<{ messageCenter: MessageCenter, eventCenter: EventCenter }>
 {
     render() {
         return <div className="control-panel invisible">
@@ -27,6 +27,11 @@ export class ControlPanel
         </div>;
     };
 
+    componentDidMount() {
+        this.props.eventCenter.on(Event.afterLogin, () => {
+            $('.control-panel').removeClass('invisible').addClass('visible');
+        });
+    };
 
     private onTextAdd(text: string) {
         this.props.messageCenter.addText(Roles.User, text);
