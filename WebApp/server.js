@@ -52,7 +52,6 @@ const rootQuery = new graphql.GraphQLObjectType({
   }
 });
 
-
 app.use('/graphql', express_graphql({
   schema: new graphql.GraphQLSchema({ query: rootQuery }),
   graphiql: true
@@ -99,29 +98,19 @@ app.route('/apis/uploadImage').post((req, res, next) => {
         .translate(descriptions, 'zh-TW')
         .then(results => {
           let translations = results[0];
-          translations = Array.isArray(translations)
-            ? translations
-            : [translations];
+          translations = Array.isArray(translations) ? translations : [translations];
           const translationResult = translations.join('');
           logger.info('Translations: ' + translationResult);
           res.json(translationResult);
           res.end();
         })
-        .catch(errorHandler);
+        .catch(err => errorHandler(err, next));
       /* 
            res.json(labels);
            res.end();*/
     })
-    .catch(errorHandler);
-
-
-  function errorHandler(err) {
-    logger.error(err);
-    logger.error(err.message);
-    next(err);
-  };
+    .catch(err => errorHandler(err, next));
 });
-
 
 
 
@@ -139,18 +128,7 @@ app.route('/apis/uploadText').post((req, res, next) => {
       res.json(result.data);
       res.end();
     })
-    .catch(err => {
-      logger.error(err);
-      logger.error(err.message);
-      res.json({
-        "active": "chatbots",
-        "roomId": 1,
-        "chatbotResponse": response,
-        "algaeResponse": 'al...gae......',
-        "inputMsg": message
-      });
-      res.end();
-    });
+    .catch(err => errorHandler(err, next));
 });
 
 
@@ -169,6 +147,14 @@ app.route('/apis/getPoints').get((req, res) => {
     res.end();
   });
 });
+
+
+
+function errorHandler(err, next) {
+  logger.error(err);
+  logger.error(err.message);
+  if (next) next(err);
+};
 // [END APIs]
 
 
