@@ -1,4 +1,4 @@
-const logger = require('./server/logger');
+const logger = require('./logger');
 const Sequelize = require('sequelize');
 
 const sequelize = new Sequelize('mysql://root:threesththreesththreesth@35.236.188.139:3306/threesth');
