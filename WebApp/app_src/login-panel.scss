@@ -1,5 +1,3 @@
-/* loginPanel */
-
 #loginPanel {
     position: fixed;
     top: 0;
@@ -8,14 +6,24 @@
     height: 100%;
     background-color: rgba(0, 0, 0, 0.3);
     overflow: auto;
+    >.wordCard {
+        display: none;
+        white-space: nowrap;
+    }
+    .skipAnimation {
+        position: absolute;
+        bottom: 10%;
+        left: 50%;
+        transform: translate(-50%);
+        >button {
+            @extend .button;
+            @extend .white-text;
+            border: 1px solid white;
+            border-radius: 2px;
+            padding: 0 20px;
+        }
+    }
 }
-
-
-#loginPanel>div {
-    display: none;
-    white-space: nowrap;
-}
-
 
 #signinButton {
     display: inline-block;
@@ -32,7 +40,6 @@
 #signinButton:hover {
     cursor: pointer;
 }
-
 
 #signInWrapper .label {
     font-family: serif;

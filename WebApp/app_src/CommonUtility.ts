@@ -70,4 +70,11 @@ export class CommonUtility {
         const array = Array.apply(null, { length: length });
         return array as T[];
     };
+
+    static getQueryString(field: string, url?: string) {
+        const href = url ? url : window.location.href;
+        const reg = new RegExp('[?&]' + field + '=([^&#]*)', 'i');
+        const string = reg.exec(href);
+        return string ? decodeURIComponent(string[1]) : null;
+    };
 };

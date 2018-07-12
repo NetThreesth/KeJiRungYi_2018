@@ -12,10 +12,6 @@ import { EventCenter, Event } from './MessageCenter';
 
 export class Scene extends React.Component<{ eventCenter: EventCenter }> {
 
-    private texts: BABYLON.Mesh[] = [];
-
-
-    private canvas: HTMLElement;
     private engine: BABYLON.Engine;
     private scene: BABYLON.Scene;
 
@@ -40,7 +36,6 @@ export class Scene extends React.Component<{ eventCenter: EventCenter }> {
         this.getPoints();
 
         this.registerRunRenderLoop();
-        // new ControlPanel().initPanel(this.onTextAdd.bind(this), this.onImageAdd.bind(this));
 
         this.props.eventCenter.on(Event.afterWordCardsAnimation, this.transformation.bind(this));
         this.props.eventCenter.on(Event.afterLogin, this.zoomIn.bind(this));
@@ -50,14 +45,14 @@ export class Scene extends React.Component<{ eventCenter: EventCenter }> {
     };
 
     private initScene() {
-        this.canvas = document.getElementById("renderCanvas");
-        this.engine = new BABYLON.Engine(this.canvas as HTMLCanvasElement, true);
+        const canvas = document.getElementById("renderCanvas") as HTMLCanvasElement;
+        this.engine = new BABYLON.Engine(canvas, true);
         const scene = this.scene = new BABYLON.Scene(this.engine);
 
         const camera = this.camera = new BABYLON.UniversalCamera("Camera", new BABYLON.Vector3(0, 0, -25), this.scene);
         camera.speed = 0.5;
         camera.setTarget(BABYLON.Vector3.Zero());
-        camera.attachControl(this.canvas, true);
+        camera.attachControl(canvas, true);
 
 
         new BABYLON.HemisphericLight("HemiLight1", new BABYLON.Vector3(0, 0, 10), scene).intensity = 0.8;
@@ -168,7 +163,6 @@ export class Scene extends React.Component<{ eventCenter: EventCenter }> {
 
         const origin = { x: 0, y: 0, z: 0 } as BABYLON.Vector3;
         const viewport = this.camera.viewport.toGlobal(this.camera.getEngine(), null);
-        const $mark = $('.mark');
 
 
         this.engine.runRenderLoop(() => {
@@ -197,23 +191,6 @@ export class Scene extends React.Component<{ eventCenter: EventCenter }> {
 
             /** render after */
             this.publishDevData();
-
-            /*             const text = this.texts[0];
-                        if (!text) return;
-                        const transformationMatrix = this.camera.getViewMatrix().multiply(this.camera.getProjectionMatrix());
-                        const projectedPosition = BABYLON.Vector3.Project(origin, text.computeWorldMatrix(false), transformationMatrix, viewport);
-            
-                        if (projectedPosition.z > 1) {
-                            $mark.hide();
-                            return;
-                        }
-                        $mark.show();
-                        $mark.css('top', projectedPosition.y + 60);
-                        $mark.css('left', projectedPosition.x);
-                        const scale = 1 / (1 - projectedPosition.z);
-                        // $mark.css('transform', 'translate(-50%, -50%) scale(' + scale + ',' + scale + ')');
-                        $mark.text(JSON.stringify(projectedPosition)); */
-            /** render after end */
         });
     };
 
@@ -224,54 +201,6 @@ export class Scene extends React.Component<{ eventCenter: EventCenter }> {
         });
     };
 
-    /* private onTextAdd(text: string, x: number, y: number, z: number) {
-        const outputplaneTexture = new BABYLON.DynamicTexture(
-            "dynamic texture",
-            { width: 500, height: 80 },
-            this.scene,
-            true
-        );
-        outputplaneTexture.drawText(text, 0, 60, "60px verdana", "white", 'true');
-        outputplaneTexture.hasAlpha = true;
-
-        const outputplane = BABYLON.MeshBuilder.CreatePlane(
-            "outputplane",
-            { width: 5, height: 1 },
-            this.scene
-        );
-        outputplane.billboardMode = BABYLON.AbstractMesh.BILLBOARDMODE_ALL;
-        outputplane.position = new BABYLON.Vector3(x, y, z);
-        outputplane.scaling.y = 1;
-        outputplane['_message'] = text;
-
-        const material = outputplane.material = new BABYLON.StandardMaterial("outputplane", this.scene);
-        material.diffuseTexture = outputplaneTexture;
-        material.alpha = 0;
-        material.backFaceCulling = false;
-
-        this.texts.push(outputplane);
-    };
-
-
-    private onImageAdd(image: string, x: number, y: number, z: number) {
-        const outputplaneTexture = BABYLON.Texture.CreateFromBase64String(
-            image,
-            'image-' + Date.now,
-            this.scene
-        );
-        // outputplaneTexture.hasAlpha = true;
-
-        const outputplane = BABYLON.MeshBuilder.CreatePlane("outputplane", { width: 5, height: 5 }, this.scene);
-        outputplane.billboardMode = BABYLON.AbstractMesh.BILLBOARDMODE_ALL;
-        outputplane.position = new BABYLON.Vector3(x, y, z);
-        outputplane.scaling.y = 1;
-
-        const material = outputplane.material = new BABYLON.StandardMaterial("outputplane", this.scene);
-        material.diffuseTexture = outputplaneTexture;
-        material.specularColor = new BABYLON.Color3(0, 0, 0);
-        material.emissiveColor = new BABYLON.Color3(1, 1, 1);
-        material.backFaceCulling = false;
-    }; */
 
 
     private colorsSetForParticle = [

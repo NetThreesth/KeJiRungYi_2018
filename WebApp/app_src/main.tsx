@@ -2,13 +2,19 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 
 
-import { MessageCenter, EventCenter,Event } from './MessageCenter';
+import { MessageCenter, EventCenter, Event } from './MessageCenter';
 
 import { Scene } from './Scene';
 import { DevPanel } from './DevPanel';
 import { LoginPanel } from './LoginPanel';
 import { ControlPanel } from './ControlPanel';
 import { MessageBoard } from './MessageBoard';
+import { CommonUtility } from './CommonUtility';
+
+
+const isdev = CommonUtility.getQueryString('isdev');
+if (!isdev) console.info = console.debug = console.log = () => { };
+
 
 
 const eventCenter = new EventCenter();

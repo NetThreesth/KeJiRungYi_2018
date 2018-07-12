@@ -6,7 +6,7 @@ export class ControlPanel
     extends React.Component<{ messageCenter: MessageCenter, eventCenter: EventCenter }>
 {
     render() {
-        return <div className="control-panel invisible">
+        return <div className="control-panel invisible untouchable">
             <span className="textInput invisible">
                 <input type="text" />
                 <button className="button" onClick={() => this.handleText()}>
@@ -29,7 +29,7 @@ export class ControlPanel
 
     componentDidMount() {
         this.props.eventCenter.on(Event.afterLogin, () => {
-            $('.control-panel').removeClass('invisible').addClass('visible');
+            $('.control-panel').removeClass(['invisible', 'untouchable']).addClass('visible');
         });
     };
 

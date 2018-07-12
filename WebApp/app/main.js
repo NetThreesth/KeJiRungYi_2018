@@ -258,6 +258,13 @@ var CommonUtility = /** @class */ (function () {
         return array;
     };
     ;
+    CommonUtility.getQueryString = function (field, url) {
+        var href = url ? url : window.location.href;
+        var reg = new RegExp('[?&]' + field + '=([^&#]*)', 'i');
+        var string = reg.exec(href);
+        return string ? decodeURIComponent(string[1]) : null;
+    };
+    ;
     return CommonUtility;
 }());
 
@@ -300,7 +307,7 @@ var ControlPanel = /** @class */ (function (_super) {
     }
     ControlPanel.prototype.render = function () {
         var _this = this;
-        return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "control-panel invisible" },
+        return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "control-panel invisible untouchable" },
             react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("span", { className: "textInput invisible" },
                 react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("input", { type: "text" }),
                 react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("button", { className: "button", onClick: function () { return _this.handleText(); } },
@@ -316,7 +323,7 @@ var ControlPanel = /** @class */ (function (_super) {
     ;
     ControlPanel.prototype.componentDidMount = function () {
         this.props.eventCenter.on(_MessageCenter__WEBPACK_IMPORTED_MODULE_1__["Event"].afterLogin, function () {
-            $('.control-panel').removeClass('invisible').addClass('visible');
+            $('.control-panel').removeClass(['invisible', 'untouchable']).addClass('visible');
         });
     };
     ;
@@ -382,6 +389,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _MessageCenter__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./MessageCenter */ "./app_src/MessageCenter.ts");
+/* harmony import */ var _CommonUtility__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./CommonUtility */ "./app_src/CommonUtility.ts");
 var __extends = (undefined && undefined.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -392,6 +400,7 @@ var __extends = (undefined && undefined.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+
 
 
 var DevPanel = /** @class */ (function (_super) {
@@ -415,6 +424,9 @@ var DevPanel = /** @class */ (function (_super) {
     ;
     DevPanel.prototype.componentDidMount = function () {
         var _this = this;
+        var isdev = _CommonUtility__WEBPACK_IMPORTED_MODULE_2__["CommonUtility"].getQueryString('isdev');
+        if (!isdev)
+            return;
         $('#devPanel').show();
         this.props.eventCenter.on(_MessageCenter__WEBPACK_IMPORTED_MODULE_1__["Event"].updateDevPanelData, function (data) {
             _this.setState({ fps: data.fps, coordinate: data.coordinate });
@@ -464,24 +476,26 @@ var __extends = (undefined && undefined.__extends) || (function () {
 var LoginPanel = /** @class */ (function (_super) {
     __extends(LoginPanel, _super);
     function LoginPanel() {
-        return _super !== null && _super.apply(this, arguments) || this;
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.performance = null;
+        return _this;
     }
     LoginPanel.prototype.render = function () {
         var _this = this;
         return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { id: "loginPanel", className: "flex flex-center" },
-            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "white-text text-center" },
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "white-text text-center wordCard" },
                 "\u6982\u5FF5\u6709\u540D\u800C\u6210\u6578\u64DA\uFF0C",
                 react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("br", null),
                 " \u7269\u9AD4\u7121\u5F62\u800C\u6210\u6982\u5FF5\uFF0C",
                 react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("br", null),
                 " \u5F7C\u81EA\u6210\u7A7A\u9593\uFF1B"),
-            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "white-text text-center" },
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "white-text text-center wordCard" },
                 "\u842C\u7269\u7AC4\u6D41\u5B87\u5B99\uFF0C",
                 react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("br", null),
                 " \u5728\u908A\u9699\u8655\u843D\u4E0B\uFF0C",
                 react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("br", null),
                 " \u65BC\u5F7C\u7AEF\u518D\u73FE\uFF1B"),
-            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "white-text text-center" },
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "white-text text-center wordCard" },
                 "\u5343\u842C\u5F62\u8C8C\uFF0C",
                 react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("br", null),
                 " \u7D42\u6B78\u6D85\u69C3\uFF0C",
@@ -489,11 +503,13 @@ var LoginPanel = /** @class */ (function (_super) {
                 " \u751F\u751F\u4E0D\u606F\uFF0C",
                 react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("br", null),
                 " \u5468\u800C\u5FA9\u59CB\u3002"),
-            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { id: "signInWrapper" },
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { id: "signInWrapper", className: "wordCard" },
                 react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("span", { className: "label white-text" }, "Sign in with:\u00A0"),
                 react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("input", { type: "text", id: "signInName" }),
-                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("button", { type: "button", className: "sign-in-button", onClick: function (e) { _this.signInButtonClickHandler(e); } },
-                    react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("i", { className: "fas fa-arrow-circle-right" }))));
+                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("button", { type: "button", className: "sign-in-button", onClick: function (e) { _this.signInButtonClickHandler(); } },
+                    react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("i", { className: "fas fa-arrow-circle-right" }))),
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "skipAnimation" },
+                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("button", { type: "button", onClick: function (e) { _this.skipAnimation(); } }, "skip")));
     };
     ;
     LoginPanel.prototype.componentDidMount = function () {
@@ -501,18 +517,26 @@ var LoginPanel = /** @class */ (function (_super) {
         this.wordCardsAnimation();
     };
     ;
-    LoginPanel.prototype.fadeAnimation = function (ele, times, onComplete) {
-        var $ele = $(ele);
-        $ele.fadeIn(times.fadeIn, undefined, function () {
-            if (!times.fadeOut) {
-                onComplete();
-                return;
-            }
-            setTimeout(function () {
-                $ele.fadeOut(times.fadeOut, undefined, function () {
-                    onComplete();
-                });
-            }, times.sustain || 0);
+    LoginPanel.prototype.getPerformance = function (startNewOne) {
+        if (startNewOne === void 0) { startNewOne = false; }
+        if (startNewOne || !this.performance)
+            this.performance = performance.now();
+        var result = performance.now() - this.performance;
+        this.performance = performance.now();
+        return result;
+    };
+    ;
+    LoginPanel.prototype.fadeAnimation = function (ele, setting, onComplete) {
+        var _this = this;
+        console.log('fadeIn start ' + this.getPerformance());
+        var animation = $(ele).fadeIn(setting.fadeIn, undefined, function () {
+            console.log('fadeIn end ' + _this.getPerformance());
+        }).delay(setting.sustain || 0);
+        if (!setting.fadeOut)
+            return;
+        animation.fadeOut(setting.fadeOut, undefined, function () {
+            console.log('fadeOut end ' + _this.getPerformance());
+            onComplete();
         });
     };
     ;
@@ -522,6 +546,7 @@ var LoginPanel = /** @class */ (function (_super) {
             afterFunc();
             return;
         }
+        console.log('fadeAnimation ' + eleArray.length);
         setting.fadeOut = (eleArray.length > 1) ? setting.fadeOut : null;
         this.fadeAnimation(eleArray.shift(), setting, function () {
             _this.fadeSequence(eleArray, setting, afterFunc);
@@ -529,17 +554,30 @@ var LoginPanel = /** @class */ (function (_super) {
     };
     ;
     LoginPanel.prototype.wordCardsAnimation = function () {
-        var _this = this;
-        var $wordCards = $('#loginPanel > div');
+        var wordCards = $('.wordCard').toArray();
         var times = {
             fadeIn: 5000,
             sustain: 1000,
             fadeOut: 2000
         };
-        this.fadeSequence($wordCards.toArray(), times, function () { return _this.props.eventCenter.trigger(_MessageCenter__WEBPACK_IMPORTED_MODULE_2__["Event"].afterWordCardsAnimation); });
+        this.fadeSequence(wordCards, times, this.afterWordCardsAnimation.bind(this));
     };
     ;
-    LoginPanel.prototype.signInButtonClickHandler = function (e) {
+    LoginPanel.prototype.skipAnimation = function () {
+        var $wordCards = $('.wordCard');
+        $wordCards.stop(true);
+        $wordCards.hide();
+        $('.skipAnimation').hide();
+        $wordCards.last().fadeIn();
+        this.afterWordCardsAnimation();
+    };
+    ;
+    LoginPanel.prototype.afterWordCardsAnimation = function () {
+        $('.skipAnimation').hide();
+        this.props.eventCenter.trigger(_MessageCenter__WEBPACK_IMPORTED_MODULE_2__["Event"].afterWordCardsAnimation);
+    };
+    ;
+    LoginPanel.prototype.signInButtonClickHandler = function () {
         var signInName = $('#signInName').val();
         if (signInName.length === 0)
             return;
@@ -594,15 +632,17 @@ var MessageBoard = /** @class */ (function (_super) {
         var _this = _super.call(this, props) || this;
         var messageCenter = _this.props.messageCenter;
         _this.state = { contents: messageCenter.contents.slice() };
-        _this.props.messageCenter.observable.on(_MessageCenter__WEBPACK_IMPORTED_MODULE_1__["Event"].afterLogin, _this.refresh.bind(_this));
+        _this.props.messageCenter.observable.on(_MessageCenter__WEBPACK_IMPORTED_MODULE_1__["Event"].addMessage, _this.refresh.bind(_this));
         return _this;
     }
     ;
     MessageBoard.prototype.render = function () {
         var contents = this.state.contents;
         var contentElements = contents.map(this.createContent.bind(this));
-        return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { id: "messageBoard", className: "untouchable full-page flex flex-center flex-end" },
-            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "message-board-content" }, contentElements));
+        return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { id: "messageBoard", className: "invisible" },
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "message-board-content" }, contentElements),
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "scrollbarContainer" },
+                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "scrollbar" })));
     };
     ;
     MessageBoard.prototype.createContent = function (content) {
@@ -638,6 +678,10 @@ var MessageBoard = /** @class */ (function (_super) {
     };
     ;
     MessageBoard.prototype.refresh = function () {
+        var contents = this.props.messageCenter.contents.slice();
+        if (contents.length === 0)
+            return;
+        $('#messageBoard').removeClass('invisible');
         this.setState({ contents: this.props.messageCenter.contents.slice() });
     };
     ;
@@ -788,57 +832,8 @@ var Scene = /** @class */ (function (_super) {
     __extends(Scene, _super);
     function Scene() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.texts = [];
         _this.cameraLocations = [];
         _this.bubbleSprays = [];
-        /* private onTextAdd(text: string, x: number, y: number, z: number) {
-            const outputplaneTexture = new BABYLON.DynamicTexture(
-                "dynamic texture",
-                { width: 500, height: 80 },
-                this.scene,
-                true
-            );
-            outputplaneTexture.drawText(text, 0, 60, "60px verdana", "white", 'true');
-            outputplaneTexture.hasAlpha = true;
-    
-            const outputplane = BABYLON.MeshBuilder.CreatePlane(
-                "outputplane",
-                { width: 5, height: 1 },
-                this.scene
-            );
-            outputplane.billboardMode = BABYLON.AbstractMesh.BILLBOARDMODE_ALL;
-            outputplane.position = new BABYLON.Vector3(x, y, z);
-            outputplane.scaling.y = 1;
-            outputplane['_message'] = text;
-    
-            const material = outputplane.material = new BABYLON.StandardMaterial("outputplane", this.scene);
-            material.diffuseTexture = outputplaneTexture;
-            material.alpha = 0;
-            material.backFaceCulling = false;
-    
-            this.texts.push(outputplane);
-        };
-    
-    
-        private onImageAdd(image: string, x: number, y: number, z: number) {
-            const outputplaneTexture = BABYLON.Texture.CreateFromBase64String(
-                image,
-                'image-' + Date.now,
-                this.scene
-            );
-            // outputplaneTexture.hasAlpha = true;
-    
-            const outputplane = BABYLON.MeshBuilder.CreatePlane("outputplane", { width: 5, height: 5 }, this.scene);
-            outputplane.billboardMode = BABYLON.AbstractMesh.BILLBOARDMODE_ALL;
-            outputplane.position = new BABYLON.Vector3(x, y, z);
-            outputplane.scaling.y = 1;
-    
-            const material = outputplane.material = new BABYLON.StandardMaterial("outputplane", this.scene);
-            material.diffuseTexture = outputplaneTexture;
-            material.specularColor = new BABYLON.Color3(0, 0, 0);
-            material.emissiveColor = new BABYLON.Color3(1, 1, 1);
-            material.backFaceCulling = false;
-        }; */
         _this.colorsSetForParticle = [
             { diffuseColor: [253, 245, 134], glowColor: [255, 252, 193, 0.85] },
             { diffuseColor: [253, 229, 210], glowColor: [255, 219, 225, 0.85] },
@@ -879,7 +874,6 @@ var Scene = /** @class */ (function (_super) {
         this.getTexts();
         this.getPoints();
         this.registerRunRenderLoop();
-        // new ControlPanel().initPanel(this.onTextAdd.bind(this), this.onImageAdd.bind(this));
         this.props.eventCenter.on(_MessageCenter__WEBPACK_IMPORTED_MODULE_5__["Event"].afterWordCardsAnimation, this.transformation.bind(this));
         this.props.eventCenter.on(_MessageCenter__WEBPACK_IMPORTED_MODULE_5__["Event"].afterLogin, this.zoomIn.bind(this));
         window.addEventListener("resize", function () {
@@ -888,13 +882,13 @@ var Scene = /** @class */ (function (_super) {
     };
     ;
     Scene.prototype.initScene = function () {
-        this.canvas = document.getElementById("renderCanvas");
-        this.engine = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Engine"](this.canvas, true);
+        var canvas = document.getElementById("renderCanvas");
+        this.engine = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Engine"](canvas, true);
         var scene = this.scene = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Scene"](this.engine);
         var camera = this.camera = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["UniversalCamera"]("Camera", new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"](0, 0, -25), this.scene);
         camera.speed = 0.5;
         camera.setTarget(babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"].Zero());
-        camera.attachControl(this.canvas, true);
+        camera.attachControl(canvas, true);
         new babylonjs__WEBPACK_IMPORTED_MODULE_1__["HemisphericLight"]("HemiLight1", new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"](0, 0, 10), scene).intensity = 0.8;
         new babylonjs__WEBPACK_IMPORTED_MODULE_1__["HemisphericLight"]("HemiLight2", new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"](0, 0, -10), scene).intensity = 0.8;
         this.lightOfCamera = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["PointLight"]("lightOfCamera", new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"](0, 0, 0), scene);
@@ -982,7 +976,6 @@ var Scene = /** @class */ (function (_super) {
         var _this = this;
         var origin = { x: 0, y: 0, z: 0 };
         var viewport = this.camera.viewport.toGlobal(this.camera.getEngine(), null);
-        var $mark = jquery__WEBPACK_IMPORTED_MODULE_2__('.mark');
         this.engine.runRenderLoop(function () {
             /** render before */
             _this.bubbleSprays.forEach(function (e) { return e.setParticles(); });
@@ -1002,22 +995,6 @@ var Scene = /** @class */ (function (_super) {
             _this.scene.render();
             /** render after */
             _this.publishDevData();
-            /*             const text = this.texts[0];
-                        if (!text) return;
-                        const transformationMatrix = this.camera.getViewMatrix().multiply(this.camera.getProjectionMatrix());
-                        const projectedPosition = BABYLON.Vector3.Project(origin, text.computeWorldMatrix(false), transformationMatrix, viewport);
-            
-                        if (projectedPosition.z > 1) {
-                            $mark.hide();
-                            return;
-                        }
-                        $mark.show();
-                        $mark.css('top', projectedPosition.y + 60);
-                        $mark.css('left', projectedPosition.x);
-                        const scale = 1 / (1 - projectedPosition.z);
-                        // $mark.css('transform', 'translate(-50%, -50%) scale(' + scale + ',' + scale + ')');
-                        $mark.text(JSON.stringify(projectedPosition)); */
-            /** render after end */
         });
     };
     ;
@@ -1311,6 +1288,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _LoginPanel__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./LoginPanel */ "./app_src/LoginPanel.tsx");
 /* harmony import */ var _ControlPanel__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./ControlPanel */ "./app_src/ControlPanel.tsx");
 /* harmony import */ var _MessageBoard__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./MessageBoard */ "./app_src/MessageBoard.tsx");
+/* harmony import */ var _CommonUtility__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./CommonUtility */ "./app_src/CommonUtility.ts");
 
 
 
@@ -1319,6 +1297,10 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+
+var isdev = _CommonUtility__WEBPACK_IMPORTED_MODULE_8__["CommonUtility"].getQueryString('isdev');
+if (!isdev)
+    console.info = console.debug = console.log = function () { };
 var eventCenter = new _MessageCenter__WEBPACK_IMPORTED_MODULE_2__["EventCenter"]();
 var messageCenter = new _MessageCenter__WEBPACK_IMPORTED_MODULE_2__["MessageCenter"](eventCenter);
 // this.observable.trigger('add');

@@ -11,14 +11,15 @@ export class MessageBoard
         super(props);
         const messageCenter = this.props.messageCenter;
         this.state = { contents: messageCenter.contents.slice() };
-        this.props.messageCenter.observable.on(Event.afterLogin, this.refresh.bind(this));
+        this.props.messageCenter.observable.on(Event.addMessage, this.refresh.bind(this));
     };
 
     render() {
         const contents = this.state.contents;
         const contentElements = contents.map(this.createContent.bind(this));
-        return <div id="messageBoard" className="untouchable full-page flex flex-center flex-end">
+        return <div id="messageBoard" className="invisible">
             <div className="message-board-content">{contentElements}</div>
+            <div className="scrollbarContainer"><div className="scrollbar" /></div>
         </div>;
     };
 
@@ -56,6 +57,9 @@ export class MessageBoard
     };
 
     private refresh() {
+        const contents = this.props.messageCenter.contents.slice();
+        if (contents.length === 0) return;
+        $('#messageBoard').removeClass('invisible');
         this.setState({ contents: this.props.messageCenter.contents.slice() });
     };
 

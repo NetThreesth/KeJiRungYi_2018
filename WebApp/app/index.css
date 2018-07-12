@@ -8,13 +8,7 @@ body {
   padding: 0;
 }
 
-#renderCanvas {
-  width: 100%;
-  height: 100%;
-  touch-action: none;
-}
-
-.full-page, .flashMask {
+.full-page, #renderCanvas, .flashMask, #messageBoard {
   position: fixed;
   top: 0;
   left: 0;
@@ -49,22 +43,7 @@ body {
   }
 }
 
-.mark {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 10;
-  transform: translate(-50%, -50%);
-  color: thistle;
-  border: 1px solid thistle;
-  padding: 6px;
-  display: none;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-}
-
-.untouchable, .flashMask {
+.untouchable, .flashMask, #messageBoard {
   pointer-events: none;
 }
 
@@ -76,37 +55,12 @@ input[type=text] {
   color: #ffffff;
 }
 
-.button {
+.button, #loginPanel .skipAnimation > button {
   background-color: transparent;
   cursor: pointer;
 }
 
-#centerByMargin {
-  margin: 0 auto;
-}
-
-.flex, .control-panel, .control-panel .textInput {
-  display: flex;
-}
-
-.flex-row {
-  flex-direction: row;
-}
-
-.flex-column, .control-panel {
-  flex-direction: column;
-}
-
-.flex-center, .control-panel, .control-panel .textInput {
-  align-items: center;
-  justify-content: center;
-}
-
-.flex-end {
-  align-items: flex-end;
-}
-
-.white-text, .control-panel .textInput button, .message-board-content .messageBox {
+.white-text, .control-panel .textInput button, #loginPanel .skipAnimation > button, #messageBoard .message-board-content .messageBox {
   color: white;
   text-shadow: 0px 0px 6px #404040;
 }
@@ -130,136 +84,38 @@ input[type=text] {
   transition: all 0.3s ease;
 }
 
-html,
-body {
-  font-family: Microsoft JhengHei;
-  overflow: hidden;
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  padding: 0;
+.clearfix::after, #messageBoard .message-board-content::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+.flex, .control-panel, .control-panel .textInput, #messageBoard {
+  display: flex;
+}
+
+.flex-row {
+  flex-direction: row;
+}
+
+.flex-column, .control-panel {
+  flex-direction: column;
+}
+
+.flex-verticalCenter, .flex-center, .control-panel, .control-panel .textInput {
+  align-items: center;
+}
+
+.flex-horizontalCenter, .flex-center, .control-panel, .control-panel .textInput, #messageBoard {
+  justify-content: center;
+}
+
+.flex-end {
+  align-items: flex-end;
 }
 
 #renderCanvas {
-  width: 100%;
-  height: 100%;
   touch-action: none;
-}
-
-.full-page, .flashMask {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-}
-
-/* flash */
-.flash {
-  -webkit-animation-name: flash-animation;
-  -webkit-animation-duration: 1s;
-  animation-name: flash-animation;
-  animation-duration: 1s;
-}
-
-@-webkit-keyframes flash-animation {
-  from {
-    background: rgba(255, 255, 255, 0.8);
-  }
-  to {
-    background: default;
-  }
-}
-
-@keyframes flash-animation {
-  from {
-    background: rgba(255, 255, 255, 0.8);
-  }
-  to {
-    background: default;
-  }
-}
-
-.mark {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 10;
-  transform: translate(-50%, -50%);
-  color: thistle;
-  border: 1px solid thistle;
-  padding: 6px;
-  display: none;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-}
-
-.untouchable, .flashMask {
-  pointer-events: none;
-}
-
-input[type=text] {
-  background-color: transparent;
-  border: 1px solid #ffffff;
-  border-radius: 3px;
-  height: 24px;
-  color: #ffffff;
-}
-
-.button {
-  background-color: transparent;
-  cursor: pointer;
-}
-
-#centerByMargin {
-  margin: 0 auto;
-}
-
-.flex, .control-panel, .control-panel .textInput {
-  display: flex;
-}
-
-.flex-row {
-  flex-direction: row;
-}
-
-.flex-column, .control-panel {
-  flex-direction: column;
-}
-
-.flex-center, .control-panel, .control-panel .textInput {
-  align-items: center;
-  justify-content: center;
-}
-
-.flex-end {
-  align-items: flex-end;
-}
-
-.white-text, .control-panel .textInput button, .message-board-content .messageBox {
-  color: white;
-  text-shadow: 0px 0px 6px #404040;
-}
-
-.text-center {
-  text-align: center;
-}
-
-.visible {
-  opacity: 1;
-}
-
-.invisible {
-  opacity: 0;
-}
-
-.transition-all, .control-panel, .control-panel .textInput {
-  -webkit-transition: all 0.3s ease;
-  -moz-transition: all 0.3s ease;
-  -o-transition: all 0.3s ease;
-  transition: all 0.3s ease;
 }
 
 .control-panel {
@@ -267,9 +123,10 @@ input[type=text] {
   bottom: 30px;
   left: 0;
   width: 100%;
+  height: 70px;
 }
 
-.control-panel .buttons .button {
+.control-panel .buttons .button, .control-panel .buttons #loginPanel .skipAnimation > button, #loginPanel .control-panel .buttons .skipAnimation > button {
   font-size: 1.8em;
   border: 0;
 }
@@ -292,7 +149,6 @@ input[type=text] {
   margin: 0;
 }
 
-/* loginPanel */
 #loginPanel {
   position: fixed;
   top: 0;
@@ -303,9 +159,22 @@ input[type=text] {
   overflow: auto;
 }
 
-#loginPanel > div {
+#loginPanel > .wordCard {
   display: none;
   white-space: nowrap;
+}
+
+#loginPanel .skipAnimation {
+  position: absolute;
+  bottom: 10%;
+  left: 50%;
+  transform: translate(-50%);
+}
+
+#loginPanel .skipAnimation > button {
+  border: 1px solid white;
+  border-radius: 2px;
+  padding: 0 20px;
 }
 
 #signinButton {
@@ -346,144 +215,16 @@ input[type=text] {
   cursor: pointer;
 }
 
-html,
-body {
-  font-family: Microsoft JhengHei;
-  overflow: hidden;
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  padding: 0;
+#messageBoard > div {
+  margin-bottom: 100px;
 }
 
-#renderCanvas {
-  width: 100%;
-  height: 100%;
-  touch-action: none;
-}
-
-.full-page, .flashMask {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+#messageBoard .message-board-content {
+  width: 90%;
   overflow: hidden;
 }
 
-/* flash */
-.flash {
-  -webkit-animation-name: flash-animation;
-  -webkit-animation-duration: 1s;
-  animation-name: flash-animation;
-  animation-duration: 1s;
-}
-
-@-webkit-keyframes flash-animation {
-  from {
-    background: rgba(255, 255, 255, 0.8);
-  }
-  to {
-    background: default;
-  }
-}
-
-@keyframes flash-animation {
-  from {
-    background: rgba(255, 255, 255, 0.8);
-  }
-  to {
-    background: default;
-  }
-}
-
-.mark {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 10;
-  transform: translate(-50%, -50%);
-  color: thistle;
-  border: 1px solid thistle;
-  padding: 6px;
-  display: none;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-}
-
-.untouchable, .flashMask {
-  pointer-events: none;
-}
-
-input[type=text] {
-  background-color: transparent;
-  border: 1px solid #ffffff;
-  border-radius: 3px;
-  height: 24px;
-  color: #ffffff;
-}
-
-.button {
-  background-color: transparent;
-  cursor: pointer;
-}
-
-#centerByMargin {
-  margin: 0 auto;
-}
-
-.flex, .control-panel, .control-panel .textInput {
-  display: flex;
-}
-
-.flex-row {
-  flex-direction: row;
-}
-
-.flex-column, .control-panel {
-  flex-direction: column;
-}
-
-.flex-center, .control-panel, .control-panel .textInput {
-  align-items: center;
-  justify-content: center;
-}
-
-.flex-end {
-  align-items: flex-end;
-}
-
-.white-text, .control-panel .textInput button, .message-board-content .messageBox {
-  color: white;
-  text-shadow: 0px 0px 6px #404040;
-}
-
-.text-center {
-  text-align: center;
-}
-
-.visible {
-  opacity: 1;
-}
-
-.invisible {
-  opacity: 0;
-}
-
-.transition-all, .control-panel, .control-panel .textInput {
-  -webkit-transition: all 0.3s ease;
-  -moz-transition: all 0.3s ease;
-  -o-transition: all 0.3s ease;
-  transition: all 0.3s ease;
-}
-
-.message-board-content {
-  width: 80%;
-  margin-bottom: 150px;
-}
-
-.message-board-content .messageBox {
+#messageBoard .message-board-content .messageBox {
   position: relative;
   background-color: rgba(255, 255, 255, 0.05);
   padding: 3px;
@@ -493,23 +234,48 @@ input[type=text] {
   color: white;
 }
 
-.message-board-content .messageBox .avatar {
+#messageBoard .message-board-content .messageBox .avatar {
   position: absolute;
   width: 30px;
   transform: translateY(40%);
 }
 
-.message-board-content .messageBox .name {
+#messageBoard .message-board-content .messageBox .name {
   position: absolute;
   top: 0px;
   left: 7px;
 }
 
-.message-board-content .messageBox .content {
+#messageBoard .message-board-content .messageBox .content {
   margin: 20px 0 0 30px;
 }
 
+#messageBoard .scrollbarContainer {
+  pointer-events: auto;
+  position: relative;
+  top: 0;
+  right: -10px;
+  width: 10px;
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+#messageBoard .scrollbarContainer .scrollbar {
+  position: absolute;
+  top: 300px;
+  right: 0;
+  width: 100%;
+  height: 100px;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 5px;
+}
+
 @media only screen and (min-width: 768px) {
+  .message-board-content {
+    width: 80%;
+  }
+}
+
+@media only screen and (min-width: 1224px) {
   .message-board-content {
     width: 60%;
   }

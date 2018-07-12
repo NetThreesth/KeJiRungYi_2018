@@ -1,5 +1,6 @@
 import * as React from "react";
 import { EventCenter, Event } from './MessageCenter';
+import { CommonUtility } from './CommonUtility';
 
 export class DevPanel
     extends React.Component<{ eventCenter: EventCenter }, DevPanelData> {
@@ -22,6 +23,8 @@ export class DevPanel
         </div>;
     };
     componentDidMount() {
+        const isdev = CommonUtility.getQueryString('isdev');
+        if (!isdev) return;
         $('#devPanel').show();
         this.props.eventCenter.on<DevPanelData>(Event.updateDevPanelData, data => {
             this.setState({ fps: data.fps, coordinate: data.coordinate });
