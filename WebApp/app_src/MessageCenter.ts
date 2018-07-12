@@ -13,12 +13,16 @@ export interface Content {
 export class MessageCenter {
 
     contents: Content[] = [];
-    observable = $({});
+    observable: EventCenter = null;
+
+    constructor(eventCenter: EventCenter) {
+        this.observable = eventCenter;
+    };
 
 
     addText(role: Roles, text: string) {
         this.contents.push({ role: role, type: ContentType.Text, content: text });
-        this.observable.trigger('add');
+        this.observable.trigger(Event.addMessage);
 
         if (role !== Roles.User) return;
         $.ajax({
@@ -33,7 +37,7 @@ export class MessageCenter {
     };
     addImage(role: Roles, b64String: string) {
         this.contents.push({ role: role, type: ContentType.Image, content: b64String });
-        this.observable.trigger('add');
+        this.observable.trigger(Event.addMessage);
 
         $.ajax({
             url: 'apis/uploadImage',
@@ -60,4 +64,5 @@ export enum Event {
     updateDevPanelData,
     afterWordCardsAnimation,
     afterLogin,
+    addMessage
 }

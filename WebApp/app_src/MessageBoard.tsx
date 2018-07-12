@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { MessageCenter, Content, ContentType } from './MessageCenter';
+import { MessageCenter, Content, ContentType, Event } from './MessageCenter';
 import { AppSetting, Roles } from './AppSetting';
 
 
@@ -11,7 +11,7 @@ export class MessageBoard
         super(props);
         const messageCenter = this.props.messageCenter;
         this.state = { contents: messageCenter.contents.slice() };
-        this.props.messageCenter.observable.on('add', this.refresh.bind(this));
+        this.props.messageCenter.observable.on(Event.afterLogin, this.refresh.bind(this));
     };
 
     render() {

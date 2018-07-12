@@ -91,38 +91,18 @@ app.route('/apis/uploadImage').post((req, res, next) => {
       const labels = results[0].labelAnnotations;
       const descriptions = labels.map(label => label.description).join(' ');
 
-
       const Translate = require('@google-cloud/translate');
       const translate = new Translate();
-      translate
-        .translate(descriptions, 'zh-TW')
-        .then(results => {
-          let translations = results[0];
-          translations = Array.isArray(translations) ? translations : [translations];
-          const translationResult = translations.join('');
-          logger.info('Translations: ' + translationResult);
-          res.json(translationResult);
-          res.end();
-        })
-        .catch(err => errorHandler(err, next));
-      /* 
-           res.json(labels);
-           res.end();*/
+      return translate.translate(descriptions, 'zh-TW');
     })
-    .catch(err => errorHandler(err, next));
-});
+    .then(results => {
+      let translations = results[0];
+      translations = Array.isArray(translations) ? translations : [translations];
+      const translationResult = translations.join('');
+      logger.info('Translations: ' + translationResult);
 
-
-
-app.route('/apis/uploadText').post((req, res, next) => {
-  const message = req.body.text;
-  const response = message.split('').join('...');
-
-  const axios = require('axios');
-  axios.post('http://35.236.167.99:5000/3sth/api/v1.0/chatbots/', {
-    msg: message,
-    rid: 1
-  })
+      return sentToChatbots(translationResult);
+    })
     .then(result => {
       logger.info(result.data);
       res.json(result.data);
@@ -131,6 +111,27 @@ app.route('/apis/uploadText').post((req, res, next) => {
     .catch(err => errorHandler(err, next));
 });
 
+
+
+app.route('/apis/uploadText').post((req, res, next) => {
+  const message = req.body.text;
+
+  sentToChatbots(message)
+    .then(result => {
+      logger.info(result.data);
+      res.json(result.data);
+      res.end();
+    })
+    .catch(err => errorHandler(err, next));
+});
+
+function sentToChatbots(message) {
+  const axios = require('axios');
+  return axios.post('http://35.236.167.99:5000/3sth/api/v1.0/chatbots/', {
+    msg: message,
+    rid: 1
+  })
+};
 
 
 app.route('/apis/getPoints').get((req, res) => {

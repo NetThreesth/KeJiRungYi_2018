@@ -594,7 +594,7 @@ var MessageBoard = /** @class */ (function (_super) {
         var _this = _super.call(this, props) || this;
         var messageCenter = _this.props.messageCenter;
         _this.state = { contents: messageCenter.contents.slice() };
-        _this.props.messageCenter.observable.on('add', _this.refresh.bind(_this));
+        _this.props.messageCenter.observable.on(_MessageCenter__WEBPACK_IMPORTED_MODULE_1__["Event"].afterLogin, _this.refresh.bind(_this));
         return _this;
     }
     ;
@@ -681,14 +681,16 @@ var ContentType;
 ;
 ;
 var MessageCenter = /** @class */ (function () {
-    function MessageCenter() {
+    function MessageCenter(eventCenter) {
         this.contents = [];
-        this.observable = $({});
+        this.observable = null;
+        this.observable = eventCenter;
     }
+    ;
     MessageCenter.prototype.addText = function (role, text) {
         var _this = this;
         this.contents.push({ role: role, type: ContentType.Text, content: text });
-        this.observable.trigger('add');
+        this.observable.trigger(Event.addMessage);
         if (role !== _AppSetting__WEBPACK_IMPORTED_MODULE_0__["Roles"].User)
             return;
         $.ajax({
@@ -705,7 +707,7 @@ var MessageCenter = /** @class */ (function () {
     MessageCenter.prototype.addImage = function (role, b64String) {
         var _this = this;
         this.contents.push({ role: role, type: ContentType.Image, content: b64String });
-        this.observable.trigger('add');
+        this.observable.trigger(Event.addMessage);
         $.ajax({
             url: 'apis/uploadImage',
             type: "post",
@@ -741,6 +743,7 @@ var Event;
     Event[Event["updateDevPanelData"] = 0] = "updateDevPanelData";
     Event[Event["afterWordCardsAnimation"] = 1] = "afterWordCardsAnimation";
     Event[Event["afterLogin"] = 2] = "afterLogin";
+    Event[Event["addMessage"] = 3] = "addMessage";
 })(Event || (Event = {}));
 
 
@@ -1316,8 +1319,8 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-var messageCenter = new _MessageCenter__WEBPACK_IMPORTED_MODULE_2__["MessageCenter"]();
 var eventCenter = new _MessageCenter__WEBPACK_IMPORTED_MODULE_2__["EventCenter"]();
+var messageCenter = new _MessageCenter__WEBPACK_IMPORTED_MODULE_2__["MessageCenter"](eventCenter);
 // this.observable.trigger('add');
 /* afterWordCardsAnimation={scene.transformation.bind(scene)}
 afterLogin={() => {

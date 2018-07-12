@@ -11,8 +11,8 @@ import { ControlPanel } from './ControlPanel';
 import { MessageBoard } from './MessageBoard';
 
 
-const messageCenter = new MessageCenter();
 const eventCenter = new EventCenter();
+const messageCenter = new MessageCenter(eventCenter);
 
 // this.observable.trigger('add');
 
