@@ -60,7 +60,7 @@ input[type=text] {
   cursor: pointer;
 }
 
-.white-text, .control-panel .textInput button, #loginPanel .skipAnimation > button, #messageBoard .message-board-content .messageBox {
+.white-text, .control-panel .textInput button, #loginPanel .skipAnimation > button, #messageBoard .messageBoardContent .messageBox {
   color: white;
   text-shadow: 0px 0px 6px #404040;
 }
@@ -84,7 +84,7 @@ input[type=text] {
   transition: all 0.3s ease;
 }
 
-.clearfix::after, #messageBoard .message-board-content::after {
+.clearfix::after, #messageBoard .messageBoardContent::after {
   content: "";
   clear: both;
   display: table;
@@ -219,12 +219,12 @@ input[type=text] {
   margin-bottom: 100px;
 }
 
-#messageBoard .message-board-content {
+#messageBoard .messageBoardContent {
   width: 100%;
   overflow: hidden;
 }
 
-#messageBoard .message-board-content .messageBox {
+#messageBoard .messageBoardContent .messageBox {
   position: relative;
   background-color: rgba(255, 255, 255, 0.05);
   padding: 3px;
@@ -234,19 +234,19 @@ input[type=text] {
   color: white;
 }
 
-#messageBoard .message-board-content .messageBox .avatar {
+#messageBoard .messageBoardContent .messageBox .avatar {
   position: absolute;
   width: 30px;
   transform: translateY(40%);
 }
 
-#messageBoard .message-board-content .messageBox .name {
+#messageBoard .messageBoardContent .messageBox .name {
   position: absolute;
   top: 0px;
   left: 7px;
 }
 
-#messageBoard .message-board-content .messageBox .content {
+#messageBoard .messageBoardContent .messageBox .content {
   margin: 20px 0 0 30px;
 }
 
@@ -255,28 +255,28 @@ input[type=text] {
   position: relative;
   top: 0;
   right: 0;
-  width: 10px;
+  width: 12px;
   background-color: rgba(0, 0, 0, 0.1);
 }
 
 #messageBoard .scrollbarContainer .scrollbar {
   position: absolute;
   top: 0;
-  right: 0;
-  width: 100%;
+  right: 1px;
+  width: 10px;
   height: 100px;
   background-color: rgba(0, 0, 0, 0.3);
   border-radius: 5px;
 }
 
 @media only screen and (min-width: 768px) {
-  .message-board-content {
+  .messageBoardContent {
     padding: 0 50px;
   }
 }
 
 @media only screen and (min-width: 1224px) {
-  .message-board-content {
+  .messageBoardContent {
     padding: 0 200px;
   }
 }

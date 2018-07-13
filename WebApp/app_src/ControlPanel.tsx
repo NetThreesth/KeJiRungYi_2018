@@ -28,7 +28,7 @@ export class ControlPanel
     };
 
     componentDidMount() {
-        this.props.eventCenter.on(Event.afterLogin, () => {
+        this.props.eventCenter.on(Event.AfterLogin, () => {
             $('.control-panel').removeClass(['invisible', 'untouchable']).addClass('visible');
         });
     };

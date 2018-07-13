@@ -6,7 +6,7 @@
     >div {
         margin-bottom: 100px;
     }
-    .message-board-content {
+    .messageBoardContent {
         @extend .clearfix;
         width: 100%;
         overflow: hidden;
@@ -39,13 +39,13 @@
         position: relative;
         top: 0;
         right: 0;
-        width: 10px;
+        width: 12px;
         background-color: rgba(0, 0, 0, 0.1);
         .scrollbar {
             position: absolute;
             top: 0;
-            right: 0;
-            width: 100%;
+            right: 1px;
+            width: 10px;
             height: 100px;
             background-color: rgba(0, 0, 0, 0.3);
             border-radius: 5px;
@@ -54,13 +54,13 @@
 }
 
 @media only screen and (min-width: 768px) {
-    .message-board-content {
+    .messageBoardContent {
         padding: 0 50px;
     }
 }
 
 @media only screen and (min-width: 1224px) {
-    .message-board-content {
+    .messageBoardContent {
         padding: 0 200px;
     }
 }

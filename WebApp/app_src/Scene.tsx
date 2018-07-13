@@ -1,4 +1,3 @@
-
 import * as React from "react";
 import * as BABYLON from 'babylonjs';
 import * as $ from 'jquery';
@@ -12,6 +11,8 @@ import { EventCenter, Event } from './MessageCenter';
 
 export class Scene extends React.Component<{ eventCenter: EventCenter }> {
 
+    static chatRoomIndex: number = null;
+
     private engine: BABYLON.Engine;
     private scene: BABYLON.Scene;
 
@@ -22,7 +23,8 @@ export class Scene extends React.Component<{ eventCenter: EventCenter }> {
 
 
     private glowLayerForParticle: BABYLON.GlowLayer;
-    private bubbleSprays: BABYLON.SolidParticleSystem[] = [];
+    private bubbleSpray: BABYLON.SolidParticleSystem;
+
 
     render() {
         return <canvas id="renderCanvas" touch-action="none"></canvas>;
@@ -37,8 +39,8 @@ export class Scene extends React.Component<{ eventCenter: EventCenter }> {
 
         this.registerRunRenderLoop();
 
-        this.props.eventCenter.on(Event.afterWordCardsAnimation, this.transformation.bind(this));
-        this.props.eventCenter.on(Event.afterLogin, this.zoomIn.bind(this));
+        this.props.eventCenter.on(Event.AfterWordCardsAnimation, this.transformation.bind(this));
+        this.props.eventCenter.on(Event.AfterLogin, this.zoomIn.bind(this));
         window.addEventListener("resize", () => {
             this.engine.resize();
         });
@@ -80,7 +82,7 @@ export class Scene extends React.Component<{ eventCenter: EventCenter }> {
 
     private createBubbleSpray(position: BABYLON.Vector3) {
         // creation
-        const sphere = BABYLON.MeshBuilder.CreateSphere("s", { diameter: 0.08, segments: 12 }, this.scene);
+        const sphere = BABYLON.MeshBuilder.CreateSphere("s", { diameter: 0.3, segments: 12 }, this.scene);
         const bubbleSpray = new BABYLON.SolidParticleSystem('bubbleSpray', this.scene);
 
         bubbleSpray.addShape(sphere, 20);
@@ -88,7 +90,7 @@ export class Scene extends React.Component<{ eventCenter: EventCenter }> {
         mesh.material = function () {
             const bubbleMat = new BABYLON.StandardMaterial("bubbleMat", this.scene);
             //mat.backFaceCulling = false;
-            bubbleMat.alpha = 0.1;
+            bubbleMat.alpha = 0.2;
 
             return bubbleMat;
         }.bind(this)();
@@ -98,46 +100,37 @@ export class Scene extends React.Component<{ eventCenter: EventCenter }> {
         sphere.dispose();
 
 
-        // behavior definition
         const speed = 0.01;
 
         // init
         bubbleSpray.initParticles = function () {
-            // just recycle everything
             for (var p = 0; p < this.nbParticles; p++) {
                 this.recycleParticle(this.particles[p]);
             }
         };
 
-        // recycle
-        let scale;
+
         bubbleSpray.recycleParticle = (particle) => {
-            // Set particle new velocity, scale and rotation
-            // As this function is called for each particle, we don't allocate new
-            // memory by using "new BABYLON.Vector3()" but we set directly the
-            // x, y, z particle properties instead
             particle.position.x = 0;
             particle.position.y = 0;
             particle.position.z = 0;
             particle.velocity.x = (Math.random() - 0.5) * speed / 3;
             particle.velocity.y = Math.random() * speed;
             particle.velocity.z = (Math.random() - 0.5) * speed / 3;
-            scale = 1 * Math.random() + 0.2;
+            const scale = 1 * Math.random() + 0.2;
             particle.scale.x = scale;
             particle.scale.y = scale;
             particle.scale.z = scale;
-            particle['age'] = Math.random() * 0.8;
+            particle['age'] = Math.random() * 2 + 1;
 
             return particle;
         };
 
-        // update : will be called by setParticles()
         bubbleSpray.updateParticle = (particle) => {
-            // some physics here 
             if (particle.position.y < 0 || particle['age'] < 0) {
                 bubbleSpray.recycleParticle(particle);
             }
-            (particle.position).addInPlace(particle.velocity);      // update particle new position
+            particle.position.addInPlace(particle.velocity);
             particle.position.y += speed / 2;
 
             particle['age'] -= 0.01;
@@ -146,16 +139,14 @@ export class Scene extends React.Component<{ eventCenter: EventCenter }> {
         };
 
 
-        // init all particle values and set them once to apply textures, colors, etc
         bubbleSpray.initParticles();
         bubbleSpray.setParticles();
 
-        // Tuning : 
         bubbleSpray.computeParticleColor = false;
         bubbleSpray.computeParticleTexture = false;
         bubbleSpray.computeParticleRotation = false;
 
-        this.bubbleSprays.push(bubbleSpray);
+        this.bubbleSpray = bubbleSpray;
     };
 
 
@@ -168,21 +159,19 @@ export class Scene extends React.Component<{ eventCenter: EventCenter }> {
         this.engine.runRenderLoop(() => {
 
             /** render before */
-            this.bubbleSprays.forEach(e => e.setParticles());
-
             if (this.cameraLocations.length > 0) {
                 const position = this.camera.position = this.cameraLocations.shift();
                 if (this.cameraLocations.length >= 1) {
                     this.camera.setTarget(BABYLON.Vector3.Zero());
                     if (this.cameraLocations.length === 1)
-                        this.createBubbleSprayAndParticles();
+                        this.createBubbleSpray(this.chatRoomsCenter[Scene.chatRoomIndex]);
                 }
             }
 
             this.lightOfCamera.position = this.camera.position;
             this.translateLinesForTextNodes();
             this.translateParticles();
-            this.bubbleSprays.forEach(e => e.setParticles());
+            if (this.bubbleSpray) this.bubbleSpray.setParticles();
             /** render before end */
 
 
@@ -195,7 +184,7 @@ export class Scene extends React.Component<{ eventCenter: EventCenter }> {
     };
 
     private publishDevData() {
-        this.props.eventCenter.trigger(Event.updateDevPanelData, {
+        this.props.eventCenter.trigger(Event.UpdateDevPanelData, {
             fps: this.engine.getFps().toFixed() + ' fps',
             coordinate: BabylonUtility.positionToString(this.camera.position)
         });
@@ -233,7 +222,7 @@ export class Scene extends React.Component<{ eventCenter: EventCenter }> {
         const colorInRGB = colorSet.diffuseColor;
         const color = new BABYLON.Color3(colorInRGB[0], colorInRGB[1], colorInRGB[2]);
 
-        const radius = CommonUtility.getRandomIntInRange(50, 70) * 0.001;
+        const radius = CommonUtility.getRandomIntInRange(10, 20) * 0.01;
 
         const core = BABYLON.Mesh.CreateSphere(`core-colorSetIndex:${colorSetIndex}`, 2, radius, this.scene);
         core.position = position;
@@ -376,9 +365,6 @@ export class Scene extends React.Component<{ eventCenter: EventCenter }> {
 
     private createBubbleSprayAndParticles() {
         this.chatRoomsCenter.forEach(center => {
-
-            this.createBubbleSpray(center);
-
             for (let i = 0; i < 10; i++) {
                 this.createParticle(center);
             }
@@ -525,12 +511,13 @@ export class Scene extends React.Component<{ eventCenter: EventCenter }> {
             this.translateType = null;
             this.textNodes.length = 0;
             this.drawLine();
+            this.createBubbleSprayAndParticles();
         }, 1.8 * 1000);
     };
 
     private zoomIn() {
-        const randomChatRoomIndex = CommonUtility.getRandomIntInRange(0, this.chatRoomsCenter.length - 1);
-        const chatRoom = this.chatRoomsCenter[randomChatRoomIndex];
+        Scene.chatRoomIndex = CommonUtility.getRandomIntInRange(0, this.chatRoomsCenter.length - 1);
+        const chatRoom = this.chatRoomsCenter[Scene.chatRoomIndex];
         const destination = chatRoom ?
             new BABYLON.Vector3(chatRoom.x * 3, chatRoom.y * 3, 0) :
             BABYLON.Vector3.Zero();

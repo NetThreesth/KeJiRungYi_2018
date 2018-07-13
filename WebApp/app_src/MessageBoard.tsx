@@ -1,26 +1,34 @@
 import * as React from "react";
 
-import { MessageCenter, Content, ContentType, Event } from './MessageCenter';
+import { MessageCenter, Content, ContentType, EventCenter } from './MessageCenter';
 import { AppSetting, Roles } from './AppSetting';
 
 
 export class MessageBoard
     extends React.Component<{ messageCenter: MessageCenter }, { contents: Content[] }>{
 
+    private eventCenter = new EventCenter();
+
     constructor(props) {
         super(props);
         const messageCenter = this.props.messageCenter;
         this.state = { contents: messageCenter.contents.slice() };
-        this.props.messageCenter.observable.on(Event.addMessage, this.refresh.bind(this));
+        this.props.messageCenter.observable.on(MessageCenter.eventName, this.refresh.bind(this));
     };
 
     render() {
         const contents = this.state.contents;
         const contentElements = contents.map(this.createContent.bind(this));
         return <div id="messageBoard" className="invisible">
-            <div className="message-board-content">{contentElements}</div>
-            <div className="scrollbarContainer"><div className="scrollbar" /></div>
+            <div className="messageBoardContent">{contentElements}</div>
+            <Scrollbar syncTarget=".messageBoardContent" eventCenter={this.eventCenter} />
         </div>;
+    };
+
+    componentDidMount() {
+        this.eventCenter.on<number>(Scrollbar.ScrollEvent, rate => {
+            this.scrollTo(rate);
+        });
     };
 
     private createContent(content: Content) {
@@ -61,6 +69,8 @@ export class MessageBoard
         if (contents.length === 0) return;
         $('#messageBoard').removeClass('invisible');
         this.setState({ contents: this.props.messageCenter.contents.slice() });
+        this.scrollTo(1);
+        this.eventCenter.trigger(Scrollbar.UpdateEvent);
     };
 
     private getAvatar(role: Roles) {
@@ -70,5 +80,101 @@ export class MessageBoard
             return 'assets/avatar_yellow.png';
         if (role === Roles.ChatBot)
             return 'assets/avatar_pink.png';
+    };
+
+
+
+
+    private scrollTo(rate: number) {
+        const $scrollTarget = $('.messageBoardContent');
+        const targetTotalH = $scrollTarget.prop('scrollHeight');
+        const targetViewH = $scrollTarget.height();
+        const offset = (targetTotalH - targetViewH) * rate;
+        $scrollTarget.scrollTop(offset);
+    };
+};
+
+export class Scrollbar
+    extends React.Component<{ syncTarget: string, eventCenter: EventCenter }>{
+
+    static readonly ScrollEvent = 'scroll';
+    static readonly UpdateEvent = 'update';
+
+    private $syncTarget: JQuery<HTMLElement> = null;
+
+    render() {
+        return <div className="scrollbarContainer"><div className="scrollbar" /></div>;
+    };
+
+    componentDidMount() {
+        this.$syncTarget = $(this.props.syncTarget);
+        this.initScrollbar();
+    };
+
+
+    private initScrollbar() {
+        const eventCenter = this.props.eventCenter;
+
+        let isDragging = false;
+        const origin = { pageY: 0, scrollbarOffset: 0 };
+        const $scrollbarContainer = $('.scrollbarContainer');
+        const $scrollbar = $scrollbarContainer.find('.scrollbar');
+        $scrollbarContainer
+            .on('mousedown', e => {
+                e.preventDefault();
+                isDragging = true;
+                origin.pageY = e.pageY;
+
+                const scrollbarOffset = Number($scrollbar.css('top').replace('px', ''));
+                origin.scrollbarOffset = scrollbarOffset;
+            })
+            .on('mousemove', e => {
+                e.preventDefault();
+                if (!isDragging) return;
+                const offsetY = e.pageY - origin.pageY;
+                console.log(offsetY);
+                const maxOffset = $scrollbarContainer.height() - $scrollbar.height();
+                let scrollbarOffset = origin.scrollbarOffset + offsetY;
+                if (scrollbarOffset > maxOffset) scrollbarOffset = maxOffset;
+                else if (scrollbarOffset < 0) scrollbarOffset = 0;
+                $scrollbar.css('top', scrollbarOffset);
+
+                eventCenter.trigger(Scrollbar.ScrollEvent, scrollbarOffset / maxOffset);
+            });
+            
+        $(document).on('mouseup', e => {
+            e.preventDefault();
+            if (!isDragging) return;
+            isDragging = false;
+            console.log('mouseup');
+        });
+
+        eventCenter.on(Scrollbar.UpdateEvent, () => {
+            this.adjustScrollbarH();
+            this.adjustScrollbarOffset();
+        });
+    };
+
+    private adjustScrollbarH() {
+        const $scrollTarget = this.$syncTarget;
+        const targetTotalH = $scrollTarget.prop('scrollHeight');
+        const targetViewH = $scrollTarget.height();
+
+        const $scrollbarContainer = $('.scrollbarContainer');
+        const scrollbarContainerH = $scrollbarContainer.height();
+
+        const scrollbarH = scrollbarContainerH * (targetViewH / targetTotalH);
+        $scrollbarContainer.find('.scrollbar').height(scrollbarH);
+    };
+
+    private adjustScrollbarOffset() {
+        const $scrollTarget = this.$syncTarget;
+        const targetTotalH = $scrollTarget.prop('scrollHeight');
+        const targetScrollTop = $scrollTarget.scrollTop();
+
+        const $scrollbarContainer = $('.scrollbarContainer');
+        const scrollbarContainerH = $scrollbarContainer.height();
+        const offset = scrollbarContainerH * targetScrollTop / targetTotalH;
+        $scrollbarContainer.find('.scrollbar').css('top', offset);
     };
 };

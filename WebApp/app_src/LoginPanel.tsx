@@ -42,7 +42,6 @@ export class LoginPanel
     };
 
     componentDidMount() {
-        //gapi.load('client', this.initGoogleClient.bind(this));
         this.wordCardsAnimation();
     };
 
@@ -65,10 +64,13 @@ export class LoginPanel
         console.log('fadeIn start ' + this.getPerformance());
         const animation = $(ele).fadeIn(setting.fadeIn, undefined, () => {
             console.log('fadeIn end ' + this.getPerformance());
-        }).delay(setting.sustain || 0);
+        })
 
-        if (!setting.fadeOut) return;
-        animation.fadeOut(setting.fadeOut, undefined, () => {
+        if (!setting.fadeOut) {
+            onComplete();
+            return;
+        }
+        animation.delay(setting.sustain || 0).fadeOut(setting.fadeOut, undefined, () => {
             console.log('fadeOut end ' + this.getPerformance());
             onComplete();
         });
@@ -121,7 +123,7 @@ export class LoginPanel
 
     private afterWordCardsAnimation() {
         $('.skipAnimation').hide();
-        this.props.eventCenter.trigger(Event.afterWordCardsAnimation);
+        this.props.eventCenter.trigger(Event.AfterWordCardsAnimation);
     };
 
 
@@ -135,7 +137,7 @@ export class LoginPanel
     private login() {
         const $loginPanel = $('#loginPanel');
         $loginPanel.animate({ opacity: 0 }, 2000, () => $loginPanel.hide());
-        this.props.eventCenter.trigger(Event.afterLogin);
+        this.props.eventCenter.trigger(Event.AfterLogin);
     };
 
 };

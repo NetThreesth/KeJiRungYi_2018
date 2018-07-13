@@ -12,6 +12,8 @@ export interface Content {
 
 export class MessageCenter {
 
+    static readonly eventName = 'addMessage';
+
     contents: Content[] = [];
     observable: EventCenter = null;
 
@@ -22,7 +24,7 @@ export class MessageCenter {
 
     addText(role: Roles, text: string) {
         this.contents.push({ role: role, type: ContentType.Text, content: text });
-        this.observable.trigger(Event.addMessage);
+        this.observable.trigger(MessageCenter.eventName);
 
         if (role !== Roles.User) return;
         $.ajax({
@@ -37,7 +39,7 @@ export class MessageCenter {
     };
     addImage(role: Roles, b64String: string) {
         this.contents.push({ role: role, type: ContentType.Image, content: b64String });
-        this.observable.trigger(Event.addMessage);
+        this.observable.trigger(MessageCenter.eventName);
 
         $.ajax({
             url: 'apis/uploadImage',
@@ -51,18 +53,27 @@ export class MessageCenter {
 };
 
 export class EventCenter {
+
     private eventCenter = $({});
-    on<T>(event: Event, handler: (data: T) => void) {
-        this.eventCenter.on(String(event), (event, data) => handler(data));
+    private registeredEventMap = {};
+
+    on<T>(event: string, handler: (data: T) => void) {
+        this.registeredEventMap[event] = true;
+        console.log(`Event registered: ${event}`);
+        this.eventCenter.on(event, (event, data) => handler(data));
     };
-    trigger<T>(event: Event, data?: T) {
-        this.eventCenter.trigger(String(event), data);
+    trigger<T>(event: string, data?: T) {
+        if (!this.registeredEventMap[event]) {
+            console.warn(`Event not registered: ${event}`);
+            return;
+        }
+        this.eventCenter.trigger(event, data);
     };
 };
 
-export enum Event {
-    updateDevPanelData,
-    afterWordCardsAnimation,
-    afterLogin,
-    addMessage
-}
+export class Event {
+    static readonly AfterLogin = 'AfterLogin';
+    static readonly UpdateDevPanelData = 'UpdateDevPanelData';
+    static readonly AfterWordCardsAnimation = 'AfterWordCardsAnimation';
+    static readonly None = 'None';
+};

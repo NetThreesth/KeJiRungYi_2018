@@ -322,7 +322,7 @@ var ControlPanel = /** @class */ (function (_super) {
     };
     ;
     ControlPanel.prototype.componentDidMount = function () {
-        this.props.eventCenter.on(_MessageCenter__WEBPACK_IMPORTED_MODULE_1__["Event"].afterLogin, function () {
+        this.props.eventCenter.on(_MessageCenter__WEBPACK_IMPORTED_MODULE_1__["Event"].AfterLogin, function () {
             $('.control-panel').removeClass(['invisible', 'untouchable']).addClass('visible');
         });
     };
@@ -428,7 +428,7 @@ var DevPanel = /** @class */ (function (_super) {
         if (!isdev)
             return;
         $('#devPanel').show();
-        this.props.eventCenter.on(_MessageCenter__WEBPACK_IMPORTED_MODULE_1__["Event"].updateDevPanelData, function (data) {
+        this.props.eventCenter.on(_MessageCenter__WEBPACK_IMPORTED_MODULE_1__["Event"].UpdateDevPanelData, function (data) {
             _this.setState({ fps: data.fps, coordinate: data.coordinate });
         });
     };
@@ -513,7 +513,6 @@ var LoginPanel = /** @class */ (function (_super) {
     };
     ;
     LoginPanel.prototype.componentDidMount = function () {
-        //gapi.load('client', this.initGoogleClient.bind(this));
         this.wordCardsAnimation();
     };
     ;
@@ -531,10 +530,12 @@ var LoginPanel = /** @class */ (function (_super) {
         console.log('fadeIn start ' + this.getPerformance());
         var animation = $(ele).fadeIn(setting.fadeIn, undefined, function () {
             console.log('fadeIn end ' + _this.getPerformance());
-        }).delay(setting.sustain || 0);
-        if (!setting.fadeOut)
+        });
+        if (!setting.fadeOut) {
+            onComplete();
             return;
-        animation.fadeOut(setting.fadeOut, undefined, function () {
+        }
+        animation.delay(setting.sustain || 0).fadeOut(setting.fadeOut, undefined, function () {
             console.log('fadeOut end ' + _this.getPerformance());
             onComplete();
         });
@@ -574,7 +575,7 @@ var LoginPanel = /** @class */ (function (_super) {
     ;
     LoginPanel.prototype.afterWordCardsAnimation = function () {
         $('.skipAnimation').hide();
-        this.props.eventCenter.trigger(_MessageCenter__WEBPACK_IMPORTED_MODULE_2__["Event"].afterWordCardsAnimation);
+        this.props.eventCenter.trigger(_MessageCenter__WEBPACK_IMPORTED_MODULE_2__["Event"].AfterWordCardsAnimation);
     };
     ;
     LoginPanel.prototype.signInButtonClickHandler = function () {
@@ -588,7 +589,7 @@ var LoginPanel = /** @class */ (function (_super) {
     LoginPanel.prototype.login = function () {
         var $loginPanel = $('#loginPanel');
         $loginPanel.animate({ opacity: 0 }, 2000, function () { return $loginPanel.hide(); });
-        this.props.eventCenter.trigger(_MessageCenter__WEBPACK_IMPORTED_MODULE_2__["Event"].afterLogin);
+        this.props.eventCenter.trigger(_MessageCenter__WEBPACK_IMPORTED_MODULE_2__["Event"].AfterLogin);
     };
     ;
     return LoginPanel;
@@ -603,12 +604,13 @@ var LoginPanel = /** @class */ (function (_super) {
 /*!**********************************!*\
   !*** ./app_src/MessageBoard.tsx ***!
   \**********************************/
-/*! exports provided: MessageBoard */
+/*! exports provided: MessageBoard, Scrollbar */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MessageBoard", function() { return MessageBoard; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Scrollbar", function() { return Scrollbar; });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _MessageCenter__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./MessageCenter */ "./app_src/MessageCenter.ts");
@@ -630,9 +632,10 @@ var MessageBoard = /** @class */ (function (_super) {
     __extends(MessageBoard, _super);
     function MessageBoard(props) {
         var _this = _super.call(this, props) || this;
+        _this.eventCenter = new _MessageCenter__WEBPACK_IMPORTED_MODULE_1__["EventCenter"]();
         var messageCenter = _this.props.messageCenter;
         _this.state = { contents: messageCenter.contents.slice() };
-        _this.props.messageCenter.observable.on(_MessageCenter__WEBPACK_IMPORTED_MODULE_1__["Event"].addMessage, _this.refresh.bind(_this));
+        _this.props.messageCenter.observable.on(_MessageCenter__WEBPACK_IMPORTED_MODULE_1__["MessageCenter"].eventName, _this.refresh.bind(_this));
         return _this;
     }
     ;
@@ -640,9 +643,15 @@ var MessageBoard = /** @class */ (function (_super) {
         var contents = this.state.contents;
         var contentElements = contents.map(this.createContent.bind(this));
         return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { id: "messageBoard", className: "invisible" },
-            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "message-board-content" }, contentElements),
-            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "scrollbarContainer" },
-                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "scrollbar" })));
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "messageBoardContent" }, contentElements),
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"](Scrollbar, { syncTarget: ".messageBoardContent", eventCenter: this.eventCenter }));
+    };
+    ;
+    MessageBoard.prototype.componentDidMount = function () {
+        var _this = this;
+        this.eventCenter.on(Scrollbar.ScrollEvent, function (rate) {
+            _this.scrollTo(rate);
+        });
     };
     ;
     MessageBoard.prototype.createContent = function (content) {
@@ -683,6 +692,8 @@ var MessageBoard = /** @class */ (function (_super) {
             return;
         $('#messageBoard').removeClass('invisible');
         this.setState({ contents: this.props.messageCenter.contents.slice() });
+        this.scrollTo(1);
+        this.eventCenter.trigger(Scrollbar.UpdateEvent);
     };
     ;
     MessageBoard.prototype.getAvatar = function (role) {
@@ -694,7 +705,101 @@ var MessageBoard = /** @class */ (function (_super) {
             return 'assets/avatar_pink.png';
     };
     ;
+    MessageBoard.prototype.scrollTo = function (rate) {
+        var $scrollTarget = $('.messageBoardContent');
+        var targetTotalH = $scrollTarget.prop('scrollHeight');
+        var targetViewH = $scrollTarget.height();
+        var offset = (targetTotalH - targetViewH) * rate;
+        $scrollTarget.scrollTop(offset);
+    };
+    ;
     return MessageBoard;
+}(react__WEBPACK_IMPORTED_MODULE_0__["Component"]));
+
+;
+var Scrollbar = /** @class */ (function (_super) {
+    __extends(Scrollbar, _super);
+    function Scrollbar() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.$syncTarget = null;
+        return _this;
+    }
+    Scrollbar.prototype.render = function () {
+        return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "scrollbarContainer" },
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "scrollbar" }));
+    };
+    ;
+    Scrollbar.prototype.componentDidMount = function () {
+        this.$syncTarget = $(this.props.syncTarget);
+        this.initScrollbar();
+    };
+    ;
+    Scrollbar.prototype.initScrollbar = function () {
+        var _this = this;
+        var eventCenter = this.props.eventCenter;
+        var isDragging = false;
+        var origin = { pageY: 0, scrollbarOffset: 0 };
+        var $scrollbarContainer = $('.scrollbarContainer');
+        var $scrollbar = $scrollbarContainer.find('.scrollbar');
+        $scrollbarContainer
+            .on('mousedown', function (e) {
+            e.preventDefault();
+            isDragging = true;
+            origin.pageY = e.pageY;
+            var scrollbarOffset = Number($scrollbar.css('top').replace('px', ''));
+            origin.scrollbarOffset = scrollbarOffset;
+        })
+            .on('mousemove', function (e) {
+            e.preventDefault();
+            if (!isDragging)
+                return;
+            var offsetY = e.pageY - origin.pageY;
+            console.log(offsetY);
+            var maxOffset = $scrollbarContainer.height() - $scrollbar.height();
+            var scrollbarOffset = origin.scrollbarOffset + offsetY;
+            if (scrollbarOffset > maxOffset)
+                scrollbarOffset = maxOffset;
+            else if (scrollbarOffset < 0)
+                scrollbarOffset = 0;
+            $scrollbar.css('top', scrollbarOffset);
+            eventCenter.trigger(Scrollbar.ScrollEvent, scrollbarOffset / maxOffset);
+        });
+        $(document).on('mouseup', function (e) {
+            e.preventDefault();
+            if (!isDragging)
+                return;
+            isDragging = false;
+            console.log('mouseup');
+        });
+        eventCenter.on(Scrollbar.UpdateEvent, function () {
+            _this.adjustScrollbarH();
+            _this.adjustScrollbarOffset();
+        });
+    };
+    ;
+    Scrollbar.prototype.adjustScrollbarH = function () {
+        var $scrollTarget = this.$syncTarget;
+        var targetTotalH = $scrollTarget.prop('scrollHeight');
+        var targetViewH = $scrollTarget.height();
+        var $scrollbarContainer = $('.scrollbarContainer');
+        var scrollbarContainerH = $scrollbarContainer.height();
+        var scrollbarH = scrollbarContainerH * (targetViewH / targetTotalH);
+        $scrollbarContainer.find('.scrollbar').height(scrollbarH);
+    };
+    ;
+    Scrollbar.prototype.adjustScrollbarOffset = function () {
+        var $scrollTarget = this.$syncTarget;
+        var targetTotalH = $scrollTarget.prop('scrollHeight');
+        var targetScrollTop = $scrollTarget.scrollTop();
+        var $scrollbarContainer = $('.scrollbarContainer');
+        var scrollbarContainerH = $scrollbarContainer.height();
+        var offset = scrollbarContainerH * targetScrollTop / targetTotalH;
+        $scrollbarContainer.find('.scrollbar').css('top', offset);
+    };
+    ;
+    Scrollbar.ScrollEvent = 'scroll';
+    Scrollbar.UpdateEvent = 'update';
+    return Scrollbar;
 }(react__WEBPACK_IMPORTED_MODULE_0__["Component"]));
 
 ;
@@ -734,7 +839,7 @@ var MessageCenter = /** @class */ (function () {
     MessageCenter.prototype.addText = function (role, text) {
         var _this = this;
         this.contents.push({ role: role, type: ContentType.Text, content: text });
-        this.observable.trigger(Event.addMessage);
+        this.observable.trigger(MessageCenter.eventName);
         if (role !== _AppSetting__WEBPACK_IMPORTED_MODULE_0__["Roles"].User)
             return;
         $.ajax({
@@ -751,7 +856,7 @@ var MessageCenter = /** @class */ (function () {
     MessageCenter.prototype.addImage = function (role, b64String) {
         var _this = this;
         this.contents.push({ role: role, type: ContentType.Image, content: b64String });
-        this.observable.trigger(Event.addMessage);
+        this.observable.trigger(MessageCenter.eventName);
         $.ajax({
             url: 'apis/uploadImage',
             type: "post",
@@ -762,6 +867,7 @@ var MessageCenter = /** @class */ (function () {
         });
     };
     ;
+    MessageCenter.eventName = 'addMessage';
     return MessageCenter;
 }());
 
@@ -769,26 +875,37 @@ var MessageCenter = /** @class */ (function () {
 var EventCenter = /** @class */ (function () {
     function EventCenter() {
         this.eventCenter = $({});
+        this.registeredEventMap = {};
     }
     EventCenter.prototype.on = function (event, handler) {
-        this.eventCenter.on(String(event), function (event, data) { return handler(data); });
+        this.registeredEventMap[event] = true;
+        console.log("Event registered: " + event);
+        this.eventCenter.on(event, function (event, data) { return handler(data); });
     };
     ;
     EventCenter.prototype.trigger = function (event, data) {
-        this.eventCenter.trigger(String(event), data);
+        if (!this.registeredEventMap[event]) {
+            console.warn("Event not registered: " + event);
+            return;
+        }
+        this.eventCenter.trigger(event, data);
     };
     ;
     return EventCenter;
 }());
 
 ;
-var Event;
-(function (Event) {
-    Event[Event["updateDevPanelData"] = 0] = "updateDevPanelData";
-    Event[Event["afterWordCardsAnimation"] = 1] = "afterWordCardsAnimation";
-    Event[Event["afterLogin"] = 2] = "afterLogin";
-    Event[Event["addMessage"] = 3] = "addMessage";
-})(Event || (Event = {}));
+var Event = /** @class */ (function () {
+    function Event() {
+    }
+    Event.AfterLogin = 'AfterLogin';
+    Event.UpdateDevPanelData = 'UpdateDevPanelData';
+    Event.AfterWordCardsAnimation = 'AfterWordCardsAnimation';
+    Event.None = 'None';
+    return Event;
+}());
+
+;
 
 
 /***/ }),
@@ -833,7 +950,6 @@ var Scene = /** @class */ (function (_super) {
     function Scene() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
         _this.cameraLocations = [];
-        _this.bubbleSprays = [];
         _this.colorsSetForParticle = [
             { diffuseColor: [253, 245, 134], glowColor: [255, 252, 193, 0.85] },
             { diffuseColor: [253, 229, 210], glowColor: [255, 219, 225, 0.85] },
@@ -874,8 +990,8 @@ var Scene = /** @class */ (function (_super) {
         this.getTexts();
         this.getPoints();
         this.registerRunRenderLoop();
-        this.props.eventCenter.on(_MessageCenter__WEBPACK_IMPORTED_MODULE_5__["Event"].afterWordCardsAnimation, this.transformation.bind(this));
-        this.props.eventCenter.on(_MessageCenter__WEBPACK_IMPORTED_MODULE_5__["Event"].afterLogin, this.zoomIn.bind(this));
+        this.props.eventCenter.on(_MessageCenter__WEBPACK_IMPORTED_MODULE_5__["Event"].AfterWordCardsAnimation, this.transformation.bind(this));
+        this.props.eventCenter.on(_MessageCenter__WEBPACK_IMPORTED_MODULE_5__["Event"].AfterLogin, this.zoomIn.bind(this));
         window.addEventListener("resize", function () {
             _this.engine.resize();
         });
@@ -910,66 +1026,54 @@ var Scene = /** @class */ (function (_super) {
     ;
     Scene.prototype.createBubbleSpray = function (position) {
         // creation
-        var sphere = babylonjs__WEBPACK_IMPORTED_MODULE_1__["MeshBuilder"].CreateSphere("s", { diameter: 0.08, segments: 12 }, this.scene);
+        var sphere = babylonjs__WEBPACK_IMPORTED_MODULE_1__["MeshBuilder"].CreateSphere("s", { diameter: 0.3, segments: 12 }, this.scene);
         var bubbleSpray = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["SolidParticleSystem"]('bubbleSpray', this.scene);
         bubbleSpray.addShape(sphere, 20);
         var mesh = bubbleSpray.buildMesh();
         mesh.material = function () {
             var bubbleMat = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["StandardMaterial"]("bubbleMat", this.scene);
             //mat.backFaceCulling = false;
-            bubbleMat.alpha = 0.1;
+            bubbleMat.alpha = 0.2;
             return bubbleMat;
         }.bind(this)();
         mesh.position = position;
         sphere.dispose();
-        // behavior definition
         var speed = 0.01;
         // init
         bubbleSpray.initParticles = function () {
-            // just recycle everything
             for (var p = 0; p < this.nbParticles; p++) {
                 this.recycleParticle(this.particles[p]);
             }
         };
-        // recycle
-        var scale;
         bubbleSpray.recycleParticle = function (particle) {
-            // Set particle new velocity, scale and rotation
-            // As this function is called for each particle, we don't allocate new
-            // memory by using "new BABYLON.Vector3()" but we set directly the
-            // x, y, z particle properties instead
             particle.position.x = 0;
             particle.position.y = 0;
             particle.position.z = 0;
             particle.velocity.x = (Math.random() - 0.5) * speed / 3;
             particle.velocity.y = Math.random() * speed;
             particle.velocity.z = (Math.random() - 0.5) * speed / 3;
-            scale = 1 * Math.random() + 0.2;
+            var scale = 1 * Math.random() + 0.2;
             particle.scale.x = scale;
             particle.scale.y = scale;
             particle.scale.z = scale;
-            particle['age'] = Math.random() * 0.8;
+            particle['age'] = Math.random() * 2 + 1;
             return particle;
         };
-        // update : will be called by setParticles()
         bubbleSpray.updateParticle = function (particle) {
-            // some physics here 
             if (particle.position.y < 0 || particle['age'] < 0) {
                 bubbleSpray.recycleParticle(particle);
             }
-            (particle.position).addInPlace(particle.velocity); // update particle new position
+            particle.position.addInPlace(particle.velocity);
             particle.position.y += speed / 2;
             particle['age'] -= 0.01;
             return particle;
         };
-        // init all particle values and set them once to apply textures, colors, etc
         bubbleSpray.initParticles();
         bubbleSpray.setParticles();
-        // Tuning : 
         bubbleSpray.computeParticleColor = false;
         bubbleSpray.computeParticleTexture = false;
         bubbleSpray.computeParticleRotation = false;
-        this.bubbleSprays.push(bubbleSpray);
+        this.bubbleSpray = bubbleSpray;
     };
     ;
     Scene.prototype.registerRunRenderLoop = function () {
@@ -978,19 +1082,19 @@ var Scene = /** @class */ (function (_super) {
         var viewport = this.camera.viewport.toGlobal(this.camera.getEngine(), null);
         this.engine.runRenderLoop(function () {
             /** render before */
-            _this.bubbleSprays.forEach(function (e) { return e.setParticles(); });
             if (_this.cameraLocations.length > 0) {
                 var position = _this.camera.position = _this.cameraLocations.shift();
                 if (_this.cameraLocations.length >= 1) {
                     _this.camera.setTarget(babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"].Zero());
                     if (_this.cameraLocations.length === 1)
-                        _this.createBubbleSprayAndParticles();
+                        _this.createBubbleSpray(_this.chatRoomsCenter[Scene.chatRoomIndex]);
                 }
             }
             _this.lightOfCamera.position = _this.camera.position;
             _this.translateLinesForTextNodes();
             _this.translateParticles();
-            _this.bubbleSprays.forEach(function (e) { return e.setParticles(); });
+            if (_this.bubbleSpray)
+                _this.bubbleSpray.setParticles();
             /** render before end */
             _this.scene.render();
             /** render after */
@@ -999,7 +1103,7 @@ var Scene = /** @class */ (function (_super) {
     };
     ;
     Scene.prototype.publishDevData = function () {
-        this.props.eventCenter.trigger(_MessageCenter__WEBPACK_IMPORTED_MODULE_5__["Event"].updateDevPanelData, {
+        this.props.eventCenter.trigger(_MessageCenter__WEBPACK_IMPORTED_MODULE_5__["Event"].UpdateDevPanelData, {
             fps: this.engine.getFps().toFixed() + ' fps',
             coordinate: _BabylonUtility__WEBPACK_IMPORTED_MODULE_4__["BabylonUtility"].positionToString(this.camera.position)
         });
@@ -1013,7 +1117,7 @@ var Scene = /** @class */ (function (_super) {
         var colorSet = this.colorsSetForParticle[colorSetIndex];
         var colorInRGB = colorSet.diffuseColor;
         var color = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Color3"](colorInRGB[0], colorInRGB[1], colorInRGB[2]);
-        var radius = _CommonUtility__WEBPACK_IMPORTED_MODULE_3__["CommonUtility"].getRandomIntInRange(50, 70) * 0.001;
+        var radius = _CommonUtility__WEBPACK_IMPORTED_MODULE_3__["CommonUtility"].getRandomIntInRange(10, 20) * 0.01;
         var core = babylonjs__WEBPACK_IMPORTED_MODULE_1__["Mesh"].CreateSphere("core-colorSetIndex:" + colorSetIndex, 2, radius, this.scene);
         core.position = position;
         var coreMaterial = core.material = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["StandardMaterial"]("coreMaterial", this.scene);
@@ -1142,7 +1246,6 @@ var Scene = /** @class */ (function (_super) {
     Scene.prototype.createBubbleSprayAndParticles = function () {
         var _this = this;
         this.chatRoomsCenter.forEach(function (center) {
-            _this.createBubbleSpray(center);
             for (var i = 0; i < 10; i++) {
                 _this.createParticle(center);
             }
@@ -1247,12 +1350,13 @@ var Scene = /** @class */ (function (_super) {
             _this.translateType = null;
             _this.textNodes.length = 0;
             _this.drawLine();
+            _this.createBubbleSprayAndParticles();
         }, 1.8 * 1000);
     };
     ;
     Scene.prototype.zoomIn = function () {
-        var randomChatRoomIndex = _CommonUtility__WEBPACK_IMPORTED_MODULE_3__["CommonUtility"].getRandomIntInRange(0, this.chatRoomsCenter.length - 1);
-        var chatRoom = this.chatRoomsCenter[randomChatRoomIndex];
+        Scene.chatRoomIndex = _CommonUtility__WEBPACK_IMPORTED_MODULE_3__["CommonUtility"].getRandomIntInRange(0, this.chatRoomsCenter.length - 1);
+        var chatRoom = this.chatRoomsCenter[Scene.chatRoomIndex];
         var destination = chatRoom ?
             new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"](chatRoom.x * 3, chatRoom.y * 3, 0) :
             babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"].Zero();
@@ -1261,6 +1365,7 @@ var Scene = /** @class */ (function (_super) {
         this.cameraLocations = points;
     };
     ;
+    Scene.chatRoomIndex = null;
     return Scene;
 }(react__WEBPACK_IMPORTED_MODULE_0__["Component"]));
 
@@ -1303,12 +1408,6 @@ if (!isdev)
     console.info = console.debug = console.log = function () { };
 var eventCenter = new _MessageCenter__WEBPACK_IMPORTED_MODULE_2__["EventCenter"]();
 var messageCenter = new _MessageCenter__WEBPACK_IMPORTED_MODULE_2__["MessageCenter"](eventCenter);
-// this.observable.trigger('add');
-/* afterWordCardsAnimation={scene.transformation.bind(scene)}
-afterLogin={() => {
-    $('.control-panel').removeClass('invisible').addClass('visible');
-    scene.zoomIn.bind(scene)();
-}} /> */
 react_dom__WEBPACK_IMPORTED_MODULE_1__["render"](react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", null,
     react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_Scene__WEBPACK_IMPORTED_MODULE_3__["Scene"], { eventCenter: eventCenter }),
     react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_DevPanel__WEBPACK_IMPORTED_MODULE_4__["DevPanel"], { eventCenter: eventCenter }),
