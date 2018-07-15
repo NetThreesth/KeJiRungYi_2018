@@ -9,7 +9,6 @@ const logger = require('./server/logger');
 const app = express();
 
 app.use(morgan('combined', { stream: logger.accessLogStream }));
-app.use(express.static(__dirname));
 const setting = { limit: '50mb' };
 app.use(bodyParser.urlencoded(Object.assign({ extended: false }, setting)));
 app.use(bodyParser.json(setting));
@@ -21,6 +20,13 @@ app.use((err, req, res, next) => {
     error: err
   });
   res.end();
+});
+
+app.use(express.static(`${__dirname}/app`));
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => {
+  logger.info(`App listening on port ${PORT}`);
+  logger.info('Press Ctrl+C to quit.');
 });
 // [END Setup]
 
@@ -157,12 +163,3 @@ function errorHandler(err, next) {
   if (next) next(err);
 };
 // [END APIs]
-
-
-
-
-const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => {
-  logger.info(`App listening on port ${PORT}`);
-  logger.info('Press Ctrl+C to quit.');
-});

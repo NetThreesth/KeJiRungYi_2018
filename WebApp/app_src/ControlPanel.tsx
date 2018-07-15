@@ -8,20 +8,20 @@ export class ControlPanel
     render() {
         return <div className="control-panel invisible untouchable">
             <span className="textInput invisible">
-                <input type="text" />
-                <button className="button" onClick={() => this.handleText()}>
+                <input type="text" onKeyPress={this.keyPress.bind(this)} />
+                <button className="button" onClick={this.handleText.bind(this)}>
                     <i className="fas fa-share"></i>
                 </button>
             </span>
             <div className="buttons">
-                <button id="textInputSwitch" className="button white-text" onClick={() => this.switchTextInput()}>
+                <button id="textInputSwitch" className="button white-text" onClick={this.switchTextInput.bind(this)}>
                     <i className="far fa-comment-dots"></i>
                 </button>
                 <label htmlFor="fileUpload" className="button white-text">
                     <i className="fas fa-camera-retro"></i>
                 </label>
                 <input id="fileUpload" type="file" accept="image/*" style={{ display: 'none' }}
-                    onChange={(e) => this.handleFiles(e)} />
+                    onChange={this.handleFiles.bind(this)} />
             </div>
             <div className="flashMask" />
         </div>;
@@ -48,6 +48,10 @@ export class ControlPanel
         $textInput.toggleClass('visible').toggleClass('invisible');
     };
 
+    private keyPress(e) {
+        if (e.which == 13 || e.keyCode == 13)
+            this.handleText();
+    };
 
     private handleText() {
         const $input = $('.textInput>input');

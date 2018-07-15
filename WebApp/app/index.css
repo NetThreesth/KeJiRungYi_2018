@@ -8,7 +8,7 @@ body {
   padding: 0;
 }
 
-.full-page, #renderCanvas, .flashMask, #messageBoard {
+.full-page, #renderCanvas, #greenMask, .flashMask, #messageBoard {
   position: fixed;
   top: 0;
   left: 0;
@@ -43,7 +43,7 @@ body {
   }
 }
 
-.untouchable, .flashMask, #messageBoard {
+.untouchable, #greenMask, .flashMask, #messageBoard {
   pointer-events: none;
 }
 
@@ -177,36 +177,21 @@ input[type=text] {
   padding: 0 20px;
 }
 
-#signinButton {
-  display: inline-block;
-  background: white;
-  border-radius: 5px;
-  border: thin solid #888;
-  box-shadow: 1px 1px 1px grey;
-  font-size: 14px;
-  font-weight: bold;
-  font-family: 'Roboto', sans-serif;
-  padding: 0 20px;
-}
-
-#signinButton:hover {
-  cursor: pointer;
-}
-
 #signInWrapper .label {
-  font-family: serif;
-  font-weight: normal;
+  height: 24px;
+  line-height: 24px;
 }
 
 #signInWrapper .icon {
+  height: 24px;
+  line-height: 24px;
   background: url("https://google-developers.appspot.com/identity/sign-in/g-normal.png") transparent -7px 50% no-repeat;
   display: inline-block;
   vertical-align: middle;
   width: 25px;
-  height: 30px;
 }
 
-.sign-in-button {
+.signInButton {
   background: transparent;
   padding: 0;
   border: none;

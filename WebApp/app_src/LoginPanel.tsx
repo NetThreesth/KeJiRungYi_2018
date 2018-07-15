@@ -26,15 +26,16 @@ export class LoginPanel
                 </div>
             <div id="signInWrapper" className="wordCard">
                 <span className="label white-text">Sign in with:&nbsp;</span>
-                <input type="text" id="signInName" />
-                <button type="button" className="sign-in-button"
-                    onClick={e => { this.signInButtonClickHandler() }}>
+                <input type="text" id="signInName"
+                    onKeyPress={this.keyPress.bind(this)} />
+                <button type="button" className="signInButton"
+                    onClick={this.signInButtonClickHandler.bind(this)}>
                     <i className="fas fa-arrow-circle-right"></i>
                 </button>
             </div>
             <div className="skipAnimation">
                 <button type="button"
-                    onClick={e => { this.skipAnimation() }}>
+                    onClick={this.skipAnimation.bind(this)}>
                     skip
                 </button>
             </div>
@@ -126,6 +127,10 @@ export class LoginPanel
         this.props.eventCenter.trigger(Event.AfterWordCardsAnimation);
     };
 
+    private keyPress(e) {
+        if (e.which == 13 || e.keyCode == 13)
+            this.signInButtonClickHandler();
+    };
 
     private signInButtonClickHandler() {
         const signInName = $('#signInName').val() as string;

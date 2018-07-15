@@ -9,7 +9,8 @@ import { EventCenter, Event } from './MessageCenter';
 
 
 
-export class Scene extends React.Component<{ eventCenter: EventCenter }> {
+export class Scene
+    extends React.Component<{ eventCenter: EventCenter }> {
 
     static chatRoomIndex: number = null;
 
@@ -27,7 +28,10 @@ export class Scene extends React.Component<{ eventCenter: EventCenter }> {
 
 
     render() {
-        return <canvas id="renderCanvas" touch-action="none"></canvas>;
+        return <div>
+            <canvas id="renderCanvas" touch-action="none"></canvas>
+            <div id="greenMask"></div>
+        </div>;
     };
 
 
@@ -44,6 +48,18 @@ export class Scene extends React.Component<{ eventCenter: EventCenter }> {
         window.addEventListener("resize", () => {
             this.engine.resize();
         });
+
+        const updateMask = () => {
+            const setting = CommonUtility.getQueryString('greenMask');
+            const color = setting || `rgba(0, 255, 0, ${CommonUtility.getRandomNumberInRange(0, 0.5, 2)})`;
+            $('#greenMask').css('background-color', color);
+            this.props.eventCenter.trigger(Event.UpdateDevPanelData, { greenMask: color });
+            if (setting) return;
+            setTimeout(() => {
+                updateMask();
+            }, 2000);
+        };
+        updateMask();
     };
 
     private initScene() {
@@ -121,7 +137,7 @@ export class Scene extends React.Component<{ eventCenter: EventCenter }> {
             particle.scale.x = scale;
             particle.scale.y = scale;
             particle.scale.z = scale;
-            particle['age'] = Math.random() * 2 + 1;
+            particle['age'] = Math.random() * 2 + 2;
 
             return particle;
         };
@@ -160,11 +176,14 @@ export class Scene extends React.Component<{ eventCenter: EventCenter }> {
 
             /** render before */
             if (this.cameraLocations.length > 0) {
-                const position = this.camera.position = this.cameraLocations.shift();
+                this.camera.position = this.cameraLocations.shift();
                 if (this.cameraLocations.length >= 1) {
                     this.camera.setTarget(BABYLON.Vector3.Zero());
-                    if (this.cameraLocations.length === 1)
-                        this.createBubbleSpray(this.chatRoomsCenter[Scene.chatRoomIndex]);
+                    if (this.cameraLocations.length === 1) {
+                        const center = this.chatRoomsCenter[Scene.chatRoomIndex];
+                        this.createBubbleSpray(center);
+                        this.createAlgae(center);
+                    }
                 }
             }
 
@@ -180,8 +199,10 @@ export class Scene extends React.Component<{ eventCenter: EventCenter }> {
 
             /** render after */
             this.publishDevData();
+
         });
     };
+
 
     private publishDevData() {
         this.props.eventCenter.trigger(Event.UpdateDevPanelData, {
@@ -258,7 +279,7 @@ export class Scene extends React.Component<{ eventCenter: EventCenter }> {
     private translateType: 'Simple' | 'ToOrigin' | 'ToChatRoomNode' = 'Simple';
     private startUpdateTextNodeWorker() {
         if (!window['Worker']) return;
-        const worker = new Worker("app/UpdateTextNodeWorker.js");
+        const worker = new Worker((document.getElementById('UpdateTextNodeWorker') as HTMLScriptElement).src);
         const next = () => {
             let nodes: BABYLON.Vector3[] = [];
             if (this.translateType === 'Simple') {
@@ -363,7 +384,7 @@ export class Scene extends React.Component<{ eventCenter: EventCenter }> {
     };
 
 
-    private createBubbleSprayAndParticles() {
+    private createParticles() {
         this.chatRoomsCenter.forEach(center => {
             for (let i = 0; i < 10; i++) {
                 this.createParticle(center);
@@ -501,6 +522,19 @@ export class Scene extends React.Component<{ eventCenter: EventCenter }> {
         };
     };
 
+    private createAlgae(center: BABYLON.Vector3) {
+        const count = 50;
+        var algaeManager = new BABYLON.SpriteManager("algaeManager", "assets/algae_30.png", count, 30, this.scene);
+        for (var i = 0; i < count; i++) {
+            var algae = new BABYLON.Sprite("tree", algaeManager);
+            algae.size = 0.1;
+            algae.position.x = center.x + CommonUtility.getRandomNumberInRange(-3, 3, 2);
+            algae.position.y = center.y + CommonUtility.getRandomNumberInRange(-3, 3, 2);
+            algae.position.z = center.z + CommonUtility.getRandomNumberInRange(-3, 3, 2);
+            algae.isPickable = false;
+        }
+    };
+
 
     private transformation() {
         this.translateType = 'ToOrigin';
@@ -511,7 +545,7 @@ export class Scene extends React.Component<{ eventCenter: EventCenter }> {
             this.translateType = null;
             this.textNodes.length = 0;
             this.drawLine();
-            this.createBubbleSprayAndParticles();
+            this.createParticles();
         }, 1.8 * 1000);
     };
 

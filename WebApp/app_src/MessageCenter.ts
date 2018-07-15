@@ -64,7 +64,7 @@ export class EventCenter {
     };
     trigger<T>(event: string, data?: T) {
         if (!this.registeredEventMap[event]) {
-            console.warn(`Event not registered: ${event}`);
+            console.log(`Event not registered: ${event}`);
             return;
         }
         this.eventCenter.trigger(event, data);

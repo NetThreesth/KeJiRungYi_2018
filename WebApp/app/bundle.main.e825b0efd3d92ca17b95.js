@@ -36,17 +36,32 @@
 /******/ 	// define getter function for harmony exports
 /******/ 	__webpack_require__.d = function(exports, name, getter) {
 /******/ 		if(!__webpack_require__.o(exports, name)) {
-/******/ 			Object.defineProperty(exports, name, {
-/******/ 				configurable: false,
-/******/ 				enumerable: true,
-/******/ 				get: getter
-/******/ 			});
+/******/ 			Object.defineProperty(exports, name, { enumerable: true, get: getter });
 /******/ 		}
 /******/ 	};
 /******/
 /******/ 	// define __esModule on exports
 /******/ 	__webpack_require__.r = function(exports) {
+/******/ 		if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 			Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 		}
 /******/ 		Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 	};
+/******/
+/******/ 	// create a fake namespace object
+/******/ 	// mode & 1: value is a module id, require it
+/******/ 	// mode & 2: merge all properties of value into the ns
+/******/ 	// mode & 4: return value when already ns object
+/******/ 	// mode & 8|1: behave like require
+/******/ 	__webpack_require__.t = function(value, mode) {
+/******/ 		if(mode & 1) value = __webpack_require__(value);
+/******/ 		if(mode & 8) return value;
+/******/ 		if((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;
+/******/ 		var ns = Object.create(null);
+/******/ 		__webpack_require__.r(ns);
+/******/ 		Object.defineProperty(ns, 'default', { enumerable: true, value: value });
+/******/ 		if(mode & 2 && typeof value != 'string') for(var key in value) __webpack_require__.d(ns, key, function(key) { return value[key]; }.bind(null, key));
+/******/ 		return ns;
 /******/ 	};
 /******/
 /******/ 	// getDefaultExport function for compatibility with non-harmony modules
@@ -306,18 +321,17 @@ var ControlPanel = /** @class */ (function (_super) {
         return _super !== null && _super.apply(this, arguments) || this;
     }
     ControlPanel.prototype.render = function () {
-        var _this = this;
         return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "control-panel invisible untouchable" },
             react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("span", { className: "textInput invisible" },
-                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("input", { type: "text" }),
-                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("button", { className: "button", onClick: function () { return _this.handleText(); } },
+                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("input", { type: "text", onKeyPress: this.keyPress.bind(this) }),
+                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("button", { className: "button", onClick: this.handleText.bind(this) },
                     react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("i", { className: "fas fa-share" }))),
             react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "buttons" },
-                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("button", { id: "textInputSwitch", className: "button white-text", onClick: function () { return _this.switchTextInput(); } },
+                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("button", { id: "textInputSwitch", className: "button white-text", onClick: this.switchTextInput.bind(this) },
                     react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("i", { className: "far fa-comment-dots" })),
                 react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("label", { htmlFor: "fileUpload", className: "button white-text" },
                     react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("i", { className: "fas fa-camera-retro" })),
-                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("input", { id: "fileUpload", type: "file", accept: "image/*", style: { display: 'none' }, onChange: function (e) { return _this.handleFiles(e); } })),
+                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("input", { id: "fileUpload", type: "file", accept: "image/*", style: { display: 'none' }, onChange: this.handleFiles.bind(this) })),
             react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "flashMask" }));
     };
     ;
@@ -338,6 +352,11 @@ var ControlPanel = /** @class */ (function (_super) {
     ControlPanel.prototype.switchTextInput = function () {
         var $textInput = $('.textInput');
         $textInput.toggleClass('visible').toggleClass('invisible');
+    };
+    ;
+    ControlPanel.prototype.keyPress = function (e) {
+        if (e.which == 13 || e.keyCode == 13)
+            this.handleText();
     };
     ;
     ControlPanel.prototype.handleText = function () {
@@ -405,11 +424,19 @@ var __extends = (undefined && undefined.__extends) || (function () {
 
 var DevPanel = /** @class */ (function (_super) {
     __extends(DevPanel, _super);
-    function DevPanel() {
-        var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.state = { fps: '', coordinate: '' };
+    function DevPanel(props) {
+        var _this = _super.call(this, props) || this;
+        _this.state = { fps: '', coordinate: '', greenMask: '' };
+        _this.props.eventCenter.on(_MessageCenter__WEBPACK_IMPORTED_MODULE_1__["Event"].UpdateDevPanelData, function (data) {
+            _this.setState({
+                fps: data.fps || _this.state.fps,
+                coordinate: data.coordinate || _this.state.coordinate,
+                greenMask: data.greenMask || _this.state.greenMask
+            });
+        });
         return _this;
     }
+    ;
     DevPanel.prototype.render = function () {
         return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { id: "devPanel" },
             react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("table", null,
@@ -419,22 +446,17 @@ var DevPanel = /** @class */ (function (_super) {
                         react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("td", null, this.state.fps)),
                     react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("tr", null,
                         react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("td", null, "Coordinate"),
-                        react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("td", null, this.state.coordinate)))));
+                        react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("td", null, this.state.coordinate)),
+                    react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("tr", null,
+                        react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("td", null, "GreenMask"),
+                        react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("td", null, this.state.greenMask)))));
     };
     ;
     DevPanel.prototype.componentDidMount = function () {
-        var _this = this;
         var isdev = _CommonUtility__WEBPACK_IMPORTED_MODULE_2__["CommonUtility"].getQueryString('isdev');
         if (!isdev)
             return;
         $('#devPanel').show();
-        this.props.eventCenter.on(_MessageCenter__WEBPACK_IMPORTED_MODULE_1__["Event"].UpdateDevPanelData, function (data) {
-            _this.setState({ fps: data.fps, coordinate: data.coordinate });
-        });
-    };
-    ;
-    DevPanel.prototype.componentWillReceiveProps = function (nextProps) {
-        console.log(nextProps);
     };
     ;
     return DevPanel;
@@ -481,7 +503,6 @@ var LoginPanel = /** @class */ (function (_super) {
         return _this;
     }
     LoginPanel.prototype.render = function () {
-        var _this = this;
         return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { id: "loginPanel", className: "flex flex-center" },
             react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "white-text text-center wordCard" },
                 "\u6982\u5FF5\u6709\u540D\u800C\u6210\u6578\u64DA\uFF0C",
@@ -505,11 +526,11 @@ var LoginPanel = /** @class */ (function (_super) {
                 " \u5468\u800C\u5FA9\u59CB\u3002"),
             react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { id: "signInWrapper", className: "wordCard" },
                 react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("span", { className: "label white-text" }, "Sign in with:\u00A0"),
-                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("input", { type: "text", id: "signInName" }),
-                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("button", { type: "button", className: "sign-in-button", onClick: function (e) { _this.signInButtonClickHandler(); } },
+                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("input", { type: "text", id: "signInName", onKeyPress: this.keyPress.bind(this) }),
+                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("button", { type: "button", className: "signInButton", onClick: this.signInButtonClickHandler.bind(this) },
                     react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("i", { className: "fas fa-arrow-circle-right" }))),
             react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "skipAnimation" },
-                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("button", { type: "button", onClick: function (e) { _this.skipAnimation(); } }, "skip")));
+                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("button", { type: "button", onClick: this.skipAnimation.bind(this) }, "skip")));
     };
     ;
     LoginPanel.prototype.componentDidMount = function () {
@@ -576,6 +597,11 @@ var LoginPanel = /** @class */ (function (_super) {
     LoginPanel.prototype.afterWordCardsAnimation = function () {
         $('.skipAnimation').hide();
         this.props.eventCenter.trigger(_MessageCenter__WEBPACK_IMPORTED_MODULE_2__["Event"].AfterWordCardsAnimation);
+    };
+    ;
+    LoginPanel.prototype.keyPress = function (e) {
+        if (e.which == 13 || e.keyCode == 13)
+            this.signInButtonClickHandler();
     };
     ;
     LoginPanel.prototype.signInButtonClickHandler = function () {
@@ -885,7 +911,7 @@ var EventCenter = /** @class */ (function () {
     ;
     EventCenter.prototype.trigger = function (event, data) {
         if (!this.registeredEventMap[event]) {
-            console.warn("Event not registered: " + event);
+            console.log("Event not registered: " + event);
             return;
         }
         this.eventCenter.trigger(event, data);
@@ -981,7 +1007,9 @@ var Scene = /** @class */ (function (_super) {
         return _this;
     }
     Scene.prototype.render = function () {
-        return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("canvas", { id: "renderCanvas", "touch-action": "none" });
+        return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", null,
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("canvas", { id: "renderCanvas", "touch-action": "none" }),
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { id: "greenMask" }));
     };
     ;
     Scene.prototype.componentDidMount = function () {
@@ -995,6 +1023,18 @@ var Scene = /** @class */ (function (_super) {
         window.addEventListener("resize", function () {
             _this.engine.resize();
         });
+        var updateMask = function () {
+            var setting = _CommonUtility__WEBPACK_IMPORTED_MODULE_3__["CommonUtility"].getQueryString('greenMask');
+            var color = setting || "rgba(0, 255, 0, " + _CommonUtility__WEBPACK_IMPORTED_MODULE_3__["CommonUtility"].getRandomNumberInRange(0, 0.5, 2) + ")";
+            jquery__WEBPACK_IMPORTED_MODULE_2__('#greenMask').css('background-color', color);
+            _this.props.eventCenter.trigger(_MessageCenter__WEBPACK_IMPORTED_MODULE_5__["Event"].UpdateDevPanelData, { greenMask: color });
+            if (setting)
+                return;
+            setTimeout(function () {
+                updateMask();
+            }, 2000);
+        };
+        updateMask();
     };
     ;
     Scene.prototype.initScene = function () {
@@ -1056,7 +1096,7 @@ var Scene = /** @class */ (function (_super) {
             particle.scale.x = scale;
             particle.scale.y = scale;
             particle.scale.z = scale;
-            particle['age'] = Math.random() * 2 + 1;
+            particle['age'] = Math.random() * 2 + 2;
             return particle;
         };
         bubbleSpray.updateParticle = function (particle) {
@@ -1083,11 +1123,14 @@ var Scene = /** @class */ (function (_super) {
         this.engine.runRenderLoop(function () {
             /** render before */
             if (_this.cameraLocations.length > 0) {
-                var position = _this.camera.position = _this.cameraLocations.shift();
+                _this.camera.position = _this.cameraLocations.shift();
                 if (_this.cameraLocations.length >= 1) {
                     _this.camera.setTarget(babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"].Zero());
-                    if (_this.cameraLocations.length === 1)
-                        _this.createBubbleSpray(_this.chatRoomsCenter[Scene.chatRoomIndex]);
+                    if (_this.cameraLocations.length === 1) {
+                        var center = _this.chatRoomsCenter[Scene.chatRoomIndex];
+                        _this.createBubbleSpray(center);
+                        _this.createAlgae(center);
+                    }
                 }
             }
             _this.lightOfCamera.position = _this.camera.position;
@@ -1145,7 +1188,7 @@ var Scene = /** @class */ (function (_super) {
         var _this = this;
         if (!window['Worker'])
             return;
-        var worker = new Worker("app/UpdateTextNodeWorker.js");
+        var worker = new Worker(document.getElementById('UpdateTextNodeWorker').src);
         var next = function () {
             var nodes = [];
             if (_this.translateType === 'Simple') {
@@ -1243,7 +1286,7 @@ var Scene = /** @class */ (function (_super) {
         });
     };
     ;
-    Scene.prototype.createBubbleSprayAndParticles = function () {
+    Scene.prototype.createParticles = function () {
         var _this = this;
         this.chatRoomsCenter.forEach(function (center) {
             for (var i = 0; i < 10; i++) {
@@ -1340,6 +1383,19 @@ var Scene = /** @class */ (function (_super) {
         };
     };
     ;
+    Scene.prototype.createAlgae = function (center) {
+        var count = 50;
+        var algaeManager = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["SpriteManager"]("algaeManager", "assets/algae_30.png", count, 30, this.scene);
+        for (var i = 0; i < count; i++) {
+            var algae = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Sprite"]("tree", algaeManager);
+            algae.size = 0.1;
+            algae.position.x = center.x + _CommonUtility__WEBPACK_IMPORTED_MODULE_3__["CommonUtility"].getRandomNumberInRange(-3, 3, 2);
+            algae.position.y = center.y + _CommonUtility__WEBPACK_IMPORTED_MODULE_3__["CommonUtility"].getRandomNumberInRange(-3, 3, 2);
+            algae.position.z = center.z + _CommonUtility__WEBPACK_IMPORTED_MODULE_3__["CommonUtility"].getRandomNumberInRange(-3, 3, 2);
+            algae.isPickable = false;
+        }
+    };
+    ;
     Scene.prototype.transformation = function () {
         var _this = this;
         this.translateType = 'ToOrigin';
@@ -1350,7 +1406,7 @@ var Scene = /** @class */ (function (_super) {
             _this.translateType = null;
             _this.textNodes.length = 0;
             _this.drawLine();
-            _this.createBubbleSprayAndParticles();
+            _this.createParticles();
         }, 1.8 * 1000);
     };
     ;
@@ -1463,4 +1519,4 @@ module.exports = ReactDOM;
 /***/ })
 
 /******/ });
-//# sourceMappingURL=main.js.map
+//# sourceMappingURL=bundle.main.e825b0efd3d92ca17b95.js.map

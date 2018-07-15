@@ -2,3 +2,8 @@
     @extend .full-page;
     touch-action: none;
 }
+
+#greenMask {
+    @extend .full-page;
+    @extend .untouchable;
+}
