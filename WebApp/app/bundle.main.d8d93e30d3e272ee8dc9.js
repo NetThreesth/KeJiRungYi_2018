@@ -1236,7 +1236,9 @@ var Scene = /** @class */ (function (_super) {
             }
             case 'ToChatRoomNode': {
                 // this.textNodes = this.textNodes.slice(0, this.chatRoomsNodes.length);
-                var maxMove_1 = 0.3;
+                var maxMove_1 = 0.5;
+                var textNodesLen = this.textNodes.length;
+                var count_1 = 0;
                 nodes = this.textNodes.map(function (node, i) {
                     var chatRoomsNode = _this.chatRoomsNodes[i];
                     var distance = _BabylonUtility__WEBPACK_IMPORTED_MODULE_4__["BabylonUtility"].distance(chatRoomsNode, node.position);
@@ -1246,15 +1248,17 @@ var Scene = /** @class */ (function (_super) {
                     }
                     else {
                         node.position = chatRoomsNode;
-                        var textNodesLen = _this.textNodes.length;
-                        if (textNodesLen < _this.chatRoomsNodes.length) {
-                            var toAdd = _this.chatRoomsNodes[textNodesLen + 1];
-                            if (toAdd)
-                                _this.textNodes.push({ position: toAdd });
-                        }
+                        /*    if (textNodesLen < this.chatRoomsNodes.length) {
+                               const toAdd = this.chatRoomsNodes[textNodesLen + 1];
+                               if (toAdd) {
+                                   this.textNodes.push({ position: toAdd });
+                               }
+                           } */
+                        count_1++;
                     }
                     return node.position;
                 });
+                console.log(count_1 + ' / ' + textNodesLen);
                 break;
             }
         }
@@ -1550,4 +1554,4 @@ module.exports = ReactDOM;
 /***/ })
 
 /******/ });
-//# sourceMappingURL=bundle.main.a2fc4feae89e11c155b0.js.map
+//# sourceMappingURL=bundle.main.d8d93e30d3e272ee8dc9.js.map

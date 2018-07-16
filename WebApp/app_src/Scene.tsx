@@ -310,7 +310,9 @@ export class Scene
             }
             case 'ToChatRoomNode': {
                 // this.textNodes = this.textNodes.slice(0, this.chatRoomsNodes.length);
-                const maxMove = 0.3;
+                const maxMove = 0.5;
+                const textNodesLen = this.textNodes.length;
+                let count = 0;
                 nodes = this.textNodes.map((node, i) => {
                     const chatRoomsNode = this.chatRoomsNodes[i];
                     const distance = BabylonUtility.distance(chatRoomsNode, node.position);
@@ -319,14 +321,17 @@ export class Scene
                         BabylonUtility.updatePosition(node.position, vector, maxMove);
                     } else {
                         node.position = chatRoomsNode;
-                        const textNodesLen = this.textNodes.length;
-                        if (textNodesLen < this.chatRoomsNodes.length) {
-                            const toAdd = this.chatRoomsNodes[textNodesLen + 1];
-                            if (toAdd) this.textNodes.push({ position: toAdd });
-                        }
+                        /*    if (textNodesLen < this.chatRoomsNodes.length) {
+                               const toAdd = this.chatRoomsNodes[textNodesLen + 1];
+                               if (toAdd) {
+                                   this.textNodes.push({ position: toAdd });
+                               }
+                           } */
+                        count++;
                     }
                     return node.position;
                 });
+                console.log(count + ' / ' + textNodesLen);
                 break;
             }
         }
