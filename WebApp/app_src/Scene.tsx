@@ -263,11 +263,9 @@ export class Scene
         }
         this.glowLayerForParticle.addIncludedOnlyMesh(core);
 
-
-        const translateVector = BabylonUtility.getRandomVector3();
         this.particles.push({
             mesh: core,
-            translateVector: translateVector,
+            translateVector: BabylonUtility.getRandomVector3(),
             duration: this.getDurationForParticle()
         });
     };
@@ -275,35 +273,13 @@ export class Scene
 
     private linesForLinesystem: BABYLON.Vector3[][] = [];
     private linesystem: BABYLON.LinesMesh = null;
-    private translateFactor = 0;
-    private translateType: 'Simple' | 'ToOrigin' | 'ToChatRoomNode' = 'Simple';
+    // private translateFactor = 0;
+    private translateType: 'Simple' | 'ToChatRoomNode' = 'Simple';
     private startUpdateTextNodeWorker() {
         if (!window['Worker']) return;
         const worker = new Worker((document.getElementById('UpdateTextNodeWorker') as HTMLScriptElement).src);
         const next = () => {
-            let nodes: BABYLON.Vector3[] = [];
-            if (this.translateType === 'Simple') {
-                nodes = this.textNodes.map(node => {
-                    BabylonUtility.updatePosition(node.position, node.translateVector, node.scale * Math.cos(this.translateFactor));
-                    return node.position;
-                });
-                this.translateFactor += 0.01;
-            }
-            else if (this.translateType === 'ToOrigin') {
-                nodes = this.textNodes.map(node => {
-                    const vector = new BABYLON.Vector3(-node.position.x, -node.position.y, -node.position.z).normalize();
-                    BabylonUtility.updatePosition(node.position, vector, 0.5);
-                    return node.position;
-                });
-            }
-            else if (this.translateType === 'ToChatRoomNode') {
-                this.textNodes = this.textNodes.slice(0, this.chatRoomsNodes.length);
-                nodes = this.textNodes.map((node, i) => {
-                    const vector = BabylonUtility.subtractVector(this.chatRoomsNodes[i], node.position).normalize();
-                    BabylonUtility.updatePosition(node.position, vector, 0.5);
-                    return node.position;
-                });
-            }
+            const nodes = this.updateTextNode();
             worker.postMessage(nodes);
         };
         worker.onmessage = (message) => {
@@ -316,6 +292,45 @@ export class Scene
             next();
         };
         worker.postMessage(this.textNodes);
+    };
+
+    private updateTextNode() {
+        let nodes: BABYLON.Vector3[] = [];
+        switch (this.translateType) {
+            case 'Simple': {
+                nodes = this.textNodes.map((node, i) => {
+                    if (node.position.z > -13)
+                        node.translateVector.z = -1;
+                    else if (node.position.z < -16)
+                        node.translateVector.z = 1;
+                    BabylonUtility.updatePosition(node.position, node.translateVector, node.scale);
+                    return node.position;
+                });
+                break;
+            }
+            case 'ToChatRoomNode': {
+                // this.textNodes = this.textNodes.slice(0, this.chatRoomsNodes.length);
+                const maxMove = 0.3;
+                nodes = this.textNodes.map((node, i) => {
+                    const chatRoomsNode = this.chatRoomsNodes[i];
+                    const distance = BabylonUtility.distance(chatRoomsNode, node.position);
+                    if (distance > maxMove) {
+                        const vector = BabylonUtility.subtractVector(chatRoomsNode, node.position).normalize();
+                        BabylonUtility.updatePosition(node.position, vector, maxMove);
+                    } else {
+                        node.position = chatRoomsNode;
+                        const textNodesLen = this.textNodes.length;
+                        if (textNodesLen < this.chatRoomsNodes.length) {
+                            const toAdd = this.chatRoomsNodes[textNodesLen + 1];
+                            if (toAdd) this.textNodes.push({ position: toAdd });
+                        }
+                    }
+                    return node.position;
+                });
+                break;
+            }
+        }
+        return nodes;
     };
 
     private translateLinesForTextNodes() {
@@ -448,8 +463,8 @@ export class Scene
 
     private textNodes: {
         position: BABYLON.Vector3,
-        scale: number,
-        translateVector: BABYLON.Vector3
+        scale?: number,
+        translateVector?: BABYLON.Vector3
     }[] = [];
 
     private getTexts() {
@@ -502,20 +517,20 @@ export class Scene
                 });
             }
 
+            const initialZ = -15;
             this.textNodes = CommonUtility.sort(pixels, p => p.brightness).reverse()
                 .slice(0, 200)
                 .map((p, i) => {
                     const rate = 0.12;
-                    // const s = BABYLON.Mesh.CreateSphere(`pixels-${i}`, 2, 0.2, this.scene);
                     const position = new BABYLON.Vector3(
                         (p.x - 32) * rate,
                         (p.y - 32) * -1 * rate,
-                        -15 + CommonUtility.getRandomNumberInRange(0, 2, 3)
+                        initialZ + CommonUtility.getRandomNumberInRange(-2, 2, 3)
                     );
                     return {
-                        position: position,
-                        scale: CommonUtility.getRandomNumberInRange(-0.03, 0.03, 3),
-                        translateVector: BabylonUtility.getRandomVector3(false, false).normalize()
+                        position: position, // 初始位置
+                        scale: CommonUtility.getRandomNumberInRange(0.005, 0.01, 3), // 控制速度
+                        translateVector: new BABYLON.Vector3(0, 0, position.z < initialZ ? 1 : -1) // 初始方向
                     };
                 });
             this.startUpdateTextNodeWorker();
@@ -537,10 +552,7 @@ export class Scene
 
 
     private transformation() {
-        this.translateType = 'ToOrigin';
-        setTimeout(() => {
-            this.translateType = 'ToChatRoomNode';
-        }, 1 * 1000);
+        this.translateType = 'ToChatRoomNode';
         setTimeout(() => {
             this.translateType = null;
             this.textNodes.length = 0;

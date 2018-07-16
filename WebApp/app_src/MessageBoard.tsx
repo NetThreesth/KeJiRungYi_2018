@@ -31,6 +31,12 @@ export class MessageBoard
         });
     };
 
+    componentDidUpdate(){
+        this.scrollTo(1, false, () => {
+            this.eventCenter.trigger(Scrollbar.UpdateEvent);
+        });
+    };
+
     private createContent(content: Content) {
         if (content.type === ContentType.Text)
             return this.createTextMessage(content);
@@ -67,10 +73,9 @@ export class MessageBoard
     private refresh() {
         const contents = this.props.messageCenter.contents.slice();
         if (contents.length === 0) return;
+        console.log('refresh fired');
         $('#messageBoard').removeClass('invisible');
-        this.setState({ contents: this.props.messageCenter.contents.slice() });
-        this.scrollTo(1);
-        this.eventCenter.trigger(Scrollbar.UpdateEvent);
+        this.setState({ contents: contents });
     };
 
     private getAvatar(role: Roles) {
@@ -82,15 +87,12 @@ export class MessageBoard
             return 'assets/avatar_pink.png';
     };
 
-
-
-
-    private scrollTo(rate: number) {
+    private scrollTo(rate: number, immediate = true, afterFunc = () => { }) {
         const $scrollTarget = $('.messageBoardContent');
         const targetTotalH = $scrollTarget.prop('scrollHeight');
         const targetViewH = $scrollTarget.height();
         const offset = (targetTotalH - targetViewH) * rate;
-        $scrollTarget.scrollTop(offset);
+        $scrollTarget.animate({ scrollTop: offset }, immediate ? 0 : 500, afterFunc);
     };
 };
 
@@ -141,7 +143,7 @@ export class Scrollbar
 
                 eventCenter.trigger(Scrollbar.ScrollEvent, scrollbarOffset / maxOffset);
             });
-            
+
         $(document).on('mouseup', e => {
             e.preventDefault();
             if (!isDragging) return;

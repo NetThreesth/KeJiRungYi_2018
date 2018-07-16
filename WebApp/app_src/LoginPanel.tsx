@@ -6,7 +6,8 @@ export class LoginPanel
     extends React.Component<{ eventCenter: EventCenter }> {
 
     render() {
-        return <div id="loginPanel" className="flex flex-center">
+        return <div id="loginPanel" className="flex flex-center"
+            onClick={this.focus.bind(this)}>
 
             <div className="white-text text-center wordCard">
                 概念有名而成數據，
@@ -18,7 +19,7 @@ export class LoginPanel
                     <br /> 在邊隙處落下，
                     <br /> 於彼端再現；
                 </div>
-            <div className="white-text text-center wordCard">
+            <div className="white-text text-center wordCard startBackgroundTransform">
                 千萬形貌，
                     <br /> 終歸涅槃，
                     <br /> 生生不息，
@@ -53,6 +54,8 @@ export class LoginPanel
         this.performance = performance.now();
         return result;
     };
+
+
     private fadeAnimation(
         ele: HTMLElement,
         setting: {
@@ -60,22 +63,20 @@ export class LoginPanel
             sustain?: number,
             fadeOut?: number
         },
-        onComplete: () => void
+        afterFunc: (ele: HTMLElement) => void
     ) {
-        console.log('fadeIn start ' + this.getPerformance());
+        console.log('fadeAnimation start ' + this.getPerformance());
         const animation = $(ele).fadeIn(setting.fadeIn, undefined, () => {
             console.log('fadeIn end ' + this.getPerformance());
-        })
-
-        if (!setting.fadeOut) {
-            onComplete();
-            return;
-        }
+            if (!setting.fadeOut) afterFunc(ele);
+        });
+        if (!setting.fadeOut) return;
         animation.delay(setting.sustain || 0).fadeOut(setting.fadeOut, undefined, () => {
             console.log('fadeOut end ' + this.getPerformance());
-            onComplete();
+            afterFunc(ele);
         });
     };
+
 
     private fadeSequence(
         eleArray: HTMLElement[],
@@ -84,15 +85,12 @@ export class LoginPanel
             sustain: number,
             fadeOut: number
         },
-        afterFunc: () => void) {
-
-        if (eleArray.length === 0) {
-            afterFunc();
-            return;
-        }
-        console.log('fadeAnimation ' + eleArray.length);
-        setting.fadeOut = (eleArray.length > 1) ? setting.fadeOut : null;
-        this.fadeAnimation(eleArray.shift(), setting, () => {
+        afterFunc: (ele: HTMLElement) => void
+    ) {
+        setting.fadeOut = (eleArray.length === 1) ? null : setting.fadeOut;
+        this.fadeAnimation(eleArray.shift(), setting, ele => {
+            afterFunc(ele);
+            if (eleArray.length === 0) return;
             this.fadeSequence(eleArray, setting, afterFunc);
         });
     };
@@ -100,15 +98,18 @@ export class LoginPanel
 
     private wordCardsAnimation() {
         const wordCards = $('.wordCard').toArray();
-        const times = {
+        const setting = {
             fadeIn: 5000,
             sustain: 1000,
             fadeOut: 2000
         };
         this.fadeSequence(
             wordCards,
-            times,
-            this.afterWordCardsAnimation.bind(this)
+            setting,
+            ele => {
+                if (ele.classList.contains('startBackgroundTransform'))
+                    this.afterWordCardsAnimation();
+            }
         );
     };
 
@@ -125,6 +126,11 @@ export class LoginPanel
     private afterWordCardsAnimation() {
         $('.skipAnimation').hide();
         this.props.eventCenter.trigger(Event.AfterWordCardsAnimation);
+        this.focus();
+    };
+
+    private focus() {
+        setTimeout(() => $('#signInName').focus());
     };
 
     private keyPress(e) {

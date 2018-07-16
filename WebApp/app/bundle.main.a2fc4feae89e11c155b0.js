@@ -132,7 +132,7 @@ __webpack_require__.r(__webpack_exports__);
 var BabylonUtility = /** @class */ (function () {
     function BabylonUtility() {
     }
-    BabylonUtility.distanceVector = function (v1, v2) {
+    BabylonUtility.distance = function (v1, v2) {
         var dx = v1.x - v2.x;
         var dy = v1.y - v2.y;
         var dz = v1.z - v2.z;
@@ -172,7 +172,7 @@ var BabylonUtility = /** @class */ (function () {
         points.forEach(function (from, iOfFrom) {
             points.forEach(function (to, iOfTo) {
                 if (iOfFrom < iOfTo) {
-                    var distance = BabylonUtility.distanceVector(from, to);
+                    var distance = BabylonUtility.distance(from, to);
                     var key = iOfFrom + "-" + iOfTo;
                     lines.push({
                         key: key,
@@ -503,7 +503,7 @@ var LoginPanel = /** @class */ (function (_super) {
         return _this;
     }
     LoginPanel.prototype.render = function () {
-        return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { id: "loginPanel", className: "flex flex-center" },
+        return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { id: "loginPanel", className: "flex flex-center", onClick: this.focus.bind(this) },
             react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "white-text text-center wordCard" },
                 "\u6982\u5FF5\u6709\u540D\u800C\u6210\u6578\u64DA\uFF0C",
                 react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("br", null),
@@ -516,7 +516,7 @@ var LoginPanel = /** @class */ (function (_super) {
                 " \u5728\u908A\u9699\u8655\u843D\u4E0B\uFF0C",
                 react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("br", null),
                 " \u65BC\u5F7C\u7AEF\u518D\u73FE\uFF1B"),
-            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "white-text text-center wordCard" },
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "white-text text-center wordCard startBackgroundTransform" },
                 "\u5343\u842C\u5F62\u8C8C\uFF0C",
                 react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("br", null),
                 " \u7D42\u6B78\u6D85\u69C3\uFF0C",
@@ -546,43 +546,45 @@ var LoginPanel = /** @class */ (function (_super) {
         return result;
     };
     ;
-    LoginPanel.prototype.fadeAnimation = function (ele, setting, onComplete) {
+    LoginPanel.prototype.fadeAnimation = function (ele, setting, afterFunc) {
         var _this = this;
-        console.log('fadeIn start ' + this.getPerformance());
+        console.log('fadeAnimation start ' + this.getPerformance());
         var animation = $(ele).fadeIn(setting.fadeIn, undefined, function () {
             console.log('fadeIn end ' + _this.getPerformance());
+            if (!setting.fadeOut)
+                afterFunc(ele);
         });
-        if (!setting.fadeOut) {
-            onComplete();
+        if (!setting.fadeOut)
             return;
-        }
         animation.delay(setting.sustain || 0).fadeOut(setting.fadeOut, undefined, function () {
             console.log('fadeOut end ' + _this.getPerformance());
-            onComplete();
+            afterFunc(ele);
         });
     };
     ;
     LoginPanel.prototype.fadeSequence = function (eleArray, setting, afterFunc) {
         var _this = this;
-        if (eleArray.length === 0) {
-            afterFunc();
-            return;
-        }
-        console.log('fadeAnimation ' + eleArray.length);
-        setting.fadeOut = (eleArray.length > 1) ? setting.fadeOut : null;
-        this.fadeAnimation(eleArray.shift(), setting, function () {
+        setting.fadeOut = (eleArray.length === 1) ? null : setting.fadeOut;
+        this.fadeAnimation(eleArray.shift(), setting, function (ele) {
+            afterFunc(ele);
+            if (eleArray.length === 0)
+                return;
             _this.fadeSequence(eleArray, setting, afterFunc);
         });
     };
     ;
     LoginPanel.prototype.wordCardsAnimation = function () {
+        var _this = this;
         var wordCards = $('.wordCard').toArray();
-        var times = {
+        var setting = {
             fadeIn: 5000,
             sustain: 1000,
             fadeOut: 2000
         };
-        this.fadeSequence(wordCards, times, this.afterWordCardsAnimation.bind(this));
+        this.fadeSequence(wordCards, setting, function (ele) {
+            if (ele.classList.contains('startBackgroundTransform'))
+                _this.afterWordCardsAnimation();
+        });
     };
     ;
     LoginPanel.prototype.skipAnimation = function () {
@@ -597,6 +599,11 @@ var LoginPanel = /** @class */ (function (_super) {
     LoginPanel.prototype.afterWordCardsAnimation = function () {
         $('.skipAnimation').hide();
         this.props.eventCenter.trigger(_MessageCenter__WEBPACK_IMPORTED_MODULE_2__["Event"].AfterWordCardsAnimation);
+        this.focus();
+    };
+    ;
+    LoginPanel.prototype.focus = function () {
+        setTimeout(function () { return $('#signInName').focus(); });
     };
     ;
     LoginPanel.prototype.keyPress = function (e) {
@@ -680,6 +687,13 @@ var MessageBoard = /** @class */ (function (_super) {
         });
     };
     ;
+    MessageBoard.prototype.componentDidUpdate = function () {
+        var _this = this;
+        this.scrollTo(1, false, function () {
+            _this.eventCenter.trigger(Scrollbar.UpdateEvent);
+        });
+    };
+    ;
     MessageBoard.prototype.createContent = function (content) {
         if (content.type === _MessageCenter__WEBPACK_IMPORTED_MODULE_1__["ContentType"].Text)
             return this.createTextMessage(content);
@@ -716,10 +730,9 @@ var MessageBoard = /** @class */ (function (_super) {
         var contents = this.props.messageCenter.contents.slice();
         if (contents.length === 0)
             return;
+        console.log('refresh fired');
         $('#messageBoard').removeClass('invisible');
-        this.setState({ contents: this.props.messageCenter.contents.slice() });
-        this.scrollTo(1);
-        this.eventCenter.trigger(Scrollbar.UpdateEvent);
+        this.setState({ contents: contents });
     };
     ;
     MessageBoard.prototype.getAvatar = function (role) {
@@ -731,12 +744,14 @@ var MessageBoard = /** @class */ (function (_super) {
             return 'assets/avatar_pink.png';
     };
     ;
-    MessageBoard.prototype.scrollTo = function (rate) {
+    MessageBoard.prototype.scrollTo = function (rate, immediate, afterFunc) {
+        if (immediate === void 0) { immediate = true; }
+        if (afterFunc === void 0) { afterFunc = function () { }; }
         var $scrollTarget = $('.messageBoardContent');
         var targetTotalH = $scrollTarget.prop('scrollHeight');
         var targetViewH = $scrollTarget.height();
         var offset = (targetTotalH - targetViewH) * rate;
-        $scrollTarget.scrollTop(offset);
+        $scrollTarget.animate({ scrollTop: offset }, immediate ? 0 : 500, afterFunc);
     };
     ;
     return MessageBoard;
@@ -988,7 +1003,7 @@ var Scene = /** @class */ (function (_super) {
         _this.particles = [];
         _this.linesForLinesystem = [];
         _this.linesystem = null;
-        _this.translateFactor = 0;
+        // private translateFactor = 0;
         _this.translateType = 'Simple';
         _this.chatRoomsNodes = [];
         _this.chatRoomsCenter = [];
@@ -1176,10 +1191,9 @@ var Scene = /** @class */ (function (_super) {
             };
         }
         this.glowLayerForParticle.addIncludedOnlyMesh(core);
-        var translateVector = _BabylonUtility__WEBPACK_IMPORTED_MODULE_4__["BabylonUtility"].getRandomVector3();
         this.particles.push({
             mesh: core,
-            translateVector: translateVector,
+            translateVector: _BabylonUtility__WEBPACK_IMPORTED_MODULE_4__["BabylonUtility"].getRandomVector3(),
             duration: this.getDurationForParticle()
         });
     };
@@ -1190,29 +1204,7 @@ var Scene = /** @class */ (function (_super) {
             return;
         var worker = new Worker(document.getElementById('UpdateTextNodeWorker').src);
         var next = function () {
-            var nodes = [];
-            if (_this.translateType === 'Simple') {
-                nodes = _this.textNodes.map(function (node) {
-                    _BabylonUtility__WEBPACK_IMPORTED_MODULE_4__["BabylonUtility"].updatePosition(node.position, node.translateVector, node.scale * Math.cos(_this.translateFactor));
-                    return node.position;
-                });
-                _this.translateFactor += 0.01;
-            }
-            else if (_this.translateType === 'ToOrigin') {
-                nodes = _this.textNodes.map(function (node) {
-                    var vector = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"](-node.position.x, -node.position.y, -node.position.z).normalize();
-                    _BabylonUtility__WEBPACK_IMPORTED_MODULE_4__["BabylonUtility"].updatePosition(node.position, vector, 0.5);
-                    return node.position;
-                });
-            }
-            else if (_this.translateType === 'ToChatRoomNode') {
-                _this.textNodes = _this.textNodes.slice(0, _this.chatRoomsNodes.length);
-                nodes = _this.textNodes.map(function (node, i) {
-                    var vector = _BabylonUtility__WEBPACK_IMPORTED_MODULE_4__["BabylonUtility"].subtractVector(_this.chatRoomsNodes[i], node.position).normalize();
-                    _BabylonUtility__WEBPACK_IMPORTED_MODULE_4__["BabylonUtility"].updatePosition(node.position, vector, 0.5);
-                    return node.position;
-                });
-            }
+            var nodes = _this.updateTextNode();
             worker.postMessage(nodes);
         };
         worker.onmessage = function (message) {
@@ -1225,6 +1217,48 @@ var Scene = /** @class */ (function (_super) {
             next();
         };
         worker.postMessage(this.textNodes);
+    };
+    ;
+    Scene.prototype.updateTextNode = function () {
+        var _this = this;
+        var nodes = [];
+        switch (this.translateType) {
+            case 'Simple': {
+                nodes = this.textNodes.map(function (node, i) {
+                    if (node.position.z > -13)
+                        node.translateVector.z = -1;
+                    else if (node.position.z < -16)
+                        node.translateVector.z = 1;
+                    _BabylonUtility__WEBPACK_IMPORTED_MODULE_4__["BabylonUtility"].updatePosition(node.position, node.translateVector, node.scale);
+                    return node.position;
+                });
+                break;
+            }
+            case 'ToChatRoomNode': {
+                // this.textNodes = this.textNodes.slice(0, this.chatRoomsNodes.length);
+                var maxMove_1 = 0.3;
+                nodes = this.textNodes.map(function (node, i) {
+                    var chatRoomsNode = _this.chatRoomsNodes[i];
+                    var distance = _BabylonUtility__WEBPACK_IMPORTED_MODULE_4__["BabylonUtility"].distance(chatRoomsNode, node.position);
+                    if (distance > maxMove_1) {
+                        var vector = _BabylonUtility__WEBPACK_IMPORTED_MODULE_4__["BabylonUtility"].subtractVector(chatRoomsNode, node.position).normalize();
+                        _BabylonUtility__WEBPACK_IMPORTED_MODULE_4__["BabylonUtility"].updatePosition(node.position, vector, maxMove_1);
+                    }
+                    else {
+                        node.position = chatRoomsNode;
+                        var textNodesLen = _this.textNodes.length;
+                        if (textNodesLen < _this.chatRoomsNodes.length) {
+                            var toAdd = _this.chatRoomsNodes[textNodesLen + 1];
+                            if (toAdd)
+                                _this.textNodes.push({ position: toAdd });
+                        }
+                    }
+                    return node.position;
+                });
+                break;
+            }
+        }
+        return nodes;
     };
     ;
     Scene.prototype.translateLinesForTextNodes = function () {
@@ -1367,16 +1401,16 @@ var Scene = /** @class */ (function (_super) {
                     brightness: brightness
                 });
             }
+            var initialZ = -15;
             _this.textNodes = _CommonUtility__WEBPACK_IMPORTED_MODULE_3__["CommonUtility"].sort(pixels, function (p) { return p.brightness; }).reverse()
                 .slice(0, 200)
                 .map(function (p, i) {
                 var rate = 0.12;
-                // const s = BABYLON.Mesh.CreateSphere(`pixels-${i}`, 2, 0.2, this.scene);
-                var position = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"]((p.x - 32) * rate, (p.y - 32) * -1 * rate, -15 + _CommonUtility__WEBPACK_IMPORTED_MODULE_3__["CommonUtility"].getRandomNumberInRange(0, 2, 3));
+                var position = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"]((p.x - 32) * rate, (p.y - 32) * -1 * rate, initialZ + _CommonUtility__WEBPACK_IMPORTED_MODULE_3__["CommonUtility"].getRandomNumberInRange(-2, 2, 3));
                 return {
                     position: position,
-                    scale: _CommonUtility__WEBPACK_IMPORTED_MODULE_3__["CommonUtility"].getRandomNumberInRange(-0.03, 0.03, 3),
-                    translateVector: _BabylonUtility__WEBPACK_IMPORTED_MODULE_4__["BabylonUtility"].getRandomVector3(false, false).normalize()
+                    scale: _CommonUtility__WEBPACK_IMPORTED_MODULE_3__["CommonUtility"].getRandomNumberInRange(0.005, 0.01, 3),
+                    translateVector: new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"](0, 0, position.z < initialZ ? 1 : -1) // 初始方向
                 };
             });
             _this.startUpdateTextNodeWorker();
@@ -1398,10 +1432,7 @@ var Scene = /** @class */ (function (_super) {
     ;
     Scene.prototype.transformation = function () {
         var _this = this;
-        this.translateType = 'ToOrigin';
-        setTimeout(function () {
-            _this.translateType = 'ToChatRoomNode';
-        }, 1 * 1000);
+        this.translateType = 'ToChatRoomNode';
         setTimeout(function () {
             _this.translateType = null;
             _this.textNodes.length = 0;
@@ -1519,4 +1550,4 @@ module.exports = ReactDOM;
 /***/ })
 
 /******/ });
-//# sourceMappingURL=bundle.main.e825b0efd3d92ca17b95.js.map
+//# sourceMappingURL=bundle.main.a2fc4feae89e11c155b0.js.map

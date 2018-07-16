@@ -101,7 +101,7 @@ __webpack_require__.r(__webpack_exports__);
 var BabylonUtility = /** @class */ (function () {
     function BabylonUtility() {
     }
-    BabylonUtility.distanceVector = function (v1, v2) {
+    BabylonUtility.distance = function (v1, v2) {
         var dx = v1.x - v2.x;
         var dy = v1.y - v2.y;
         var dz = v1.z - v2.z;
@@ -141,7 +141,7 @@ var BabylonUtility = /** @class */ (function () {
         points.forEach(function (from, iOfFrom) {
             points.forEach(function (to, iOfTo) {
                 if (iOfFrom < iOfTo) {
-                    var distance = BabylonUtility.distanceVector(from, to);
+                    var distance = BabylonUtility.distance(from, to);
                     var key = iOfFrom + "-" + iOfTo;
                     lines.push({
                         key: key,
@@ -287,4 +287,4 @@ self.onmessage = function (message) {
 /***/ })
 
 /******/ });
-//# sourceMappingURL=bundle.UpdateTextNodeWorker.f06634ab310a37b4349c.js.map
+//# sourceMappingURL=bundle.UpdateTextNodeWorker.7b3159cd5b9acda244ef.js.map

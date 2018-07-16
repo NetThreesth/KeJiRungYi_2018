@@ -3,7 +3,7 @@ import { CommonUtility } from './CommonUtility';
 export class BabylonUtility {
 
 
-    static distanceVector(v1: BABYLON.Vector3, v2: BABYLON.Vector3) {
+    static distance(v1: BABYLON.Vector3, v2: BABYLON.Vector3) {
         var dx = v1.x - v2.x;
         var dy = v1.y - v2.y;
         var dz = v1.z - v2.z;
@@ -57,7 +57,7 @@ export class BabylonUtility {
         points.forEach((from, iOfFrom) => {
             points.forEach((to, iOfTo) => {
                 if (iOfFrom < iOfTo) {
-                    const distance = BabylonUtility.distanceVector(from, to);
+                    const distance = BabylonUtility.distance(from, to);
                     const key = `${iOfFrom}-${iOfTo}`;
                     lines.push({
                         key: key,
