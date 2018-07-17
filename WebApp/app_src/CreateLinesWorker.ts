@@ -1,12 +1,12 @@
 import { CommonUtility } from './CommonUtility';
-import { BabylonUtility, Line } from './BabylonUtility';
+import { BabylonUtility } from './BabylonUtility';
 
 self.onmessage = function (message) {
-    const textNodes = message.data
+    const textNodes: BABYLON.Vector3[] = message.data
     const lines = BabylonUtility.getLineToEachOther(textNodes);
-    const linesToSelect = CommonUtility
-        .sort(lines, l => l.distance)
-        .filter(l => l.distance > 0.2)
+    let linesToSelect = lines.filter(l => l.distance > 0.2);
+    linesToSelect = CommonUtility
+        .sort(linesToSelect, l => l.distance)
         .slice(0, 1200);
 
     const linesToDraw = linesToSelect.map(l => [l.from, l.to]);

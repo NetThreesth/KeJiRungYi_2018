@@ -158,6 +158,7 @@ var BabylonUtility = /** @class */ (function () {
         position.x += (translateVector.x * scale);
         position.y += (translateVector.y * scale);
         position.z += (translateVector.z * scale);
+        return position;
     };
     ;
     BabylonUtility.positionToString = function (position) {
@@ -1003,22 +1004,15 @@ var Scene = /** @class */ (function (_super) {
         _this.particles = [];
         _this.linesForLinesystem = [];
         _this.linesystem = null;
-        // private translateFactor = 0;
-        _this.translateType = 'Simple';
+        _this.translateType = TranslateType.Simple;
         _this.chatRoomsNodes = [];
         _this.chatRoomsCenter = [];
         _this.linesForChatRooms = [];
-        _this.highlightForLine = null;
         _this.colorSetForLines = [
             [199, 222, 205],
             [192, 231, 164],
             [168, 213, 133]
         ].map(function (set) { return set.map(function (n) { return n / 255; }); });
-        _this.glowColor = function () {
-            var glowColorInRGB = [246 / 255, 255 / 255, 201 / 255, 0.84];
-            return new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Color3"](glowColorInRGB[0], glowColorInRGB[1], glowColorInRGB[2]);
-        }();
-        _this.textNodes = [];
         return _this;
     }
     Scene.prototype.render = function () {
@@ -1032,12 +1026,11 @@ var Scene = /** @class */ (function (_super) {
         this.initScene();
         this.getTexts();
         this.getPoints();
+        this.createLinesWorker = new AsyncWorker(document.getElementById('CreateLinesWorker').src);
         this.registerRunRenderLoop();
         this.props.eventCenter.on(_MessageCenter__WEBPACK_IMPORTED_MODULE_5__["Event"].AfterWordCardsAnimation, this.transformation.bind(this));
         this.props.eventCenter.on(_MessageCenter__WEBPACK_IMPORTED_MODULE_5__["Event"].AfterLogin, this.zoomIn.bind(this));
-        window.addEventListener("resize", function () {
-            _this.engine.resize();
-        });
+        window.addEventListener("resize", this.engine.resize.bind(this));
         var updateMask = function () {
             var setting = _CommonUtility__WEBPACK_IMPORTED_MODULE_3__["CommonUtility"].getQueryString('greenMask');
             var color = setting || "rgba(0, 255, 0, " + _CommonUtility__WEBPACK_IMPORTED_MODULE_3__["CommonUtility"].getRandomNumberInRange(0, 0.5, 2) + ")";
@@ -1054,7 +1047,7 @@ var Scene = /** @class */ (function (_super) {
     ;
     Scene.prototype.initScene = function () {
         var canvas = document.getElementById("renderCanvas");
-        this.engine = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Engine"](canvas, true);
+        this.engine = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Engine"](canvas, true, { stencil: true });
         var scene = this.scene = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Scene"](this.engine);
         var camera = this.camera = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["UniversalCamera"]("Camera", new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"](0, 0, -25), this.scene);
         camera.speed = 0.5;
@@ -1133,8 +1126,6 @@ var Scene = /** @class */ (function (_super) {
     ;
     Scene.prototype.registerRunRenderLoop = function () {
         var _this = this;
-        var origin = { x: 0, y: 0, z: 0 };
-        var viewport = this.camera.viewport.toGlobal(this.camera.getEngine(), null);
         this.engine.runRenderLoop(function () {
             /** render before */
             if (_this.cameraLocations.length > 0) {
@@ -1198,82 +1189,108 @@ var Scene = /** @class */ (function (_super) {
         });
     };
     ;
-    Scene.prototype.startUpdateTextNodeWorker = function () {
+    Scene.prototype.startUpdateTextNodes = function (textNodes) {
         var _this = this;
-        if (!window['Worker'])
-            return;
-        var worker = new Worker(document.getElementById('UpdateTextNodeWorker').src);
-        var next = function () {
-            var nodes = _this.updateTextNode();
-            worker.postMessage(nodes);
-        };
-        worker.onmessage = function (message) {
-            if (_this.textNodes.length === 0) {
-                _this.linesForLinesystem.length = 0;
-                _this.linesystem.dispose();
-                return;
+        var updatedNodes;
+        switch (this.translateType) {
+            case TranslateType.Simple: {
+                updatedNodes = this.updateTextNodeForSimpleMotion(textNodes);
+                break;
             }
-            _this.linesForLinesystem = message.data;
-            next();
-        };
-        worker.postMessage(this.textNodes);
+            case TranslateType.Forward: {
+                updatedNodes = this.updateTextNodeForForward(textNodes);
+                break;
+            }
+            default: return;
+        }
+        ;
+        this.createLinesWorker.asyncExcute(updatedNodes.map(function (e) { return e.position; })).then(function (data) {
+            _this.linesForLinesystem = data;
+            _this.startUpdateTextNodes(updatedNodes);
+        });
     };
     ;
-    Scene.prototype.updateTextNode = function () {
+    Scene.prototype.updateTextNodeForSimpleMotion = function (nodesToTranslate) {
+        var nodes = nodesToTranslate.map(function (node, i) {
+            if (node.position.z > -13)
+                node.translateVector.z = -1;
+            else if (node.position.z < -16)
+                node.translateVector.z = 1;
+            _BabylonUtility__WEBPACK_IMPORTED_MODULE_4__["BabylonUtility"].updatePosition(node.position, node.translateVector, node.scale);
+            return node;
+        });
+        return nodes;
+    };
+    ;
+    Scene.prototype.updateTextNodeForForward = function (nodesToTranslate) {
         var _this = this;
-        var nodes = [];
-        switch (this.translateType) {
-            case 'Simple': {
-                nodes = this.textNodes.map(function (node, i) {
-                    if (node.position.z > -13)
-                        node.translateVector.z = -1;
-                    else if (node.position.z < -16)
-                        node.translateVector.z = 1;
-                    _BabylonUtility__WEBPACK_IMPORTED_MODULE_4__["BabylonUtility"].updatePosition(node.position, node.translateVector, node.scale);
-                    return node.position;
-                });
-                break;
+        var maxMove = 0.5;
+        var textNodesLen = nodesToTranslate.length;
+        var count = 0;
+        var nodes = nodesToTranslate.map(function (node, i) {
+            var chatRoomsNode = _this.chatRoomsNodes[i];
+            var distance = _BabylonUtility__WEBPACK_IMPORTED_MODULE_4__["BabylonUtility"].distance(chatRoomsNode, node.position);
+            if (distance > maxMove) {
+                var vector = _BabylonUtility__WEBPACK_IMPORTED_MODULE_4__["BabylonUtility"].subtractVector(chatRoomsNode, node.position).normalize();
+                _BabylonUtility__WEBPACK_IMPORTED_MODULE_4__["BabylonUtility"].updatePosition(node.position, vector, maxMove);
             }
-            case 'ToChatRoomNode': {
-                // this.textNodes = this.textNodes.slice(0, this.chatRoomsNodes.length);
-                var maxMove_1 = 0.5;
-                var textNodesLen = this.textNodes.length;
-                var count_1 = 0;
-                nodes = this.textNodes.map(function (node, i) {
-                    var chatRoomsNode = _this.chatRoomsNodes[i];
-                    var distance = _BabylonUtility__WEBPACK_IMPORTED_MODULE_4__["BabylonUtility"].distance(chatRoomsNode, node.position);
-                    if (distance > maxMove_1) {
-                        var vector = _BabylonUtility__WEBPACK_IMPORTED_MODULE_4__["BabylonUtility"].subtractVector(chatRoomsNode, node.position).normalize();
-                        _BabylonUtility__WEBPACK_IMPORTED_MODULE_4__["BabylonUtility"].updatePosition(node.position, vector, maxMove_1);
-                    }
-                    else {
-                        node.position = chatRoomsNode;
-                        /*    if (textNodesLen < this.chatRoomsNodes.length) {
-                               const toAdd = this.chatRoomsNodes[textNodesLen + 1];
-                               if (toAdd) {
-                                   this.textNodes.push({ position: toAdd });
-                               }
-                           } */
-                        count_1++;
-                    }
-                    return node.position;
-                });
-                console.log(count_1 + ' / ' + textNodesLen);
-                break;
+            else {
+                node.position = chatRoomsNode;
+                /*    if (textNodesLen < this.chatRoomsNodes.length) {
+                       const toAdd = this.chatRoomsNodes[textNodesLen + 1];
+                       if (toAdd) {
+                           this.textNodes.push({ position: toAdd });
+                       }
+                   } */
+                count++;
             }
-        }
+            return node;
+        });
+        if (count)
+            console.log("ToChatRoomNode end: " + count + " / " + textNodesLen);
+        if (count > 50)
+            this.translateType = TranslateType.Expand;
         return nodes;
     };
     ;
     Scene.prototype.translateLinesForTextNodes = function () {
-        if (this.linesForLinesystem.length === 0)
+        if (this.linesForLinesystem.length === 0) {
+            if (this.linesystem) {
+                this.linesystem.dispose();
+                this.linesystem = null;
+            }
             return;
+        }
+        else if (this.translateType === TranslateType.Expand) {
+            this.expandTextNodes();
+        }
         this.linesystem = babylonjs__WEBPACK_IMPORTED_MODULE_1__["MeshBuilder"].CreateLineSystem("linesystem", {
             lines: this.linesForLinesystem,
             updatable: true,
             instance: this.linesystem || null
         }, this.scene);
         this.linesystem.color = babylonjs__WEBPACK_IMPORTED_MODULE_1__["Color3"].White();
+    };
+    ;
+    Scene.prototype.expandTextNodes = function () {
+        var linesystemLen = this.linesForLinesystem.length;
+        var linesForChatRoomLen = this.linesForChatRooms.length;
+        var exchangeCount = 30;
+        var maxIndex = Math.min(linesystemLen, linesForChatRoomLen) - 1 - exchangeCount;
+        var startIndex = _CommonUtility__WEBPACK_IMPORTED_MODULE_3__["CommonUtility"].getRandomIntInRange(0, maxIndex);
+        for (var i = 0; i < exchangeCount; i++) {
+            var index = startIndex + i;
+            var toExchange = this.linesForChatRooms[index];
+            this.linesForLinesystem[index] = [toExchange.from, toExchange.to];
+        }
+        if (linesForChatRoomLen > linesystemLen) {
+            var toAdd = this.linesForChatRooms[linesystemLen - 1];
+            this.linesForLinesystem.push([toAdd.from, toAdd.to]);
+        }
+        else if (linesForChatRoomLen < linesystemLen) {
+            this.linesForLinesystem.pop();
+            console.log('pop');
+        }
     };
     ;
     Scene.prototype.translateParticles = function () {
@@ -1284,14 +1301,13 @@ var Scene = /** @class */ (function (_super) {
         this.particles.forEach(function (p) {
             if (p.duration <= 0) {
                 p.translateVector = _BabylonUtility__WEBPACK_IMPORTED_MODULE_4__["BabylonUtility"].getRandomVector3();
-                p.duration = _this.getDurationForParticle();
+                p.duration = _this.getDurationForParticle(); // unit: frame number
             }
             _BabylonUtility__WEBPACK_IMPORTED_MODULE_4__["BabylonUtility"].updatePosition(p.mesh.position, p.translateVector, scale);
             p.duration -= 1;
         });
     };
     ;
-    // unit: frame number
     Scene.prototype.getDurationForParticle = function () {
         return _CommonUtility__WEBPACK_IMPORTED_MODULE_3__["CommonUtility"].getRandomIntInRange(60 * 3, 60 * 6);
     };
@@ -1307,6 +1323,7 @@ var Scene = /** @class */ (function (_super) {
                 _this.chatRoomsNodes = _this.chatRoomsNodes.concat(pointInGroup);
                 pointInGroups[i] = pointInGroup;
             });
+            _this.chatRoomsNodes = _CommonUtility__WEBPACK_IMPORTED_MODULE_3__["CommonUtility"].shuffle(_this.chatRoomsNodes);
             var lines = [];
             var take = 120;
             pointInGroups.forEach(function (points) {
@@ -1337,13 +1354,9 @@ var Scene = /** @class */ (function (_super) {
         var _this = this;
         if (this.linesForChatRooms.length === 0)
             return;
-        var highlightForLine = this.highlightForLine =
-            this.highlightForLine ||
-                function () {
-                    var highlightForLine = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["HighlightLayer"]("highlightForLine", this.scene);
-                    highlightForLine.innerGlow = false;
-                    return highlightForLine;
-                }.bind(this)();
+        var highlightForLine = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["HighlightLayer"]("highlightForLine", this.scene);
+        highlightForLine.innerGlow = false;
+        var glowColor = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Color3"](246 / 255, 255 / 255, 201 / 255);
         var materials = this.colorSetForLines.map(function (colorInRGB, i) {
             var color = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Color3"](colorInRGB[0], colorInRGB[1], colorInRGB[2]);
             var mat = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["StandardMaterial"]("lineMat" + i, _this.scene);
@@ -1365,7 +1378,7 @@ var Scene = /** @class */ (function (_super) {
             if (group.length === 0)
                 return;
             var merged = babylonjs__WEBPACK_IMPORTED_MODULE_1__["Mesh"].MergeMeshes(group, true, false);
-            highlightForLine.addMesh(merged, _this.glowColor);
+            highlightForLine.addMesh(merged, glowColor);
         });
     };
     ;
@@ -1406,7 +1419,7 @@ var Scene = /** @class */ (function (_super) {
                 });
             }
             var initialZ = -15;
-            _this.textNodes = _CommonUtility__WEBPACK_IMPORTED_MODULE_3__["CommonUtility"].sort(pixels, function (p) { return p.brightness; }).reverse()
+            var textNodes = _CommonUtility__WEBPACK_IMPORTED_MODULE_3__["CommonUtility"].sort(pixels, function (p) { return p.brightness; }).reverse()
                 .slice(0, 200)
                 .map(function (p, i) {
                 var rate = 0.12;
@@ -1417,7 +1430,7 @@ var Scene = /** @class */ (function (_super) {
                     translateVector: new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"](0, 0, position.z < initialZ ? 1 : -1) // 初始方向
                 };
             });
-            _this.startUpdateTextNodeWorker();
+            _this.startUpdateTextNodes(textNodes);
         };
     };
     ;
@@ -1436,13 +1449,15 @@ var Scene = /** @class */ (function (_super) {
     ;
     Scene.prototype.transformation = function () {
         var _this = this;
-        this.translateType = 'ToChatRoomNode';
+        this.translateType = TranslateType.Forward;
         setTimeout(function () {
-            _this.translateType = null;
-            _this.textNodes.length = 0;
-            _this.drawLine();
-            _this.createParticles();
-        }, 1.8 * 1000);
+            _this.translateType = TranslateType.Expand;
+            setTimeout(function () {
+                _this.linesForLinesystem.length = 0;
+                _this.drawLine();
+                _this.createParticles();
+            }, 0.5 * 1000);
+        }, 2 * 1000);
     };
     ;
     Scene.prototype.zoomIn = function () {
@@ -1460,6 +1475,34 @@ var Scene = /** @class */ (function (_super) {
     return Scene;
 }(react__WEBPACK_IMPORTED_MODULE_0__["Component"]));
 
+;
+var TranslateType;
+(function (TranslateType) {
+    TranslateType[TranslateType["Simple"] = 0] = "Simple";
+    TranslateType[TranslateType["Forward"] = 1] = "Forward";
+    TranslateType[TranslateType["Expand"] = 2] = "Expand";
+})(TranslateType || (TranslateType = {}));
+;
+;
+var AsyncWorker = /** @class */ (function () {
+    function AsyncWorker(src) {
+        if (!window['Worker'])
+            throw 'Worker not support';
+        this.worker = new Worker(src);
+    }
+    ;
+    AsyncWorker.prototype.asyncExcute = function (input) {
+        var _this = this;
+        return new Promise(function (resolve, reject) {
+            var worker = _this.worker;
+            worker.onmessage = function (message) { return resolve(message.data); };
+            worker.onerror = function (e) { return reject(e.error); };
+            worker.postMessage(input);
+        });
+    };
+    ;
+    return AsyncWorker;
+}());
 ;
 
 
@@ -1554,4 +1597,4 @@ module.exports = ReactDOM;
 /***/ })
 
 /******/ });
-//# sourceMappingURL=bundle.main.d8d93e30d3e272ee8dc9.js.map
+//# sourceMappingURL=bundle.main.f08f2abafcec09a28061.js.map

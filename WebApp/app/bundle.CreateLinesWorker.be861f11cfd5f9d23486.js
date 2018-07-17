@@ -81,7 +81,7 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = "./app_src/UpdateTextNodeWorker.ts");
+/******/ 	return __webpack_require__(__webpack_require__.s = "./app_src/CreateLinesWorker.ts");
 /******/ })
 /************************************************************************/
 /******/ ({
@@ -127,6 +127,7 @@ var BabylonUtility = /** @class */ (function () {
         position.x += (translateVector.x * scale);
         position.y += (translateVector.y * scale);
         position.z += (translateVector.z * scale);
+        return position;
     };
     ;
     BabylonUtility.positionToString = function (position) {
@@ -257,10 +258,10 @@ var CommonUtility = /** @class */ (function () {
 
 /***/ }),
 
-/***/ "./app_src/UpdateTextNodeWorker.ts":
-/*!*****************************************!*\
-  !*** ./app_src/UpdateTextNodeWorker.ts ***!
-  \*****************************************/
+/***/ "./app_src/CreateLinesWorker.ts":
+/*!**************************************!*\
+  !*** ./app_src/CreateLinesWorker.ts ***!
+  \**************************************/
 /*! no exports provided */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -273,9 +274,9 @@ __webpack_require__.r(__webpack_exports__);
 self.onmessage = function (message) {
     var textNodes = message.data;
     var lines = _BabylonUtility__WEBPACK_IMPORTED_MODULE_1__["BabylonUtility"].getLineToEachOther(textNodes);
-    var linesToSelect = _CommonUtility__WEBPACK_IMPORTED_MODULE_0__["CommonUtility"]
-        .sort(lines, function (l) { return l.distance; })
-        .filter(function (l) { return l.distance > 0.2; })
+    var linesToSelect = lines.filter(function (l) { return l.distance > 0.2; });
+    linesToSelect = _CommonUtility__WEBPACK_IMPORTED_MODULE_0__["CommonUtility"]
+        .sort(linesToSelect, function (l) { return l.distance; })
         .slice(0, 1200);
     var linesToDraw = linesToSelect.map(function (l) { return [l.from, l.to]; });
     //.shuffle(linesToSelect)
@@ -287,4 +288,4 @@ self.onmessage = function (message) {
 /***/ })
 
 /******/ });
-//# sourceMappingURL=bundle.UpdateTextNodeWorker.041b5b4ae0a74d0203ad.js.map
+//# sourceMappingURL=bundle.CreateLinesWorker.be861f11cfd5f9d23486.js.map

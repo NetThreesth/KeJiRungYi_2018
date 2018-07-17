@@ -5,7 +5,7 @@ module.exports = {
   mode: 'development',
   entry: {
     'main': './app_src/main.tsx',
-    'UpdateTextNodeWorker': './app_src/UpdateTextNodeWorker.ts'
+    'CreateLinesWorker': './app_src/CreateLinesWorker.ts'
   },
   output: {
     filename: 'bundle.[name].[chunkhash].js',

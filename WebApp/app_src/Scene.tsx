@@ -26,6 +26,8 @@ export class Scene
     private glowLayerForParticle: BABYLON.GlowLayer;
     private bubbleSpray: BABYLON.SolidParticleSystem;
 
+    private createLinesWorker: AsyncWorker<BABYLON.Vector3[], BABYLON.Vector3[][]>;
+
 
     render() {
         return <div>
@@ -41,13 +43,16 @@ export class Scene
         this.getTexts();
         this.getPoints();
 
+
+        this.createLinesWorker = new AsyncWorker(
+            (document.getElementById('CreateLinesWorker') as HTMLScriptElement).src
+        );
+
         this.registerRunRenderLoop();
 
         this.props.eventCenter.on(Event.AfterWordCardsAnimation, this.transformation.bind(this));
         this.props.eventCenter.on(Event.AfterLogin, this.zoomIn.bind(this));
-        window.addEventListener("resize", () => {
-            this.engine.resize();
-        });
+        window.addEventListener("resize", this.engine.resize.bind(this));
 
         const updateMask = () => {
             const setting = CommonUtility.getQueryString('greenMask');
@@ -64,7 +69,7 @@ export class Scene
 
     private initScene() {
         const canvas = document.getElementById("renderCanvas") as HTMLCanvasElement;
-        this.engine = new BABYLON.Engine(canvas, true);
+        this.engine = new BABYLON.Engine(canvas, true, { stencil: true });
         const scene = this.scene = new BABYLON.Scene(this.engine);
 
         const camera = this.camera = new BABYLON.UniversalCamera("Camera", new BABYLON.Vector3(0, 0, -25), this.scene);
@@ -168,10 +173,6 @@ export class Scene
 
     private registerRunRenderLoop() {
 
-        const origin = { x: 0, y: 0, z: 0 } as BABYLON.Vector3;
-        const viewport = this.camera.viewport.toGlobal(this.camera.getEngine(), null);
-
-
         this.engine.runRenderLoop(() => {
 
             /** render before */
@@ -271,75 +272,80 @@ export class Scene
     };
 
 
+
     private linesForLinesystem: BABYLON.Vector3[][] = [];
     private linesystem: BABYLON.LinesMesh = null;
-    // private translateFactor = 0;
-    private translateType: 'Simple' | 'ToChatRoomNode' = 'Simple';
-    private startUpdateTextNodeWorker() {
-        if (!window['Worker']) return;
-        const worker = new Worker((document.getElementById('UpdateTextNodeWorker') as HTMLScriptElement).src);
-        const next = () => {
-            const nodes = this.updateTextNode();
-            worker.postMessage(nodes);
-        };
-        worker.onmessage = (message) => {
-            if (this.textNodes.length === 0) {
-                this.linesForLinesystem.length = 0;
-                this.linesystem.dispose();
-                return;
+    private translateType: TranslateType = TranslateType.Simple;
+
+
+    private startUpdateTextNodes(textNodes: TranslatableNode[]) {
+        let updatedNodes: TranslatableNode[];
+        switch (this.translateType) {
+            case TranslateType.Simple: {
+                updatedNodes = this.updateTextNodeForSimpleMotion(textNodes);
+                break;
             }
-            this.linesForLinesystem = message.data;
-            next();
+            case TranslateType.Forward: {
+                updatedNodes = this.updateTextNodeForForward(textNodes);
+                break;
+            }
+            default: return;
         };
-        worker.postMessage(this.textNodes);
+        this.createLinesWorker.asyncExcute(updatedNodes.map(e => e.position)).then(data => {
+            this.linesForLinesystem = data;
+            this.startUpdateTextNodes(updatedNodes);
+        });
     };
 
-    private updateTextNode() {
-        let nodes: BABYLON.Vector3[] = [];
-        switch (this.translateType) {
-            case 'Simple': {
-                nodes = this.textNodes.map((node, i) => {
-                    if (node.position.z > -13)
-                        node.translateVector.z = -1;
-                    else if (node.position.z < -16)
-                        node.translateVector.z = 1;
-                    BabylonUtility.updatePosition(node.position, node.translateVector, node.scale);
-                    return node.position;
-                });
-                break;
+    private updateTextNodeForSimpleMotion(nodesToTranslate: TranslatableNode[]) {
+        const nodes = nodesToTranslate.map((node, i) => {
+            if (node.position.z > -13)
+                node.translateVector.z = -1;
+            else if (node.position.z < -16)
+                node.translateVector.z = 1;
+            BabylonUtility.updatePosition(node.position, node.translateVector, node.scale);
+            return node;
+        });
+        return nodes;
+    };
+    private updateTextNodeForForward(nodesToTranslate: TranslatableNode[]) {
+        const maxMove = 0.5;
+        const textNodesLen = nodesToTranslate.length;
+        let count = 0;
+        const nodes = nodesToTranslate.map((node, i) => {
+            const chatRoomsNode = this.chatRoomsNodes[i];
+            const distance = BabylonUtility.distance(chatRoomsNode, node.position);
+            if (distance > maxMove) {
+                const vector = BabylonUtility.subtractVector(chatRoomsNode, node.position).normalize();
+                BabylonUtility.updatePosition(node.position, vector, maxMove);
+            } else {
+                node.position = chatRoomsNode;
+                /*    if (textNodesLen < this.chatRoomsNodes.length) {
+                       const toAdd = this.chatRoomsNodes[textNodesLen + 1];
+                       if (toAdd) {
+                           this.textNodes.push({ position: toAdd });
+                       }
+                   } */
+                count++;
             }
-            case 'ToChatRoomNode': {
-                // this.textNodes = this.textNodes.slice(0, this.chatRoomsNodes.length);
-                const maxMove = 0.5;
-                const textNodesLen = this.textNodes.length;
-                let count = 0;
-                nodes = this.textNodes.map((node, i) => {
-                    const chatRoomsNode = this.chatRoomsNodes[i];
-                    const distance = BabylonUtility.distance(chatRoomsNode, node.position);
-                    if (distance > maxMove) {
-                        const vector = BabylonUtility.subtractVector(chatRoomsNode, node.position).normalize();
-                        BabylonUtility.updatePosition(node.position, vector, maxMove);
-                    } else {
-                        node.position = chatRoomsNode;
-                        /*    if (textNodesLen < this.chatRoomsNodes.length) {
-                               const toAdd = this.chatRoomsNodes[textNodesLen + 1];
-                               if (toAdd) {
-                                   this.textNodes.push({ position: toAdd });
-                               }
-                           } */
-                        count++;
-                    }
-                    return node.position;
-                });
-                console.log(count + ' / ' + textNodesLen);
-                break;
-            }
-        }
+            return node;
+        });
+        if (count) console.log(`ToChatRoomNode end: ${count} / ${textNodesLen}`);
+        if (count > 50) this.translateType = TranslateType.Expand;
         return nodes;
     };
 
+
     private translateLinesForTextNodes() {
-        if (this.linesForLinesystem.length === 0) return;
+        if (this.linesForLinesystem.length === 0) {
+            if (this.linesystem) {
+                this.linesystem.dispose();
+                this.linesystem = null;
+            }
+            return;
+        } else if (this.translateType === TranslateType.Expand) {
+            this.expandTextNodes();
+        }
 
         this.linesystem = BABYLON.MeshBuilder.CreateLineSystem("linesystem", {
             lines: this.linesForLinesystem,
@@ -349,24 +355,46 @@ export class Scene
         this.linesystem.color = BABYLON.Color3.White();
     };
 
+    private expandTextNodes() {
+        const linesystemLen = this.linesForLinesystem.length;
+        const linesForChatRoomLen = this.linesForChatRooms.length;
+
+        const exchangeCount = 30;
+        const maxIndex = Math.min(linesystemLen, linesForChatRoomLen) - 1 - exchangeCount;
+        const startIndex = CommonUtility.getRandomIntInRange(0, maxIndex);
+        for (let i = 0; i < exchangeCount; i++) {
+            const index = startIndex + i;
+            const toExchange = this.linesForChatRooms[index];
+            this.linesForLinesystem[index] = [toExchange.from, toExchange.to];
+        }
+
+        if (linesForChatRoomLen > linesystemLen) {
+            const toAdd = this.linesForChatRooms[linesystemLen - 1];
+            this.linesForLinesystem.push([toAdd.from, toAdd.to]);
+        } else if (linesForChatRoomLen < linesystemLen) {
+            this.linesForLinesystem.pop();
+            console.log('pop');
+        }
+
+    };
+
     private translateParticles() {
         if (this.particles.length === 0) return;
         const scale = 0.003;
         this.particles.forEach(p => {
             if (p.duration <= 0) {
                 p.translateVector = BabylonUtility.getRandomVector3();
-                p.duration = this.getDurationForParticle();
+                p.duration = this.getDurationForParticle();// unit: frame number
             }
             BabylonUtility.updatePosition(p.mesh.position, p.translateVector, scale);
             p.duration -= 1;
         });
     };
 
-
-    // unit: frame number
     private getDurationForParticle() {
         return CommonUtility.getRandomIntInRange(60 * 3, 60 * 6);
     };
+
 
     private chatRoomsNodes: BABYLON.Vector3[] = [];
     private chatRoomsCenter: BABYLON.Vector3[] = [];
@@ -384,6 +412,7 @@ export class Scene
                     this.chatRoomsNodes = this.chatRoomsNodes.concat(pointInGroup);
                     pointInGroups[i] = pointInGroup;
                 });
+                this.chatRoomsNodes=CommonUtility.shuffle(this.chatRoomsNodes);
                 let lines: Line[] = [];
 
                 const take = 120;
@@ -414,30 +443,19 @@ export class Scene
 
 
 
-    private highlightForLine: BABYLON.HighlightLayer = null;
     private colorSetForLines = [
         [199, 222, 205],
         [192, 231, 164],
         [168, 213, 133]
     ].map(set => set.map(n => n / 255));
 
-
-    private glowColor = function () {
-        const glowColorInRGB = [246 / 255, 255 / 255, 201 / 255, 0.84];
-        return new BABYLON.Color3(glowColorInRGB[0], glowColorInRGB[1], glowColorInRGB[2])
-    }();
-
     private drawLine() {
 
         if (this.linesForChatRooms.length === 0) return;
 
-        const highlightForLine = this.highlightForLine =
-            this.highlightForLine ||
-            function () {
-                const highlightForLine = new BABYLON.HighlightLayer("highlightForLine", this.scene);
-                highlightForLine.innerGlow = false;
-                return highlightForLine;
-            }.bind(this)();
+        const highlightForLine = new BABYLON.HighlightLayer("highlightForLine", this.scene);
+        highlightForLine.innerGlow = false;
+        const glowColor = new BABYLON.Color3(246 / 255, 255 / 255, 201 / 255);
 
         const materials = this.colorSetForLines.map((colorInRGB, i) => {
             const color = new BABYLON.Color3(colorInRGB[0], colorInRGB[1], colorInRGB[2]);
@@ -460,17 +478,11 @@ export class Scene
         meshContainer.forEach(group => {
             if (group.length === 0) return;
             const merged = BABYLON.Mesh.MergeMeshes(group, true, false);
-            highlightForLine.addMesh(merged, this.glowColor);
+            highlightForLine.addMesh(merged, glowColor);
         });
     };
 
 
-
-    private textNodes: {
-        position: BABYLON.Vector3,
-        scale?: number,
-        translateVector?: BABYLON.Vector3
-    }[] = [];
 
     private getTexts() {
         const img = new Image();
@@ -523,7 +535,7 @@ export class Scene
             }
 
             const initialZ = -15;
-            this.textNodes = CommonUtility.sort(pixels, p => p.brightness).reverse()
+            const textNodes = CommonUtility.sort(pixels, p => p.brightness).reverse()
                 .slice(0, 200)
                 .map((p, i) => {
                     const rate = 0.12;
@@ -538,7 +550,7 @@ export class Scene
                         translateVector: new BABYLON.Vector3(0, 0, position.z < initialZ ? 1 : -1) // 初始方向
                     };
                 });
-            this.startUpdateTextNodeWorker();
+            this.startUpdateTextNodes(textNodes);
         };
     };
 
@@ -557,13 +569,15 @@ export class Scene
 
 
     private transformation() {
-        this.translateType = 'ToChatRoomNode';
+        this.translateType = TranslateType.Forward;
         setTimeout(() => {
-            this.translateType = null;
-            this.textNodes.length = 0;
-            this.drawLine();
-            this.createParticles();
-        }, 1.8 * 1000);
+            this.translateType = TranslateType.Expand;
+            setTimeout(() => {
+                this.linesForLinesystem.length = 0;
+                this.drawLine();
+                this.createParticles();
+            }, 0.5 * 1000);
+        }, 2 * 1000);
     };
 
     private zoomIn() {
@@ -582,5 +596,38 @@ export class Scene
         );
         const points = curve.getPoints();
         this.cameraLocations = points;
+    };
+};
+
+
+enum TranslateType { 'Simple', 'Forward', 'Expand' };
+
+interface TranslatableNode {
+    position: BABYLON.Vector3,
+    scale?: number,
+    translateVector?: BABYLON.Vector3
+};
+
+
+class AsyncWorker<inT, outT> {
+
+    private worker: Worker;
+
+    constructor(
+        src: string
+    ) {
+        if (!window['Worker'])
+            throw 'Worker not support';
+
+        this.worker = new Worker(src);
+    };
+
+    asyncExcute(input: inT) {
+        return new Promise<outT>((resolve, reject) => {
+            const worker = this.worker;
+            worker.onmessage = message => resolve(message.data);
+            worker.onerror = e => reject(e.error);
+            worker.postMessage(input);
+        });
     };
 };
