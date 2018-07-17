@@ -40,7 +40,6 @@ export class BabylonUtility {
         position.x += (translateVector.x * scale);
         position.y += (translateVector.y * scale);
         position.z += (translateVector.z * scale);
-        return position;
     };
 
 

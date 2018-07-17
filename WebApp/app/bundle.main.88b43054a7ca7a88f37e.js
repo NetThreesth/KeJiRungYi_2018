@@ -158,7 +158,6 @@ var BabylonUtility = /** @class */ (function () {
         position.x += (translateVector.x * scale);
         position.y += (translateVector.y * scale);
         position.z += (translateVector.z * scale);
-        return position;
     };
     ;
     BabylonUtility.positionToString = function (position) {
@@ -1191,20 +1190,10 @@ var Scene = /** @class */ (function (_super) {
     ;
     Scene.prototype.startUpdateTextNodes = function (textNodes) {
         var _this = this;
-        var updatedNodes;
-        switch (this.translateType) {
-            case TranslateType.Simple: {
-                updatedNodes = this.updateTextNodeForSimpleMotion(textNodes);
-                break;
-            }
-            case TranslateType.Forward: {
-                updatedNodes = this.updateTextNodeForForward(textNodes);
-                break;
-            }
-            default: return;
-        }
-        ;
+        var updatedNodes = this.updateTextNodeForSimpleMotion(textNodes);
         this.createLinesWorker.asyncExcute(updatedNodes.map(function (e) { return e.position; })).then(function (data) {
+            if (_this.translateType !== TranslateType.Simple)
+                return;
             _this.linesForLinesystem = data;
             _this.startUpdateTextNodes(updatedNodes);
         });
@@ -1222,37 +1211,6 @@ var Scene = /** @class */ (function (_super) {
         return nodes;
     };
     ;
-    Scene.prototype.updateTextNodeForForward = function (nodesToTranslate) {
-        var _this = this;
-        var maxMove = 0.5;
-        var textNodesLen = nodesToTranslate.length;
-        var count = 0;
-        var nodes = nodesToTranslate.map(function (node, i) {
-            var chatRoomsNode = _this.chatRoomsNodes[i];
-            var distance = _BabylonUtility__WEBPACK_IMPORTED_MODULE_4__["BabylonUtility"].distance(chatRoomsNode, node.position);
-            if (distance > maxMove) {
-                var vector = _BabylonUtility__WEBPACK_IMPORTED_MODULE_4__["BabylonUtility"].subtractVector(chatRoomsNode, node.position).normalize();
-                _BabylonUtility__WEBPACK_IMPORTED_MODULE_4__["BabylonUtility"].updatePosition(node.position, vector, maxMove);
-            }
-            else {
-                node.position = chatRoomsNode;
-                /*    if (textNodesLen < this.chatRoomsNodes.length) {
-                       const toAdd = this.chatRoomsNodes[textNodesLen + 1];
-                       if (toAdd) {
-                           this.textNodes.push({ position: toAdd });
-                       }
-                   } */
-                count++;
-            }
-            return node;
-        });
-        if (count)
-            console.log("ToChatRoomNode end: " + count + " / " + textNodesLen);
-        if (count > 50)
-            this.translateType = TranslateType.Expand;
-        return nodes;
-    };
-    ;
     Scene.prototype.translateLinesForTextNodes = function () {
         if (this.linesForLinesystem.length === 0) {
             if (this.linesystem) {
@@ -1261,8 +1219,11 @@ var Scene = /** @class */ (function (_super) {
             }
             return;
         }
+        else if (this.translateType === TranslateType.Forward) {
+            this.forwardLinesystem();
+        }
         else if (this.translateType === TranslateType.Expand) {
-            this.expandTextNodes();
+            this.expandLinesystem();
         }
         this.linesystem = babylonjs__WEBPACK_IMPORTED_MODULE_1__["MeshBuilder"].CreateLineSystem("linesystem", {
             lines: this.linesForLinesystem,
@@ -1272,7 +1233,30 @@ var Scene = /** @class */ (function (_super) {
         this.linesystem.color = babylonjs__WEBPACK_IMPORTED_MODULE_1__["Color3"].White();
     };
     ;
-    Scene.prototype.expandTextNodes = function () {
+    Scene.prototype.forwardLinesystem = function () {
+        var _this = this;
+        var maxMove = 0.1;
+        this.linesForLinesystem.length = this.linesForChatRooms.length;
+        this.linesForLinesystem.forEach(function (line, i) {
+            var target = _this.linesForChatRooms[i];
+            var dFrom = _BabylonUtility__WEBPACK_IMPORTED_MODULE_4__["BabylonUtility"].distance(target.from, line[0]);
+            var dTo = _BabylonUtility__WEBPACK_IMPORTED_MODULE_4__["BabylonUtility"].distance(target.to, line[1]);
+            var move = Math.max(dFrom, dTo);
+            if (move < maxMove)
+                return;
+            move = Math.min(maxMove, move);
+            if (i === 0)
+                console.log(JSON.stringify(target.from) + ' d: ' + dFrom);
+            var vectorForBegin = _BabylonUtility__WEBPACK_IMPORTED_MODULE_4__["BabylonUtility"].subtractVector(target.from, line[0]).normalize();
+            if (i === 0)
+                console.log(JSON.stringify(line[0]) + ' ' + JSON.stringify(vectorForBegin));
+            _BabylonUtility__WEBPACK_IMPORTED_MODULE_4__["BabylonUtility"].updatePosition(line[0], vectorForBegin, move);
+            var vectorForEnd = _BabylonUtility__WEBPACK_IMPORTED_MODULE_4__["BabylonUtility"].subtractVector(target.to, line[1]).normalize();
+            _BabylonUtility__WEBPACK_IMPORTED_MODULE_4__["BabylonUtility"].updatePosition(line[1], vectorForEnd, move);
+        });
+    };
+    ;
+    Scene.prototype.expandLinesystem = function () {
         var linesystemLen = this.linesForLinesystem.length;
         var linesForChatRoomLen = this.linesForChatRooms.length;
         var exchangeCount = 30;
@@ -1282,14 +1266,6 @@ var Scene = /** @class */ (function (_super) {
             var index = startIndex + i;
             var toExchange = this.linesForChatRooms[index];
             this.linesForLinesystem[index] = [toExchange.from, toExchange.to];
-        }
-        if (linesForChatRoomLen > linesystemLen) {
-            var toAdd = this.linesForChatRooms[linesystemLen - 1];
-            this.linesForLinesystem.push([toAdd.from, toAdd.to]);
-        }
-        else if (linesForChatRoomLen < linesystemLen) {
-            this.linesForLinesystem.pop();
-            console.log('pop');
         }
     };
     ;
@@ -1597,4 +1573,4 @@ module.exports = ReactDOM;
 /***/ })
 
 /******/ });
-//# sourceMappingURL=bundle.main.f08f2abafcec09a28061.js.map
+//# sourceMappingURL=bundle.main.88b43054a7ca7a88f37e.js.map
