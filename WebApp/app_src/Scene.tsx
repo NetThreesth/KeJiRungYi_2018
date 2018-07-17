@@ -279,9 +279,19 @@ export class Scene
 
 
     private startUpdateTextNodes(textNodes: TranslatableNode[]) {
-        const updatedNodes = this.updateTextNodeForSimpleMotion(textNodes);
+        let updatedNodes: TranslatableNode[];
+        switch (this.translateType) {
+            case TranslateType.Simple: {
+                updatedNodes = this.updateTextNodeForSimpleMotion(textNodes);
+                break;
+            }
+            case TranslateType.Forward: {
+                updatedNodes = this.updateTextNodeForForward(textNodes);
+                break;
+            }
+            default: return;
+        };
         this.createLinesWorker.asyncExcute(updatedNodes.map(e => e.position)).then(data => {
-            if (this.translateType !== TranslateType.Simple) return;
             this.linesForLinesystem = data;
             this.startUpdateTextNodes(updatedNodes);
         });
@@ -298,6 +308,32 @@ export class Scene
         });
         return nodes;
     };
+    private updateTextNodeForForward(nodesToTranslate: TranslatableNode[]) {
+        const maxMove = 0.5;
+        const textNodesLen = nodesToTranslate.length;
+        let count = 0;
+        const nodes = nodesToTranslate.map((node, i) => {
+            const chatRoomsNode = this.chatRoomsNodes[i];
+            const distance = BabylonUtility.distance(chatRoomsNode, node.position);
+            if (distance > maxMove) {
+                const vector = BabylonUtility.subtractVector(chatRoomsNode, node.position).normalize();
+                BabylonUtility.updatePosition(node.position, vector, maxMove);
+            } else {
+                node.position = chatRoomsNode;
+                /*    if (textNodesLen < this.chatRoomsNodes.length) {
+                       const toAdd = this.chatRoomsNodes[textNodesLen + 1];
+                       if (toAdd) {
+                           this.textNodes.push({ position: toAdd });
+                       }
+                   } */
+                count++;
+            }
+            return node;
+        });
+        if (count) console.log(`ToChatRoomNode end: ${count} / ${textNodesLen}`);
+        if (count > 50) this.translateType = TranslateType.Expand;
+        return nodes;
+    };
 
 
     private translateLinesForTextNodes() {
@@ -307,10 +343,8 @@ export class Scene
                 this.linesystem = null;
             }
             return;
-        } else if (this.translateType === TranslateType.Forward) {
-            this.forwardLinesystem();
         } else if (this.translateType === TranslateType.Expand) {
-            this.expandLinesystem();
+            this.expandTextNodes();
         }
 
         this.linesystem = BABYLON.MeshBuilder.CreateLineSystem("linesystem", {
@@ -321,29 +355,7 @@ export class Scene
         this.linesystem.color = BABYLON.Color3.White();
     };
 
-
-    private forwardLinesystem() {
-
-        const maxMove = 0.1;
-        this.linesForLinesystem.length = this.linesForChatRooms.length;
-        this.linesForLinesystem.forEach((line, i) => {
-            const target = this.linesForChatRooms[i];
-            const dFrom = BabylonUtility.distance(target.from, line[0]);
-            const dTo = BabylonUtility.distance(target.to, line[1]);
-            let move = Math.max(dFrom, dTo);
-            if (move < maxMove) return;
-
-            move = Math.min(maxMove, move);
-            if (i === 0) console.log(JSON.stringify(target.from) + ' d: ' + dFrom);
-            const vectorForBegin = BabylonUtility.subtractVector(target.from, line[0]).normalize();
-            if (i === 0) console.log(JSON.stringify(line[0]) + ' ' + JSON.stringify(vectorForBegin));
-            BabylonUtility.updatePosition(line[0], vectorForBegin, move);
-            const vectorForEnd = BabylonUtility.subtractVector(target.to, line[1]).normalize();
-            BabylonUtility.updatePosition(line[1], vectorForEnd, move);
-        });
-    };
-
-    private expandLinesystem() {
+    private expandTextNodes() {
         const linesystemLen = this.linesForLinesystem.length;
         const linesForChatRoomLen = this.linesForChatRooms.length;
 
@@ -355,6 +367,15 @@ export class Scene
             const toExchange = this.linesForChatRooms[index];
             this.linesForLinesystem[index] = [toExchange.from, toExchange.to];
         }
+
+        if (linesForChatRoomLen > linesystemLen) {
+            const toAdd = this.linesForChatRooms[linesystemLen - 1];
+            this.linesForLinesystem.push([toAdd.from, toAdd.to]);
+        } else if (linesForChatRoomLen < linesystemLen) {
+            this.linesForLinesystem.pop();
+            console.log('pop');
+        }
+
     };
 
     private translateParticles() {
@@ -391,7 +412,7 @@ export class Scene
                     this.chatRoomsNodes = this.chatRoomsNodes.concat(pointInGroup);
                     pointInGroups[i] = pointInGroup;
                 });
-                this.chatRoomsNodes = CommonUtility.shuffle(this.chatRoomsNodes);
+                this.chatRoomsNodes=CommonUtility.shuffle(this.chatRoomsNodes);
                 let lines: Line[] = [];
 
                 const take = 120;

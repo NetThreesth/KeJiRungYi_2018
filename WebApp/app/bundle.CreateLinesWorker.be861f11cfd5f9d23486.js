@@ -127,6 +127,7 @@ var BabylonUtility = /** @class */ (function () {
         position.x += (translateVector.x * scale);
         position.y += (translateVector.y * scale);
         position.z += (translateVector.z * scale);
+        return position;
     };
     ;
     BabylonUtility.positionToString = function (position) {
@@ -287,4 +288,4 @@ self.onmessage = function (message) {
 /***/ })
 
 /******/ });
-//# sourceMappingURL=bundle.CreateLinesWorker.83b1d9c3e60d4e7560f0.js.map
+//# sourceMappingURL=bundle.CreateLinesWorker.be861f11cfd5f9d23486.js.map
