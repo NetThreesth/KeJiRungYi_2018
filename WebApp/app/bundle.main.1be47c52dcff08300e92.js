@@ -587,6 +587,7 @@ var LoginPanel = /** @class */ (function (_super) {
     };
     ;
     LoginPanel.prototype.skipAnimation = function () {
+        alert('onClick');
         var $wordCards = $('.wordCard');
         $wordCards.stop(true);
         $wordCards.hide();
@@ -2546,4 +2547,4 @@ module.exports = ReactDOM;
 /***/ })
 
 /******/ });
-//# sourceMappingURL=bundle.main.1abd1c94b6e60aedf97f.js.map
+//# sourceMappingURL=bundle.main.1be47c52dcff08300e92.js.map
