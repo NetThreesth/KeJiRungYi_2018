@@ -428,12 +428,9 @@ var DevPanel = /** @class */ (function (_super) {
     function DevPanel() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
         _this.state = {};
-        _this.isdev = _CommonUtility__WEBPACK_IMPORTED_MODULE_2__["CommonUtility"].getQueryString('isdev');
         return _this;
     }
     DevPanel.prototype.render = function () {
-        if (!this.isdev)
-            return;
         return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { id: "devPanel" },
             react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("table", null,
                 react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("tbody", null,
@@ -453,7 +450,7 @@ var DevPanel = /** @class */ (function (_super) {
     ;
     DevPanel.prototype.componentDidMount = function () {
         var _this = this;
-        if (!this.isdev)
+        if (!_CommonUtility__WEBPACK_IMPORTED_MODULE_2__["CommonUtility"].getQueryString('isdev'))
             return;
         this.props.eventCenter.on(_MessageCenter__WEBPACK_IMPORTED_MODULE_1__["Event"].UpdateDevPanelData, function (data) {
             if (Object.keys(data).some(function (key) { return _this.state[key] !== data[key]; }))
@@ -2549,4 +2546,4 @@ module.exports = ReactDOM;
 /***/ })
 
 /******/ });
-//# sourceMappingURL=bundle.main.1f40569bab6941d5d250.js.map
+//# sourceMappingURL=bundle.main.1abd1c94b6e60aedf97f.js.map

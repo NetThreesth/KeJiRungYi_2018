@@ -7,12 +7,9 @@ export class DevPanel
     extends React.Component<{ eventCenter: EventCenter }, DevPanelData> {
 
     state = {} as DevPanelData;
-    private isdev = CommonUtility.getQueryString('isdev');
 
 
     render() {
-        if (!this.isdev) return;
-
         return <div id="devPanel">
             <table>
                 <tbody>
@@ -38,8 +35,8 @@ export class DevPanel
     };
 
     componentDidMount() {
-        if (!this.isdev) return;
-        
+        if (!CommonUtility.getQueryString('isdev')) return;
+
         this.props.eventCenter.on<DevPanelData>(Event.UpdateDevPanelData, data => {
             if (Object.keys(data).some(key => this.state[key] !== data[key]))
                 this.setState(Object.assign({}, this.state, data));
