@@ -1228,8 +1228,10 @@ var Scene = /** @class */ (function (_super) {
         this.createLinesWorker.asyncExcute(updatedNodes.map(function (e) { return e.position; })).then(function (data) {
             _this.linesForLinesystem = data;
             var linesystemPerformance = _this.linesystemPerformance;
-            if (linesystemPerformance < -3)
+            if (linesystemPerformance < -3) {
                 console.log("linesystemPerformance: " + linesystemPerformance);
+                updatedNodes.length = updatedNodes.length + linesystemPerformance;
+            }
             _this.props.eventCenter.trigger(_MessageCenter__WEBPACK_IMPORTED_MODULE_5__["Event"].UpdateDevPanelData, {
                 linesystemPerformance: linesystemPerformance
             });
@@ -1252,7 +1254,7 @@ var Scene = /** @class */ (function (_super) {
     ;
     Scene.prototype.updateTextNodeForForward = function (nodesToTranslate) {
         var _this = this;
-        var maxMove = 0.5;
+        var maxMove = 0.3;
         var textNodesLen = nodesToTranslate.length;
         var count = 0;
         var nodes = nodesToTranslate.map(function (node, i) {
@@ -1264,20 +1266,14 @@ var Scene = /** @class */ (function (_super) {
             }
             else {
                 node.position = chatRoomsNode;
-                /*    if (textNodesLen < this.chatRoomsNodes.length) {
-                       const toAdd = this.chatRoomsNodes[textNodesLen + 1];
-                       if (toAdd) {
-                           this.textNodes.push({ position: toAdd });
-                       }
-                   } */
                 count++;
             }
             return node;
         });
-        if (count)
-            console.log("ToChatRoomNode end: " + count + " / " + textNodesLen);
-        if (count > 50)
+        if (count > 70) {
             this.translateType = TranslateType.Expand;
+            console.log("ToChatRoomNode end: " + count + " / " + textNodesLen);
+        }
         return nodes;
     };
     ;
@@ -1485,8 +1481,8 @@ var Scene = /** @class */ (function (_super) {
             setTimeout(function () {
                 _this.linesForLinesystem.length = 0;
                 _this.drawLine();
-                _this.createParticles();
-            }, 0.5 * 1000);
+                setTimeout(function () { return _this.createParticles(); });
+            }, 0.8 * 1000);
         }, 2 * 1000);
     };
     ;
@@ -2569,4 +2565,4 @@ module.exports = ReactDOM;
 /***/ })
 
 /******/ });
-//# sourceMappingURL=bundle.main.c8a0157cd450185b6dcd.js.map
+//# sourceMappingURL=bundle.main.js.map

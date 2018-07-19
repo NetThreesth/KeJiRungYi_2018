@@ -295,8 +295,10 @@ export class Scene
         this.createLinesWorker.asyncExcute(updatedNodes.map(e => e.position)).then(data => {
             this.linesForLinesystem = data;
             const linesystemPerformance = this.linesystemPerformance;
-            if (linesystemPerformance < -3)
+            if (linesystemPerformance < -3) {
                 console.log(`linesystemPerformance: ${linesystemPerformance}`);
+                updatedNodes.length = updatedNodes.length + linesystemPerformance;
+            }
 
             this.props.eventCenter.trigger(Event.UpdateDevPanelData, {
                 linesystemPerformance: linesystemPerformance
@@ -318,7 +320,7 @@ export class Scene
         return nodes;
     };
     private updateTextNodeForForward(nodesToTranslate: TranslatableNode[]) {
-        const maxMove = 0.5;
+        const maxMove = 0.3;
         const textNodesLen = nodesToTranslate.length;
         let count = 0;
         const nodes = nodesToTranslate.map((node, i) => {
@@ -329,18 +331,14 @@ export class Scene
                 BabylonUtility.updatePosition(node.position, vector, maxMove);
             } else {
                 node.position = chatRoomsNode;
-                /*    if (textNodesLen < this.chatRoomsNodes.length) {
-                       const toAdd = this.chatRoomsNodes[textNodesLen + 1];
-                       if (toAdd) {
-                           this.textNodes.push({ position: toAdd });
-                       }
-                   } */
                 count++;
             }
             return node;
         });
-        if (count) console.log(`ToChatRoomNode end: ${count} / ${textNodesLen}`);
-        if (count > 50) this.translateType = TranslateType.Expand;
+        if (count > 70) {
+            this.translateType = TranslateType.Expand;
+            console.log(`ToChatRoomNode end: ${count} / ${textNodesLen}`);
+        }
         return nodes;
     };
 
@@ -584,8 +582,8 @@ export class Scene
             setTimeout(() => {
                 this.linesForLinesystem.length = 0;
                 this.drawLine();
-                this.createParticles();
-            }, 0.5 * 1000);
+                setTimeout(() => this.createParticles());
+            }, 0.8 * 1000);
         }, 2 * 1000);
     };
 
