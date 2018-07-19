@@ -4,7 +4,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
-const logger = require('./server/logger');
+const logger = require('./logger');
 
 const app = express();
 
@@ -21,11 +21,11 @@ app.use((err, req, res, next) => {
   });
   res.end();
 });
-
-app.use(express.static(`${__dirname}/app`));
-const PORT = process.env.PORT || 8080;
+const path = require('path').resolve(__dirname, `../app`);
+app.use(express.static(path));
+const PORT = 8080;
 app.listen(PORT, () => {
-  logger.info(`App listening on port ${PORT}`);
+  logger.info(`App listening. serve path: ${path}, port: ${PORT}`);
   logger.info('Press Ctrl+C to quit.');
 });
 // [END Setup]
@@ -35,7 +35,7 @@ app.listen(PORT, () => {
 // [GraphQL]
 const express_graphql = require('express-graphql');
 const graphql = require('graphql');
-const repo = require('./server/repository.js');
+const repo = require('./repository.js');
 
 const MessageType = new graphql.GraphQLObjectType({
   name: 'Message',

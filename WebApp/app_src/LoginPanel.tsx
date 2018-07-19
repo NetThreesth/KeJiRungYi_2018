@@ -126,7 +126,6 @@ export class LoginPanel
     private afterWordCardsAnimation() {
         $('.skipAnimation').hide();
         this.props.eventCenter.trigger(Event.AfterWordCardsAnimation);
-        this.focus();
     };
 
     private focus() {

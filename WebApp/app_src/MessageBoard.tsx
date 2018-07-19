@@ -122,7 +122,7 @@ export class Scrollbar
         const $scrollbarContainer = $('.scrollbarContainer');
         const $scrollbar = $scrollbarContainer.find('.scrollbar');
         $scrollbarContainer
-            .on('mousedown', e => {
+            .on('mousedown touchstart', e => {
                 e.preventDefault();
                 isDragging = true;
                 origin.pageY = e.pageY;
@@ -130,7 +130,7 @@ export class Scrollbar
                 const scrollbarOffset = Number($scrollbar.css('top').replace('px', ''));
                 origin.scrollbarOffset = scrollbarOffset;
             })
-            .on('mousemove', e => {
+            .on('mousemove touchmove', e => {
                 e.preventDefault();
                 if (!isDragging) return;
                 const offsetY = e.pageY - origin.pageY;
@@ -144,7 +144,7 @@ export class Scrollbar
                 eventCenter.trigger(Scrollbar.ScrollEvent, scrollbarOffset / maxOffset);
             });
 
-        $(document).on('mouseup', e => {
+        $(document).on('mouseup touchend', e => {
             e.preventDefault();
             if (!isDragging) return;
             isDragging = false;

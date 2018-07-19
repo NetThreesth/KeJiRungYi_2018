@@ -276,6 +276,7 @@ export class Scene
     private linesForLinesystem: BABYLON.Vector3[][] = [];
     private linesystem: BABYLON.LinesMesh = null;
     private translateType: TranslateType = TranslateType.Simple;
+    private linesystemPerformance = 0;
 
 
     private startUpdateTextNodes(textNodes: TranslatableNode[]) {
@@ -293,6 +294,14 @@ export class Scene
         };
         this.createLinesWorker.asyncExcute(updatedNodes.map(e => e.position)).then(data => {
             this.linesForLinesystem = data;
+            const linesystemPerformance = this.linesystemPerformance;
+            if (linesystemPerformance < -3)
+                console.log(`linesystemPerformance: ${linesystemPerformance}`);
+
+            this.props.eventCenter.trigger(Event.UpdateDevPanelData, {
+                linesystemPerformance: linesystemPerformance
+            });
+            this.linesystemPerformance = 0;
             this.startUpdateTextNodes(updatedNodes);
         });
     };
@@ -347,6 +356,7 @@ export class Scene
             this.expandTextNodes();
         }
 
+        this.linesystemPerformance--;
         this.linesystem = BABYLON.MeshBuilder.CreateLineSystem("linesystem", {
             lines: this.linesForLinesystem,
             updatable: true,
@@ -359,7 +369,7 @@ export class Scene
         const linesystemLen = this.linesForLinesystem.length;
         const linesForChatRoomLen = this.linesForChatRooms.length;
 
-        const exchangeCount = 30;
+        const exchangeCount = 20;
         const maxIndex = Math.min(linesystemLen, linesForChatRoomLen) - 1 - exchangeCount;
         const startIndex = CommonUtility.getRandomIntInRange(0, maxIndex);
         for (let i = 0; i < exchangeCount; i++) {
@@ -368,14 +378,13 @@ export class Scene
             this.linesForLinesystem[index] = [toExchange.from, toExchange.to];
         }
 
-        if (linesForChatRoomLen > linesystemLen) {
+        if (linesForChatRoomLen === linesystemLen) return;
+        else if (linesForChatRoomLen > linesystemLen) {
             const toAdd = this.linesForChatRooms[linesystemLen - 1];
             this.linesForLinesystem.push([toAdd.from, toAdd.to]);
         } else if (linesForChatRoomLen < linesystemLen) {
             this.linesForLinesystem.pop();
-            console.log('pop');
         }
-
     };
 
     private translateParticles() {
@@ -412,7 +421,7 @@ export class Scene
                     this.chatRoomsNodes = this.chatRoomsNodes.concat(pointInGroup);
                     pointInGroups[i] = pointInGroup;
                 });
-                this.chatRoomsNodes=CommonUtility.shuffle(this.chatRoomsNodes);
+                this.chatRoomsNodes = CommonUtility.shuffle(this.chatRoomsNodes);
                 let lines: Line[] = [];
 
                 const take = 120;

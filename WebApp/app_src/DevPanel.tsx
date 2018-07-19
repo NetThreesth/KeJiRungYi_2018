@@ -6,26 +6,23 @@ import { CommonUtility } from './CommonUtility';
 export class DevPanel
     extends React.Component<{ eventCenter: EventCenter }, DevPanelData> {
 
-    state = { fps: '', coordinate: '', greenMask: '' };
+    state = {} as DevPanelData;
+    private isdev = CommonUtility.getQueryString('isdev');
 
-    constructor(props) {
-        super(props);
-        this.props.eventCenter.on<DevPanelData>(Event.UpdateDevPanelData, data => {
-            this.setState({
-                fps: data.fps || this.state.fps,
-                coordinate: data.coordinate || this.state.coordinate,
-                greenMask: data.greenMask || this.state.greenMask
-            });
-        });
-    };
 
     render() {
+        if (!this.isdev) return;
+
         return <div id="devPanel">
             <table>
                 <tbody>
                     <tr>
                         <td>FPS</td>
                         <td>{this.state.fps}</td>
+                    </tr>
+                    <tr>
+                        <td>LSPerformance</td>
+                        <td>{this.state.linesystemPerformance}</td>
                     </tr>
                     <tr>
                         <td>Coordinate</td>
@@ -39,15 +36,20 @@ export class DevPanel
             </table>
         </div>;
     };
+
     componentDidMount() {
-        const isdev = CommonUtility.getQueryString('isdev');
-        if (!isdev) return;
-        $('#devPanel').show();
+        if (!this.isdev) return;
+        
+        this.props.eventCenter.on<DevPanelData>(Event.UpdateDevPanelData, data => {
+            if (Object.keys(data).some(key => this.state[key] !== data[key]))
+                this.setState(Object.assign({}, this.state, data));
+        });
     };
 };
 
 export interface DevPanelData {
     fps: string;
     coordinate: string;
+    linesystemPerformance: string;
     greenMask: string;
 };
