@@ -402,11 +402,12 @@ var ControlPanel = /** @class */ (function (_super) {
 /*!******************************!*\
   !*** ./app_src/DevPanel.tsx ***!
   \******************************/
-/*! exports provided: DevPanel */
+/*! exports provided: AddLogEvent, DevPanel */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "AddLogEvent", function() { return AddLogEvent; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DevPanel", function() { return DevPanel; });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
@@ -425,13 +426,29 @@ var __extends = (undefined && undefined.__extends) || (function () {
 
 
 
+var AddLogEvent = 'AddLogEvent';
 var DevPanel = /** @class */ (function (_super) {
     __extends(DevPanel, _super);
-    function DevPanel() {
-        var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.state = {};
+    function DevPanel(props) {
+        var _this = _super.call(this, props) || this;
+        _this.isdev = _CommonUtility__WEBPACK_IMPORTED_MODULE_2__["CommonUtility"].getQueryString('isdev');
+        _this.state = { log: [] };
+        if (!_this.isdev)
+            return _this;
+        var eventCenter = _this.props.eventCenter;
+        eventCenter.on(_MessageCenter__WEBPACK_IMPORTED_MODULE_1__["Event"].UpdateDevPanelData, function (data) {
+            if (Object.keys(data).some(function (key) { return _this.state[key] !== data[key]; }))
+                _this.setState(Object.assign({}, _this.state, data));
+        });
+        eventCenter.on(AddLogEvent, function (log) {
+            _this.state.log.push(log);
+            if (_this.state.log.length > 5)
+                _this.state.log.shift();
+            _this.setState(Object.assign({}, _this.state));
+        });
         return _this;
     }
+    ;
     DevPanel.prototype.render = function () {
         return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { id: "devPanel" },
             react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("table", null,
@@ -447,18 +464,20 @@ var DevPanel = /** @class */ (function (_super) {
                         react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("td", null, this.state.coordinate)),
                     react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("tr", null,
                         react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("td", null, "GreenMask"),
-                        react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("td", null, this.state.greenMask)))));
+                        react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("td", null, this.state.greenMask)),
+                    react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("tr", null,
+                        react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("td", { colSpan: 2 }, this.renderLog())))));
+    };
+    ;
+    DevPanel.prototype.renderLog = function () {
+        var lis = this.state.log.map(function (e) { return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("li", null, e); });
+        return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("ul", null, lis);
     };
     ;
     DevPanel.prototype.componentDidMount = function () {
-        var _this = this;
-        if (!_CommonUtility__WEBPACK_IMPORTED_MODULE_2__["CommonUtility"].getQueryString('isdev'))
+        if (!this.isdev)
             return;
         $('#devPanel').show();
-        this.props.eventCenter.on(_MessageCenter__WEBPACK_IMPORTED_MODULE_1__["Event"].UpdateDevPanelData, function (data) {
-            if (Object.keys(data).some(function (key) { return _this.state[key] !== data[key]; }))
-                _this.setState(Object.assign({}, _this.state, data));
-        });
     };
     ;
     return DevPanel;
@@ -648,7 +667,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _MessageCenter__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./MessageCenter */ "./app_src/MessageCenter.ts");
-/* harmony import */ var _AppSetting__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./AppSetting */ "./app_src/AppSetting.ts");
+/* harmony import */ var _DevPanel__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./DevPanel */ "./app_src/DevPanel.tsx");
+/* harmony import */ var _AppSetting__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./AppSetting */ "./app_src/AppSetting.ts");
 var __extends = (undefined && undefined.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -662,11 +682,11 @@ var __extends = (undefined && undefined.__extends) || (function () {
 
 
 
+
 var MessageBoard = /** @class */ (function (_super) {
     __extends(MessageBoard, _super);
     function MessageBoard(props) {
         var _this = _super.call(this, props) || this;
-        _this.eventCenter = new _MessageCenter__WEBPACK_IMPORTED_MODULE_1__["EventCenter"]();
         var messageCenter = _this.props.messageCenter;
         _this.state = { contents: messageCenter.contents.slice() };
         _this.props.messageCenter.observable.on(_MessageCenter__WEBPACK_IMPORTED_MODULE_1__["MessageCenter"].eventName, _this.refresh.bind(_this));
@@ -678,12 +698,12 @@ var MessageBoard = /** @class */ (function (_super) {
         var contentElements = contents.map(this.createContent.bind(this));
         return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { id: "messageBoard", className: "invisible" },
             react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "messageBoardContent" }, contentElements),
-            react__WEBPACK_IMPORTED_MODULE_0__["createElement"](Scrollbar, { syncTarget: ".messageBoardContent", eventCenter: this.eventCenter }));
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"](Scrollbar, { syncTarget: ".messageBoardContent", eventCenter: this.props.eventCenter }));
     };
     ;
     MessageBoard.prototype.componentDidMount = function () {
         var _this = this;
-        this.eventCenter.on(Scrollbar.ScrollEvent, function (rate) {
+        this.props.eventCenter.on(Scrollbar.ScrollEvent, function (rate) {
             _this.scrollTo(rate);
         });
     };
@@ -691,7 +711,7 @@ var MessageBoard = /** @class */ (function (_super) {
     MessageBoard.prototype.componentDidUpdate = function () {
         var _this = this;
         this.scrollTo(1, false, function () {
-            _this.eventCenter.trigger(Scrollbar.UpdateEvent);
+            _this.props.eventCenter.trigger(Scrollbar.UpdateEvent);
         });
     };
     ;
@@ -703,8 +723,8 @@ var MessageBoard = /** @class */ (function (_super) {
     };
     ;
     MessageBoard.prototype.createTextMessage = function (content) {
-        var isUser = content.role === _AppSetting__WEBPACK_IMPORTED_MODULE_2__["Roles"].User;
-        var name = isUser ? _AppSetting__WEBPACK_IMPORTED_MODULE_2__["AppSetting"].userName : '';
+        var isUser = content.role === _AppSetting__WEBPACK_IMPORTED_MODULE_3__["Roles"].User;
+        var name = isUser ? _AppSetting__WEBPACK_IMPORTED_MODULE_3__["AppSetting"].userName : '';
         var float = isUser ? 'left' : 'right';
         return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "messageBox", style: { float: float } },
             react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("img", { src: this.getAvatar(content.role), className: "avatar" }),
@@ -717,8 +737,8 @@ var MessageBoard = /** @class */ (function (_super) {
             width: '100%',
             maxWidth: '600px'
         };
-        var isUser = content.role === _AppSetting__WEBPACK_IMPORTED_MODULE_2__["Roles"].User;
-        var name = isUser ? _AppSetting__WEBPACK_IMPORTED_MODULE_2__["AppSetting"].userName : '';
+        var isUser = content.role === _AppSetting__WEBPACK_IMPORTED_MODULE_3__["Roles"].User;
+        var name = isUser ? _AppSetting__WEBPACK_IMPORTED_MODULE_3__["AppSetting"].userName : '';
         var float = isUser ? 'left' : 'right';
         return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "messageBox", style: { float: float } },
             react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("img", { src: this.getAvatar(content.role), className: "avatar" }),
@@ -737,11 +757,11 @@ var MessageBoard = /** @class */ (function (_super) {
     };
     ;
     MessageBoard.prototype.getAvatar = function (role) {
-        if (role === _AppSetting__WEBPACK_IMPORTED_MODULE_2__["Roles"].User)
+        if (role === _AppSetting__WEBPACK_IMPORTED_MODULE_3__["Roles"].User)
             return 'assets/avatar_white.png';
-        if (role === _AppSetting__WEBPACK_IMPORTED_MODULE_2__["Roles"].Algae)
+        if (role === _AppSetting__WEBPACK_IMPORTED_MODULE_3__["Roles"].Algae)
             return 'assets/avatar_yellow.png';
-        if (role === _AppSetting__WEBPACK_IMPORTED_MODULE_2__["Roles"].ChatBot)
+        if (role === _AppSetting__WEBPACK_IMPORTED_MODULE_3__["Roles"].ChatBot)
             return 'assets/avatar_pink.png';
     };
     ;
@@ -786,8 +806,10 @@ var Scrollbar = /** @class */ (function (_super) {
         $(document)
             .on('mousedown touchstart', '.scrollbarContainer', function (e) {
             e.preventDefault();
+            var pageY = (e.type === 'touchstart') ? e.originalEvent.touches[0].pageY : e.pageY;
+            eventCenter.trigger(_DevPanel__WEBPACK_IMPORTED_MODULE_2__["AddLogEvent"], e.type + ": pageY- " + pageY);
             isDragging = true;
-            origin.pageY = e.pageY;
+            origin.pageY = pageY;
             var scrollbarOffset = Number($scrollbar.css('top').replace('px', ''));
             origin.scrollbarOffset = scrollbarOffset;
         })
@@ -795,8 +817,8 @@ var Scrollbar = /** @class */ (function (_super) {
             e.preventDefault();
             if (!isDragging)
                 return;
-            var offsetY = e.pageY - origin.pageY;
-            console.log(offsetY);
+            var offsetY = ((e.type === 'touchmove') ? e.originalEvent.touches[0].pageY : e.pageY) - origin.pageY;
+            eventCenter.trigger(_DevPanel__WEBPACK_IMPORTED_MODULE_2__["AddLogEvent"], e.type + ": offsetY- " + offsetY);
             var maxOffset = $scrollbarContainer.height() - $scrollbar.height();
             var scrollbarOffset = origin.scrollbarOffset + offsetY;
             if (scrollbarOffset > maxOffset)
@@ -809,7 +831,7 @@ var Scrollbar = /** @class */ (function (_super) {
             if (!isDragging)
                 return;
             isDragging = false;
-            console.log('mouseup');
+            eventCenter.trigger(_DevPanel__WEBPACK_IMPORTED_MODULE_2__["AddLogEvent"], "" + e.type);
         });
         eventCenter.on(Scrollbar.UpdateEvent, function () {
             _this.adjustScrollbarH();
@@ -1725,7 +1747,7 @@ react_dom__WEBPACK_IMPORTED_MODULE_8__["render"](react__WEBPACK_IMPORTED_MODULE_
     react__WEBPACK_IMPORTED_MODULE_7__["createElement"](_Scene__WEBPACK_IMPORTED_MODULE_10__["Scene"], { eventCenter: eventCenter }),
     react__WEBPACK_IMPORTED_MODULE_7__["createElement"](_DevPanel__WEBPACK_IMPORTED_MODULE_11__["DevPanel"], { eventCenter: eventCenter }),
     react__WEBPACK_IMPORTED_MODULE_7__["createElement"](_LoginPanel__WEBPACK_IMPORTED_MODULE_12__["LoginPanel"], { eventCenter: eventCenter }),
-    react__WEBPACK_IMPORTED_MODULE_7__["createElement"](_MessageBoard__WEBPACK_IMPORTED_MODULE_14__["MessageBoard"], { messageCenter: messageCenter }),
+    react__WEBPACK_IMPORTED_MODULE_7__["createElement"](_MessageBoard__WEBPACK_IMPORTED_MODULE_14__["MessageBoard"], { messageCenter: messageCenter, eventCenter: eventCenter }),
     react__WEBPACK_IMPORTED_MODULE_7__["createElement"](_ControlPanel__WEBPACK_IMPORTED_MODULE_13__["ControlPanel"], { messageCenter: messageCenter, eventCenter: eventCenter })), document.getElementById("app"));
 
 
@@ -2547,4 +2569,4 @@ module.exports = ReactDOM;
 /***/ })
 
 /******/ });
-//# sourceMappingURL=bundle.main.29d62ea34791d1e3c940.js.map
+//# sourceMappingURL=bundle.main.c8a0157cd450185b6dcd.js.map

@@ -1,13 +1,13 @@
 import * as React from "react";
 
 import { MessageCenter, Content, ContentType, EventCenter } from './MessageCenter';
+import { AddLogEvent } from './DevPanel';
 import { AppSetting, Roles } from './AppSetting';
 
 
 export class MessageBoard
-    extends React.Component<{ messageCenter: MessageCenter }, { contents: Content[] }>{
+    extends React.Component<{ messageCenter: MessageCenter, eventCenter: EventCenter }, { contents: Content[] }>{
 
-    private eventCenter = new EventCenter();
 
     constructor(props) {
         super(props);
@@ -21,19 +21,19 @@ export class MessageBoard
         const contentElements = contents.map(this.createContent.bind(this));
         return <div id="messageBoard" className="invisible">
             <div className="messageBoardContent">{contentElements}</div>
-            <Scrollbar syncTarget=".messageBoardContent" eventCenter={this.eventCenter} />
+            <Scrollbar syncTarget=".messageBoardContent" eventCenter={this.props.eventCenter} />
         </div>;
     };
 
     componentDidMount() {
-        this.eventCenter.on<number>(Scrollbar.ScrollEvent, rate => {
+        this.props.eventCenter.on<number>(Scrollbar.ScrollEvent, rate => {
             this.scrollTo(rate);
         });
     };
 
     componentDidUpdate() {
         this.scrollTo(1, false, () => {
-            this.eventCenter.trigger(Scrollbar.UpdateEvent);
+            this.props.eventCenter.trigger(Scrollbar.UpdateEvent);
         });
     };
 
@@ -124,8 +124,10 @@ export class Scrollbar
         $(document)
             .on('mousedown touchstart', '.scrollbarContainer', e => {
                 e.preventDefault();
+                const pageY = (e.type === 'touchstart') ? (e.originalEvent as TouchEvent).touches[0].pageY : e.pageY;
+                eventCenter.trigger(AddLogEvent, `${e.type}: pageY- ${pageY}`);
                 isDragging = true;
-                origin.pageY = e.pageY;
+                origin.pageY = pageY;
 
                 const scrollbarOffset = Number($scrollbar.css('top').replace('px', ''));
                 origin.scrollbarOffset = scrollbarOffset;
@@ -133,8 +135,8 @@ export class Scrollbar
             .on('mousemove touchmove', '.scrollbarContainer', e => {
                 e.preventDefault();
                 if (!isDragging) return;
-                const offsetY = e.pageY - origin.pageY;
-                console.log(offsetY);
+                const offsetY = ((e.type === 'touchmove') ? (e.originalEvent as TouchEvent).touches[0].pageY : e.pageY) - origin.pageY;
+                eventCenter.trigger(AddLogEvent, `${e.type}: offsetY- ${offsetY}`);
                 const maxOffset = $scrollbarContainer.height() - $scrollbar.height();
                 let scrollbarOffset = origin.scrollbarOffset + offsetY;
                 if (scrollbarOffset > maxOffset) scrollbarOffset = maxOffset;
@@ -145,7 +147,7 @@ export class Scrollbar
             }).on('mouseup touchend', e => {
                 if (!isDragging) return;
                 isDragging = false;
-                console.log('mouseup');
+                eventCenter.trigger(AddLogEvent, `${e.type}`);
             });
 
         eventCenter.on(Scrollbar.UpdateEvent, () => {

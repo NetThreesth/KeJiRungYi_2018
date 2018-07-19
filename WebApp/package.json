@@ -48,7 +48,7 @@
     "postinstall": "npm update",
     "dev": "rimraf app/bundle.* & webpack --config webpack.dev.js",
     "build": "rimraf app/bundle.* & webpack --config webpack.prod.js",
-    "start":"npm run dev | node server/startup.js",
+    "start":"node server/startup.js",
     "test": "node tests/repositoryTest.js"
   }
 }

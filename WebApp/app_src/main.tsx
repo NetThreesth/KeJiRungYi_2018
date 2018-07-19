@@ -19,6 +19,7 @@ import { MessageBoard } from './MessageBoard';
 import { CommonUtility } from './CommonUtility';
 
 
+
 const isdev = CommonUtility.getQueryString('isdev');
 if (!isdev) console.info = console.debug = console.log = () => { };
 
@@ -31,8 +32,9 @@ ReactDOM.render(
         <Scene eventCenter={eventCenter} />
         <DevPanel eventCenter={eventCenter} />
         <LoginPanel eventCenter={eventCenter} />
-        <MessageBoard messageCenter={messageCenter} />
+        <MessageBoard messageCenter={messageCenter} eventCenter={eventCenter} />
         <ControlPanel messageCenter={messageCenter} eventCenter={eventCenter} />
     </div>,
     document.getElementById("app")
 );
+
