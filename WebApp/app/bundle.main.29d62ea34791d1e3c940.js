@@ -353,6 +353,8 @@ var ControlPanel = /** @class */ (function (_super) {
     ControlPanel.prototype.switchTextInput = function () {
         var $textInput = $('.textInput');
         $textInput.toggleClass('visible').toggleClass('invisible');
+        if ($textInput.hasClass('visible'))
+            $textInput.find('input').focus();
     };
     ;
     ControlPanel.prototype.keyPress = function (e) {
@@ -365,9 +367,9 @@ var ControlPanel = /** @class */ (function (_super) {
         var text = $input.val();
         if (!text)
             return;
-        text = String(text);
-        $input.val('').focus();
-        this.onTextAdd(text);
+        $input.val('');
+        this.onTextAdd(String(text));
+        this.switchTextInput();
         var $mask = $('.flashMask');
         $mask.addClass('flash');
         setTimeout(function () {
@@ -452,6 +454,7 @@ var DevPanel = /** @class */ (function (_super) {
         var _this = this;
         if (!_CommonUtility__WEBPACK_IMPORTED_MODULE_2__["CommonUtility"].getQueryString('isdev'))
             return;
+        $('#devPanel').show();
         this.props.eventCenter.on(_MessageCenter__WEBPACK_IMPORTED_MODULE_1__["Event"].UpdateDevPanelData, function (data) {
             if (Object.keys(data).some(function (key) { return _this.state[key] !== data[key]; }))
                 _this.setState(Object.assign({}, _this.state, data));
@@ -587,7 +590,6 @@ var LoginPanel = /** @class */ (function (_super) {
     };
     ;
     LoginPanel.prototype.skipAnimation = function () {
-        alert('onClick');
         var $wordCards = $('.wordCard');
         $wordCards.stop(true);
         $wordCards.hide();
@@ -781,15 +783,15 @@ var Scrollbar = /** @class */ (function (_super) {
         var origin = { pageY: 0, scrollbarOffset: 0 };
         var $scrollbarContainer = $('.scrollbarContainer');
         var $scrollbar = $scrollbarContainer.find('.scrollbar');
-        $scrollbarContainer
-            .on('mousedown touchstart', function (e) {
+        $(document)
+            .on('mousedown touchstart', '.scrollbarContainer', function (e) {
             e.preventDefault();
             isDragging = true;
             origin.pageY = e.pageY;
             var scrollbarOffset = Number($scrollbar.css('top').replace('px', ''));
             origin.scrollbarOffset = scrollbarOffset;
         })
-            .on('mousemove touchmove', function (e) {
+            .on('mousemove touchmove', '.scrollbarContainer', function (e) {
             e.preventDefault();
             if (!isDragging)
                 return;
@@ -803,8 +805,7 @@ var Scrollbar = /** @class */ (function (_super) {
                 scrollbarOffset = 0;
             $scrollbar.css('top', scrollbarOffset);
             eventCenter.trigger(Scrollbar.ScrollEvent, scrollbarOffset / maxOffset);
-        });
-        $(document).on('mouseup touchend', function (e) {
+        }).on('mouseup touchend', function (e) {
             if (!isDragging)
                 return;
             isDragging = false;
@@ -1840,7 +1841,7 @@ exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/li
 
 
 // module
-exports.push([module.i, "#devPanel {\n  position: fixed;\n  top: 0;\n  right: 0;\n  background-color: rgba(0, 0, 0, 0.2); }\n\n#devPanel td {\n  width: 50px;\n  padding: 3px; }\n", ""]);
+exports.push([module.i, "#devPanel {\n  display: none;\n  position: fixed;\n  top: 0;\n  right: 0;\n  background-color: rgba(0, 0, 0, 0.2); }\n\n#devPanel td {\n  width: 50px;\n  padding: 3px; }\n", ""]);
 
 // exports
 
@@ -2546,4 +2547,4 @@ module.exports = ReactDOM;
 /***/ })
 
 /******/ });
-//# sourceMappingURL=bundle.main.f423c65a4ff0ccbba52a.js.map
+//# sourceMappingURL=bundle.main.29d62ea34791d1e3c940.js.map

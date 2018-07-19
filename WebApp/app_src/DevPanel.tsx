@@ -36,7 +36,7 @@ export class DevPanel
 
     componentDidMount() {
         if (!CommonUtility.getQueryString('isdev')) return;
-
+        $('#devPanel').show();
         this.props.eventCenter.on<DevPanelData>(Event.UpdateDevPanelData, data => {
             if (Object.keys(data).some(key => this.state[key] !== data[key]))
                 this.setState(Object.assign({}, this.state, data));

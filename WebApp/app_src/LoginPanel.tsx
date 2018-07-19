@@ -114,7 +114,6 @@ export class LoginPanel
     };
 
     private skipAnimation() {
-        alert('onClick');
         const $wordCards = $('.wordCard');
         $wordCards.stop(true);
         $wordCards.hide();

@@ -31,7 +31,7 @@ export class MessageBoard
         });
     };
 
-    componentDidUpdate(){
+    componentDidUpdate() {
         this.scrollTo(1, false, () => {
             this.eventCenter.trigger(Scrollbar.UpdateEvent);
         });
@@ -121,8 +121,8 @@ export class Scrollbar
         const origin = { pageY: 0, scrollbarOffset: 0 };
         const $scrollbarContainer = $('.scrollbarContainer');
         const $scrollbar = $scrollbarContainer.find('.scrollbar');
-        $scrollbarContainer
-            .on('mousedown touchstart', e => {
+        $(document)
+            .on('mousedown touchstart', '.scrollbarContainer', e => {
                 e.preventDefault();
                 isDragging = true;
                 origin.pageY = e.pageY;
@@ -130,7 +130,7 @@ export class Scrollbar
                 const scrollbarOffset = Number($scrollbar.css('top').replace('px', ''));
                 origin.scrollbarOffset = scrollbarOffset;
             })
-            .on('mousemove touchmove', e => {
+            .on('mousemove touchmove', '.scrollbarContainer', e => {
                 e.preventDefault();
                 if (!isDragging) return;
                 const offsetY = e.pageY - origin.pageY;
@@ -142,13 +142,11 @@ export class Scrollbar
                 $scrollbar.css('top', scrollbarOffset);
 
                 eventCenter.trigger(Scrollbar.ScrollEvent, scrollbarOffset / maxOffset);
+            }).on('mouseup touchend', e => {
+                if (!isDragging) return;
+                isDragging = false;
+                console.log('mouseup');
             });
-
-        $(document).on('mouseup touchend', e => {
-            if (!isDragging) return;
-            isDragging = false;
-            console.log('mouseup');
-        });
 
         eventCenter.on(Scrollbar.UpdateEvent, () => {
             this.adjustScrollbarH();

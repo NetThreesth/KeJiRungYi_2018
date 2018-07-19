@@ -46,11 +46,9 @@
   "main": "index",
   "scripts": {
     "postinstall": "npm update",
-    "sass": "node-sass --output-style expanded --source-map true app_src/all.scss app/index.css",
-    "prebuild": "rimraf app/bundle.* & npm run sass",
     "dev": "rimraf app/bundle.* & webpack --config webpack.dev.js",
-    "prod": "rimraf app/bundle.* & webpack --config webpack.prod.js",
-    "start": "node server/startup.js",
+    "build": "rimraf app/bundle.* & webpack --config webpack.prod.js",
+    "start":"npm run dev | node server/startup.js",
     "test": "node tests/repositoryTest.js"
   }
 }

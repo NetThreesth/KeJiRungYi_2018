@@ -46,6 +46,7 @@ export class ControlPanel
     private switchTextInput() {
         const $textInput = $('.textInput');
         $textInput.toggleClass('visible').toggleClass('invisible');
+        if ($textInput.hasClass('visible')) $textInput.find('input').focus();
     };
 
     private keyPress(e) {
@@ -58,10 +59,9 @@ export class ControlPanel
         let text = $input.val();
         if (!text) return;
 
-        text = String(text);
-        $input.val('').focus();
-
-        this.onTextAdd(text);
+        $input.val('');
+        this.onTextAdd(String(text));
+        this.switchTextInput();
 
         const $mask = $('.flashMask');
         $mask.addClass('flash');
