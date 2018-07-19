@@ -805,7 +805,6 @@ var Scrollbar = /** @class */ (function (_super) {
             eventCenter.trigger(Scrollbar.ScrollEvent, scrollbarOffset / maxOffset);
         });
         $(document).on('mouseup touchend', function (e) {
-            e.preventDefault();
             if (!isDragging)
                 return;
             isDragging = false;
@@ -2547,4 +2546,4 @@ module.exports = ReactDOM;
 /***/ })
 
 /******/ });
-//# sourceMappingURL=bundle.main.1be47c52dcff08300e92.js.map
+//# sourceMappingURL=bundle.main.f423c65a4ff0ccbba52a.js.map

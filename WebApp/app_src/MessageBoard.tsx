@@ -145,7 +145,6 @@ export class Scrollbar
             });
 
         $(document).on('mouseup touchend', e => {
-            e.preventDefault();
             if (!isDragging) return;
             isDragging = false;
             console.log('mouseup');
