@@ -113,7 +113,8 @@ export class LoginPanel
         );
     };
 
-    private skipAnimation() {
+    private skipAnimation(e: React.MouseEvent) {
+        e.stopPropagation();
         const $wordCards = $('.wordCard');
         $wordCards.stop(true);
         $wordCards.hide();

@@ -108,6 +108,11 @@ var BabylonUtility = /** @class */ (function () {
         return Math.sqrt(dx * dx + dy * dy + dz * dz);
     };
     ;
+    BabylonUtility.degrees = function (v1, v2) {
+        var rad = Math.acos(BABYLON.Vector3.Dot(v1, v2) / (v1.length() * v2.length()));
+        return BABYLON.Angle.FromRadians(rad).degrees() || 0;
+    };
+    ;
     BabylonUtility.addVector = function (v1, v2) {
         return new BABYLON.Vector3(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z);
     };
@@ -248,6 +253,27 @@ var CommonUtility = /** @class */ (function () {
         var reg = new RegExp('[?&]' + field + '=([^&#]*)', 'i');
         var string = reg.exec(href);
         return string ? decodeURIComponent(string[1]) : null;
+    };
+    ;
+    CommonUtility.deepMerge = function (from, to, propName) {
+        if (from instanceof Object && !(from instanceof Date)) {
+            if (from instanceof Array)
+                to = to || [];
+            to = to || {};
+            var fromKeys = Object.keys(from);
+            if (fromKeys) {
+                fromKeys.forEach(function (prop) {
+                    to[prop] = CommonUtility.deepMerge(from[prop], to[prop], prop);
+                });
+            }
+        }
+        else
+            to = from;
+        return to;
+    };
+    ;
+    CommonUtility.deepClone = function (obj) {
+        return CommonUtility.deepMerge(obj, {});
     };
     ;
     return CommonUtility;

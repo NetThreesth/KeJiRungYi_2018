@@ -11,6 +11,11 @@ export class BabylonUtility {
         return Math.sqrt(dx * dx + dy * dy + dz * dz);
     };
 
+    static degrees(v1: BABYLON.Vector3, v2: BABYLON.Vector3) {
+        const rad = Math.acos(BABYLON.Vector3.Dot(v1, v2) / (v1.length() * v2.length()));
+        return BABYLON.Angle.FromRadians(rad).degrees() || 0;
+    };
+
     static addVector(v1: BABYLON.Vector3, v2: BABYLON.Vector3) {
         return new BABYLON.Vector3(
             v1.x + v2.x,
@@ -26,7 +31,7 @@ export class BabylonUtility {
             v1.z - v2.z
         );
     };
-    
+
     static getRandomVector3(randomOnX = true, randomOnY = true, randomOnZ = true) {
         return new BABYLON.Vector3(
             randomOnX ? CommonUtility.getRandomInt() : 0,

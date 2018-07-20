@@ -35,6 +35,7 @@ export class MessageCenter {
         }).done(resp => {
             this.addText(Roles.Algae, resp.algaeResponse);
             this.addText(Roles.ChatBot, resp.chatbotResponse);
+            this.observable.trigger(Event.AfterSubmitMessage);
         });
     };
     addImage(role: Roles, b64String: string) {
@@ -75,5 +76,6 @@ export class Event {
     static readonly AfterLogin = 'AfterLogin';
     static readonly UpdateDevPanelData = 'UpdateDevPanelData';
     static readonly AfterWordCardsAnimation = 'AfterWordCardsAnimation';
+    static readonly AfterSubmitMessage= 'AfterSubmitMessage';
     static readonly None = 'None';
 };

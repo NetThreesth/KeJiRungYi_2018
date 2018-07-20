@@ -21,6 +21,7 @@ export class Scene
     private camera: BABYLON.UniversalCamera;
     private lightOfCamera: BABYLON.PointLight;
     private cameraLocations: BABYLON.Vector3[] = [];
+    private viewPort = { position: BABYLON.Vector3.Zero(), rotation: BABYLON.Vector3.Zero() };
 
 
     private glowLayerForParticle: BABYLON.GlowLayer;
@@ -52,7 +53,10 @@ export class Scene
 
         this.props.eventCenter.on(Event.AfterWordCardsAnimation, this.transformation.bind(this));
         this.props.eventCenter.on(Event.AfterLogin, this.zoomIn.bind(this));
-        window.addEventListener("resize", this.engine.resize.bind(this));
+        this.props.eventCenter.on(Event.AfterSubmitMessage, this.createAlgae.bind(this));
+
+
+        window.addEventListener("resize", this.engine.resize.bind(this.engine));
 
         const updateMask = () => {
             const setting = CommonUtility.getQueryString('greenMask');
@@ -176,17 +180,42 @@ export class Scene
         this.engine.runRenderLoop(() => {
 
             /** render before */
-            if (this.cameraLocations.length > 0) {
+
+
+
+            const cameraLocationsLen = this.cameraLocations.length;
+            if (cameraLocationsLen > 0) {
                 this.camera.position = this.cameraLocations.shift();
-                if (this.cameraLocations.length >= 1) {
+                if (cameraLocationsLen > 1) {
                     this.camera.setTarget(BABYLON.Vector3.Zero());
-                    if (this.cameraLocations.length === 1) {
-                        const center = this.chatRoomsCenter[Scene.chatRoomIndex];
-                        this.createBubbleSpray(center);
-                        this.createAlgae(center);
-                    }
+                } else {
+                    const center = this.chatRoomsCenter[Scene.chatRoomIndex];
+                    this.createBubbleSpray(center);
+
+                    this.viewPort.position = this.camera.position.clone();
+                    this.viewPort.rotation = this.camera.rotation.clone();
                 }
+            } else if (Scene.chatRoomIndex !== null) {
+                const distance = BABYLON.Vector3.Distance(this.viewPort.position, this.camera.position);
+                if (distance > 3) {
+                    console.log(`distance: ${distance}`);
+                    this.camera.speed = 1 / (distance * distance);
+
+                }
+                const positionCorrelationRate = 0.01;
+                const positionCorrelation = this.viewPort.position
+                    .subtract(this.camera.position)
+                    .multiply(new BABYLON.Vector3(positionCorrelationRate, positionCorrelationRate, positionCorrelationRate));
+                this.camera.position = this.camera.position.add(positionCorrelation);
+
+                const rotationCorrelationRate = 0.1;
+                const rotationCorrelation = this.viewPort.rotation
+                    .subtract(this.camera.rotation)
+                    .multiply(new BABYLON.Vector3(rotationCorrelationRate, rotationCorrelationRate, rotationCorrelationRate));
+                this.camera.rotation = this.camera.rotation.add(rotationCorrelation);
             }
+
+
 
             this.lightOfCamera.position = this.camera.position;
             this.translateLinesForTextNodes();
@@ -297,7 +326,8 @@ export class Scene
             const linesystemPerformance = this.linesystemPerformance;
             if (linesystemPerformance < -3) {
                 console.log(`linesystemPerformance: ${linesystemPerformance}`);
-                updatedNodes.length = updatedNodes.length + linesystemPerformance;
+                const newCount = updatedNodes.length + linesystemPerformance;
+                if (newCount > 100) updatedNodes.length = newCount;
             }
 
             this.props.eventCenter.trigger(Event.UpdateDevPanelData, {
@@ -325,7 +355,7 @@ export class Scene
         let count = 0;
         const nodes = nodesToTranslate.map((node, i) => {
             const chatRoomsNode = this.chatRoomsNodes[i];
-            const distance = BabylonUtility.distance(chatRoomsNode, node.position);
+            const distance = BABYLON.Vector3.Distance(chatRoomsNode, node.position);
             if (distance > maxMove) {
                 const vector = BabylonUtility.subtractVector(chatRoomsNode, node.position).normalize();
                 BabylonUtility.updatePosition(node.position, vector, maxMove);
@@ -561,17 +591,16 @@ export class Scene
         };
     };
 
-    private createAlgae(center: BABYLON.Vector3) {
-        const count = 50;
-        var algaeManager = new BABYLON.SpriteManager("algaeManager", "assets/algae_30.png", count, 30, this.scene);
-        for (var i = 0; i < count; i++) {
-            var algae = new BABYLON.Sprite("tree", algaeManager);
-            algae.size = 0.1;
-            algae.position.x = center.x + CommonUtility.getRandomNumberInRange(-3, 3, 2);
-            algae.position.y = center.y + CommonUtility.getRandomNumberInRange(-3, 3, 2);
-            algae.position.z = center.z + CommonUtility.getRandomNumberInRange(-3, 3, 2);
-            algae.isPickable = false;
-        }
+
+    private createAlgae() {
+        const algaeManager = new BABYLON.SpriteManager("algaeManager", "assets/algae_30.png", 1, 30, this.scene);
+        const center = this.chatRoomsCenter[Scene.chatRoomIndex];
+        var algae = new BABYLON.Sprite("algae", algaeManager);
+        algae.size = 0.1;
+        algae.position.x = center.x + CommonUtility.getRandomNumberInRange(-3, 3, 2);
+        algae.position.y = center.y + CommonUtility.getRandomNumberInRange(-3, 3, 2);
+        algae.position.z = center.z + CommonUtility.getRandomNumberInRange(-3, 3, 2);
+        algae.isPickable = false;
     };
 
 
@@ -607,7 +636,9 @@ export class Scene
 };
 
 
+
 enum TranslateType { 'Simple', 'Forward', 'Expand' };
+
 
 interface TranslatableNode {
     position: BABYLON.Vector3,

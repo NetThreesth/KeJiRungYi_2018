@@ -139,6 +139,11 @@ var BabylonUtility = /** @class */ (function () {
         return Math.sqrt(dx * dx + dy * dy + dz * dz);
     };
     ;
+    BabylonUtility.degrees = function (v1, v2) {
+        var rad = Math.acos(BABYLON.Vector3.Dot(v1, v2) / (v1.length() * v2.length()));
+        return BABYLON.Angle.FromRadians(rad).degrees() || 0;
+    };
+    ;
     BabylonUtility.addVector = function (v1, v2) {
         return new BABYLON.Vector3(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z);
     };
@@ -279,6 +284,27 @@ var CommonUtility = /** @class */ (function () {
         var reg = new RegExp('[?&]' + field + '=([^&#]*)', 'i');
         var string = reg.exec(href);
         return string ? decodeURIComponent(string[1]) : null;
+    };
+    ;
+    CommonUtility.deepMerge = function (from, to, propName) {
+        if (from instanceof Object && !(from instanceof Date)) {
+            if (from instanceof Array)
+                to = to || [];
+            to = to || {};
+            var fromKeys = Object.keys(from);
+            if (fromKeys) {
+                fromKeys.forEach(function (prop) {
+                    to[prop] = CommonUtility.deepMerge(from[prop], to[prop], prop);
+                });
+            }
+        }
+        else
+            to = from;
+        return to;
+    };
+    ;
+    CommonUtility.deepClone = function (obj) {
+        return CommonUtility.deepMerge(obj, {});
     };
     ;
     return CommonUtility;
@@ -608,7 +634,8 @@ var LoginPanel = /** @class */ (function (_super) {
         });
     };
     ;
-    LoginPanel.prototype.skipAnimation = function () {
+    LoginPanel.prototype.skipAnimation = function (e) {
+        e.stopPropagation();
         var $wordCards = $('.wordCard');
         $wordCards.stop(true);
         $wordCards.hide();
@@ -912,6 +939,7 @@ var MessageCenter = /** @class */ (function () {
         }).done(function (resp) {
             _this.addText(_AppSetting__WEBPACK_IMPORTED_MODULE_0__["Roles"].Algae, resp.algaeResponse);
             _this.addText(_AppSetting__WEBPACK_IMPORTED_MODULE_0__["Roles"].ChatBot, resp.chatbotResponse);
+            _this.observable.trigger(Event.AfterSubmitMessage);
         });
     };
     ;
@@ -963,6 +991,7 @@ var Event = /** @class */ (function () {
     Event.AfterLogin = 'AfterLogin';
     Event.UpdateDevPanelData = 'UpdateDevPanelData';
     Event.AfterWordCardsAnimation = 'AfterWordCardsAnimation';
+    Event.AfterSubmitMessage = 'AfterSubmitMessage';
     Event.None = 'None';
     return Event;
 }());
@@ -1012,6 +1041,7 @@ var Scene = /** @class */ (function (_super) {
     function Scene() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
         _this.cameraLocations = [];
+        _this.viewPort = { position: babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"].Zero(), rotation: babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"].Zero() };
         _this.colorsSetForParticle = [
             { diffuseColor: [253, 245, 134], glowColor: [255, 252, 193, 0.85] },
             { diffuseColor: [253, 229, 210], glowColor: [255, 219, 225, 0.85] },
@@ -1051,7 +1081,8 @@ var Scene = /** @class */ (function (_super) {
         this.registerRunRenderLoop();
         this.props.eventCenter.on(_MessageCenter__WEBPACK_IMPORTED_MODULE_5__["Event"].AfterWordCardsAnimation, this.transformation.bind(this));
         this.props.eventCenter.on(_MessageCenter__WEBPACK_IMPORTED_MODULE_5__["Event"].AfterLogin, this.zoomIn.bind(this));
-        window.addEventListener("resize", this.engine.resize.bind(this));
+        this.props.eventCenter.on(_MessageCenter__WEBPACK_IMPORTED_MODULE_5__["Event"].AfterSubmitMessage, this.createAlgae.bind(this));
+        window.addEventListener("resize", this.engine.resize.bind(this.engine));
         var updateMask = function () {
             var setting = _CommonUtility__WEBPACK_IMPORTED_MODULE_3__["CommonUtility"].getQueryString('greenMask');
             var color = setting || "rgba(0, 255, 0, " + _CommonUtility__WEBPACK_IMPORTED_MODULE_3__["CommonUtility"].getRandomNumberInRange(0, 0.5, 2) + ")";
@@ -1149,16 +1180,35 @@ var Scene = /** @class */ (function (_super) {
         var _this = this;
         this.engine.runRenderLoop(function () {
             /** render before */
-            if (_this.cameraLocations.length > 0) {
+            var cameraLocationsLen = _this.cameraLocations.length;
+            if (cameraLocationsLen > 0) {
                 _this.camera.position = _this.cameraLocations.shift();
-                if (_this.cameraLocations.length >= 1) {
+                if (cameraLocationsLen > 1) {
                     _this.camera.setTarget(babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"].Zero());
-                    if (_this.cameraLocations.length === 1) {
-                        var center = _this.chatRoomsCenter[Scene.chatRoomIndex];
-                        _this.createBubbleSpray(center);
-                        _this.createAlgae(center);
-                    }
                 }
+                else {
+                    var center = _this.chatRoomsCenter[Scene.chatRoomIndex];
+                    _this.createBubbleSpray(center);
+                    _this.viewPort.position = _this.camera.position.clone();
+                    _this.viewPort.rotation = _this.camera.rotation.clone();
+                }
+            }
+            else if (Scene.chatRoomIndex !== null) {
+                var distance = babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"].Distance(_this.viewPort.position, _this.camera.position);
+                if (distance > 3) {
+                    console.log("distance: " + distance);
+                    _this.camera.speed = 1 / (distance * distance);
+                }
+                var positionCorrelationRate = 0.01;
+                var positionCorrelation = _this.viewPort.position
+                    .subtract(_this.camera.position)
+                    .multiply(new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"](positionCorrelationRate, positionCorrelationRate, positionCorrelationRate));
+                _this.camera.position = _this.camera.position.add(positionCorrelation);
+                var rotationCorrelationRate = 0.1;
+                var rotationCorrelation = _this.viewPort.rotation
+                    .subtract(_this.camera.rotation)
+                    .multiply(new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"](rotationCorrelationRate, rotationCorrelationRate, rotationCorrelationRate));
+                _this.camera.rotation = _this.camera.rotation.add(rotationCorrelation);
             }
             _this.lightOfCamera.position = _this.camera.position;
             _this.translateLinesForTextNodes();
@@ -1230,7 +1280,9 @@ var Scene = /** @class */ (function (_super) {
             var linesystemPerformance = _this.linesystemPerformance;
             if (linesystemPerformance < -3) {
                 console.log("linesystemPerformance: " + linesystemPerformance);
-                updatedNodes.length = updatedNodes.length + linesystemPerformance;
+                var newCount = updatedNodes.length + linesystemPerformance;
+                if (newCount > 100)
+                    updatedNodes.length = newCount;
             }
             _this.props.eventCenter.trigger(_MessageCenter__WEBPACK_IMPORTED_MODULE_5__["Event"].UpdateDevPanelData, {
                 linesystemPerformance: linesystemPerformance
@@ -1259,7 +1311,7 @@ var Scene = /** @class */ (function (_super) {
         var count = 0;
         var nodes = nodesToTranslate.map(function (node, i) {
             var chatRoomsNode = _this.chatRoomsNodes[i];
-            var distance = _BabylonUtility__WEBPACK_IMPORTED_MODULE_4__["BabylonUtility"].distance(chatRoomsNode, node.position);
+            var distance = babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"].Distance(chatRoomsNode, node.position);
             if (distance > maxMove) {
                 var vector = _BabylonUtility__WEBPACK_IMPORTED_MODULE_4__["BabylonUtility"].subtractVector(chatRoomsNode, node.position).normalize();
                 _BabylonUtility__WEBPACK_IMPORTED_MODULE_4__["BabylonUtility"].updatePosition(node.position, vector, maxMove);
@@ -1460,17 +1512,15 @@ var Scene = /** @class */ (function (_super) {
         };
     };
     ;
-    Scene.prototype.createAlgae = function (center) {
-        var count = 50;
-        var algaeManager = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["SpriteManager"]("algaeManager", "assets/algae_30.png", count, 30, this.scene);
-        for (var i = 0; i < count; i++) {
-            var algae = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Sprite"]("tree", algaeManager);
-            algae.size = 0.1;
-            algae.position.x = center.x + _CommonUtility__WEBPACK_IMPORTED_MODULE_3__["CommonUtility"].getRandomNumberInRange(-3, 3, 2);
-            algae.position.y = center.y + _CommonUtility__WEBPACK_IMPORTED_MODULE_3__["CommonUtility"].getRandomNumberInRange(-3, 3, 2);
-            algae.position.z = center.z + _CommonUtility__WEBPACK_IMPORTED_MODULE_3__["CommonUtility"].getRandomNumberInRange(-3, 3, 2);
-            algae.isPickable = false;
-        }
+    Scene.prototype.createAlgae = function () {
+        var algaeManager = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["SpriteManager"]("algaeManager", "assets/algae_30.png", 1, 30, this.scene);
+        var center = this.chatRoomsCenter[Scene.chatRoomIndex];
+        var algae = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Sprite"]("algae", algaeManager);
+        algae.size = 0.1;
+        algae.position.x = center.x + _CommonUtility__WEBPACK_IMPORTED_MODULE_3__["CommonUtility"].getRandomNumberInRange(-3, 3, 2);
+        algae.position.y = center.y + _CommonUtility__WEBPACK_IMPORTED_MODULE_3__["CommonUtility"].getRandomNumberInRange(-3, 3, 2);
+        algae.position.z = center.z + _CommonUtility__WEBPACK_IMPORTED_MODULE_3__["CommonUtility"].getRandomNumberInRange(-3, 3, 2);
+        algae.isPickable = false;
     };
     ;
     Scene.prototype.transformation = function () {
@@ -1916,7 +1966,7 @@ exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/li
 
 
 // module
-exports.push([module.i, "html,\nbody {\n  font-family: Microsoft JhengHei;\n  overflow: hidden;\n  width: 100%;\n  height: 100%;\n  margin: 0;\n  padding: 0; }\n\n.full-page, #messageBoard {\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  overflow: hidden; }\n\n/* flash */\n.flash {\n  -webkit-animation-name: flash-animation;\n  -webkit-animation-duration: 1s;\n  animation-name: flash-animation;\n  animation-duration: 1s; }\n\n@-webkit-keyframes flash-animation {\n  from {\n    background: rgba(255, 255, 255, 0.8); }\n  to {\n    background: default; } }\n\n@keyframes flash-animation {\n  from {\n    background: rgba(255, 255, 255, 0.8); }\n  to {\n    background: default; } }\n\n.untouchable, #messageBoard {\n  pointer-events: none; }\n\ninput[type=text] {\n  background-color: transparent;\n  border: 1px solid #ffffff;\n  border-radius: 3px;\n  height: 24px;\n  color: #ffffff; }\n\n.button {\n  background-color: transparent;\n  cursor: pointer; }\n\n.white-text, #messageBoard .messageBoardContent .messageBox {\n  color: white;\n  text-shadow: 0px 0px 6px #404040; }\n\n.text-center {\n  text-align: center; }\n\n.visible {\n  opacity: 1; }\n\n.invisible {\n  opacity: 0; }\n\n.transition-all {\n  -webkit-transition: all 0.3s ease;\n  -moz-transition: all 0.3s ease;\n  -o-transition: all 0.3s ease;\n  transition: all 0.3s ease; }\n\n.clearfix::after, #messageBoard .messageBoardContent::after {\n  content: \"\";\n  clear: both;\n  display: table; }\n\n.flex, #messageBoard {\n  display: flex; }\n\n.flex-row {\n  flex-direction: row; }\n\n.flex-column {\n  flex-direction: column; }\n\n.flex-verticalCenter, .flex-center {\n  align-items: center; }\n\n.flex-horizontalCenter, .flex-center, #messageBoard {\n  justify-content: center; }\n\n.flex-end {\n  align-items: flex-end; }\n\n#messageBoard > div {\n  margin-bottom: 100px; }\n\n#messageBoard .messageBoardContent {\n  width: 100%;\n  overflow: hidden; }\n  #messageBoard .messageBoardContent .messageBox {\n    position: relative;\n    background-color: rgba(255, 255, 255, 0.05);\n    padding: 3px;\n    margin: 5px 0;\n    border-radius: 3px;\n    width: 50%;\n    color: white; }\n    #messageBoard .messageBoardContent .messageBox .avatar {\n      position: absolute;\n      width: 30px;\n      transform: translateY(40%); }\n    #messageBoard .messageBoardContent .messageBox .name {\n      position: absolute;\n      top: 0px;\n      left: 7px; }\n    #messageBoard .messageBoardContent .messageBox .content {\n      margin: 20px 0 0 30px; }\n\n#messageBoard .scrollbarContainer {\n  pointer-events: auto;\n  position: relative;\n  top: 0;\n  right: 0;\n  width: 12px;\n  background-color: rgba(0, 0, 0, 0.1); }\n  #messageBoard .scrollbarContainer .scrollbar {\n    position: absolute;\n    top: 0;\n    right: 1px;\n    width: 10px;\n    height: 100px;\n    background-color: rgba(0, 0, 0, 0.3);\n    border-radius: 5px; }\n\n@media only screen and (min-width: 768px) {\n  .messageBoardContent {\n    padding: 0 50px; } }\n\n@media only screen and (min-width: 1224px) {\n  .messageBoardContent {\n    padding: 0 200px; } }\n", ""]);
+exports.push([module.i, "html,\nbody {\n  font-family: Microsoft JhengHei;\n  overflow: hidden;\n  width: 100%;\n  height: 100%;\n  margin: 0;\n  padding: 0; }\n\n.full-page, #messageBoard {\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  overflow: hidden; }\n\n/* flash */\n.flash {\n  -webkit-animation-name: flash-animation;\n  -webkit-animation-duration: 1s;\n  animation-name: flash-animation;\n  animation-duration: 1s; }\n\n@-webkit-keyframes flash-animation {\n  from {\n    background: rgba(255, 255, 255, 0.8); }\n  to {\n    background: default; } }\n\n@keyframes flash-animation {\n  from {\n    background: rgba(255, 255, 255, 0.8); }\n  to {\n    background: default; } }\n\n.untouchable, #messageBoard {\n  pointer-events: none; }\n\ninput[type=text] {\n  background-color: transparent;\n  border: 1px solid #ffffff;\n  border-radius: 3px;\n  height: 24px;\n  color: #ffffff; }\n\n.button {\n  background-color: transparent;\n  cursor: pointer; }\n\n.white-text, #messageBoard .messageBoardContent .messageBox {\n  color: white;\n  text-shadow: 0px 0px 6px #404040; }\n\n.text-center {\n  text-align: center; }\n\n.visible {\n  opacity: 1; }\n\n.invisible {\n  opacity: 0; }\n\n.transition-all {\n  -webkit-transition: all 0.3s ease;\n  -moz-transition: all 0.3s ease;\n  -o-transition: all 0.3s ease;\n  transition: all 0.3s ease; }\n\n.clearfix::after, #messageBoard .messageBoardContent::after {\n  content: \"\";\n  clear: both;\n  display: table; }\n\n.flex, #messageBoard {\n  display: flex; }\n\n.flex-row {\n  flex-direction: row; }\n\n.flex-column {\n  flex-direction: column; }\n\n.flex-verticalCenter, .flex-center {\n  align-items: center; }\n\n.flex-horizontalCenter, .flex-center, #messageBoard {\n  justify-content: center; }\n\n.flex-end {\n  align-items: flex-end; }\n\n#messageBoard > div {\n  margin-bottom: 100px; }\n\n#messageBoard .messageBoardContent {\n  width: 100%;\n  overflow: hidden; }\n  #messageBoard .messageBoardContent .messageBox {\n    position: relative;\n    background-color: rgba(255, 255, 255, 0.05);\n    padding: 3px;\n    margin: 5px 0;\n    border-radius: 3px;\n    width: 50%;\n    color: white; }\n    #messageBoard .messageBoardContent .messageBox .avatar {\n      position: absolute;\n      width: 30px;\n      transform: translateY(40%); }\n    #messageBoard .messageBoardContent .messageBox .name {\n      position: absolute;\n      top: 0px;\n      left: 7px; }\n    #messageBoard .messageBoardContent .messageBox .content {\n      margin: 20px 0 0 30px; }\n\n#messageBoard .scrollbarContainer {\n  pointer-events: auto;\n  position: relative;\n  top: 0;\n  right: 0;\n  width: 15px;\n  background-color: rgba(0, 0, 0, 0.1); }\n  #messageBoard .scrollbarContainer .scrollbar {\n    position: absolute;\n    top: 0;\n    right: 1px;\n    width: 12px;\n    height: 100px;\n    background-color: rgba(0, 0, 0, 0.3);\n    border-radius: 5px; }\n\n@media only screen and (min-width: 768px) {\n  .messageBoardContent {\n    padding: 0 50px; } }\n\n@media only screen and (min-width: 1224px) {\n  .messageBoardContent {\n    padding: 0 200px; } }\n", ""]);
 
 // exports
 

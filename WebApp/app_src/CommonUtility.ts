@@ -77,4 +77,23 @@ export class CommonUtility {
         const string = reg.exec(href);
         return string ? decodeURIComponent(string[1]) : null;
     };
+
+    static deepMerge<T>(from: T, to: T, propName?): T {
+        if (from instanceof Object && !(from instanceof Date)) {
+            if (from instanceof Array)
+                to = to || [] as any;
+            to = to || {} as any;
+            var fromKeys = Object.keys(from);
+            if (fromKeys) {
+                fromKeys.forEach((prop) => {
+                    to[prop] = CommonUtility.deepMerge(from[prop], to[prop], prop);
+                });
+            }
+        } else to = from;
+        return to;
+    };
+
+    static deepClone<T>(obj: T): T {
+        return CommonUtility.deepMerge(obj, {} as T);
+    };
 };
