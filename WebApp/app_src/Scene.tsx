@@ -3,7 +3,6 @@ import * as BABYLON from 'babylonjs';
 import * as $ from 'jquery';
 import { CommonUtility } from './CommonUtility';
 import { BabylonUtility, Line } from './BabylonUtility';
-import { DevPanelData } from './DevPanel';
 
 import { EventCenter, Event } from './MessageCenter';
 
@@ -198,7 +197,6 @@ export class Scene
             } else if (Scene.chatRoomIndex !== null) {
                 const distance = BABYLON.Vector3.Distance(this.viewPort.position, this.camera.position);
                 if (distance > 3) {
-                    console.log(`distance: ${distance}`);
                     this.camera.speed = 1 / (distance * distance);
 
                 }
@@ -325,7 +323,6 @@ export class Scene
             this.linesForLinesystem = data;
             const linesystemPerformance = this.linesystemPerformance;
             if (linesystemPerformance < -3) {
-                console.log(`linesystemPerformance: ${linesystemPerformance}`);
                 const newCount = updatedNodes.length + linesystemPerformance;
                 if (newCount > 100) updatedNodes.length = newCount;
             }
@@ -351,7 +348,6 @@ export class Scene
     };
     private updateTextNodeForForward(nodesToTranslate: TranslatableNode[]) {
         const maxMove = 0.3;
-        const textNodesLen = nodesToTranslate.length;
         let count = 0;
         const nodes = nodesToTranslate.map((node, i) => {
             const chatRoomsNode = this.chatRoomsNodes[i];
@@ -367,7 +363,6 @@ export class Scene
         });
         if (count > 70) {
             this.translateType = TranslateType.Expand;
-            console.log(`ToChatRoomNode end: ${count} / ${textNodesLen}`);
         }
         return nodes;
     };
@@ -463,7 +458,6 @@ export class Scene
                     this.chatRoomsCenter.push(center);
                     lines = lines.concat(linesInGroup.slice(0, take));
                 });
-                console.log(`line count: ${lines.length}`);
                 this.linesForChatRooms = lines;
             }
         );
@@ -620,7 +614,7 @@ export class Scene
         Scene.chatRoomIndex = CommonUtility.getRandomIntInRange(0, this.chatRoomsCenter.length - 1);
         const chatRoom = this.chatRoomsCenter[Scene.chatRoomIndex];
         const destination = chatRoom ?
-            new BABYLON.Vector3(chatRoom.x * 3, chatRoom.y * 3, 0) :
+            new BABYLON.Vector3(chatRoom.x * 2.5, chatRoom.y * 2.5, 0) :
             BABYLON.Vector3.Zero();
 
         const curve = BABYLON.Curve3.CreateHermiteSpline(

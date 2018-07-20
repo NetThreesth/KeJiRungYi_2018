@@ -47,13 +47,7 @@ export class LoginPanel
         this.wordCardsAnimation();
     };
 
-    private performance = null;
-    private getPerformance(startNewOne = false) {
-        if (startNewOne || !this.performance) this.performance = performance.now();
-        const result = performance.now() - this.performance;
-        this.performance = performance.now();
-        return result;
-    };
+
 
 
     private fadeAnimation(
@@ -65,14 +59,11 @@ export class LoginPanel
         },
         afterFunc: (ele: HTMLElement) => void
     ) {
-        console.log('fadeAnimation start ' + this.getPerformance());
         const animation = $(ele).fadeIn(setting.fadeIn, undefined, () => {
-            console.log('fadeIn end ' + this.getPerformance());
             if (!setting.fadeOut) afterFunc(ele);
         });
         if (!setting.fadeOut) return;
         animation.delay(setting.sustain || 0).fadeOut(setting.fadeOut, undefined, () => {
-            console.log('fadeOut end ' + this.getPerformance());
             afterFunc(ele);
         });
     };

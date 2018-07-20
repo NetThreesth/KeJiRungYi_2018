@@ -468,7 +468,7 @@ var DevPanel = /** @class */ (function (_super) {
         });
         eventCenter.on(AddLogEvent, function (log) {
             _this.state.log.push(log);
-            if (_this.state.log.length > 5)
+            if (_this.state.log.length > 3)
                 _this.state.log.shift();
             _this.setState(Object.assign({}, _this.state));
         });
@@ -545,9 +545,7 @@ var __extends = (undefined && undefined.__extends) || (function () {
 var LoginPanel = /** @class */ (function (_super) {
     __extends(LoginPanel, _super);
     function LoginPanel() {
-        var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.performance = null;
-        return _this;
+        return _super !== null && _super.apply(this, arguments) || this;
     }
     LoginPanel.prototype.render = function () {
         return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { id: "loginPanel", className: "flex flex-center", onClick: this.focus.bind(this) },
@@ -584,27 +582,14 @@ var LoginPanel = /** @class */ (function (_super) {
         this.wordCardsAnimation();
     };
     ;
-    LoginPanel.prototype.getPerformance = function (startNewOne) {
-        if (startNewOne === void 0) { startNewOne = false; }
-        if (startNewOne || !this.performance)
-            this.performance = performance.now();
-        var result = performance.now() - this.performance;
-        this.performance = performance.now();
-        return result;
-    };
-    ;
     LoginPanel.prototype.fadeAnimation = function (ele, setting, afterFunc) {
-        var _this = this;
-        console.log('fadeAnimation start ' + this.getPerformance());
         var animation = $(ele).fadeIn(setting.fadeIn, undefined, function () {
-            console.log('fadeIn end ' + _this.getPerformance());
             if (!setting.fadeOut)
                 afterFunc(ele);
         });
         if (!setting.fadeOut)
             return;
         animation.delay(setting.sustain || 0).fadeOut(setting.fadeOut, undefined, function () {
-            console.log('fadeOut end ' + _this.getPerformance());
             afterFunc(ele);
         });
     };
@@ -1196,7 +1181,6 @@ var Scene = /** @class */ (function (_super) {
             else if (Scene.chatRoomIndex !== null) {
                 var distance = babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"].Distance(_this.viewPort.position, _this.camera.position);
                 if (distance > 3) {
-                    console.log("distance: " + distance);
                     _this.camera.speed = 1 / (distance * distance);
                 }
                 var positionCorrelationRate = 0.01;
@@ -1279,7 +1263,6 @@ var Scene = /** @class */ (function (_super) {
             _this.linesForLinesystem = data;
             var linesystemPerformance = _this.linesystemPerformance;
             if (linesystemPerformance < -3) {
-                console.log("linesystemPerformance: " + linesystemPerformance);
                 var newCount = updatedNodes.length + linesystemPerformance;
                 if (newCount > 100)
                     updatedNodes.length = newCount;
@@ -1307,7 +1290,6 @@ var Scene = /** @class */ (function (_super) {
     Scene.prototype.updateTextNodeForForward = function (nodesToTranslate) {
         var _this = this;
         var maxMove = 0.3;
-        var textNodesLen = nodesToTranslate.length;
         var count = 0;
         var nodes = nodesToTranslate.map(function (node, i) {
             var chatRoomsNode = _this.chatRoomsNodes[i];
@@ -1324,7 +1306,6 @@ var Scene = /** @class */ (function (_super) {
         });
         if (count > 70) {
             this.translateType = TranslateType.Expand;
-            console.log("ToChatRoomNode end: " + count + " / " + textNodesLen);
         }
         return nodes;
     };
@@ -1414,7 +1395,6 @@ var Scene = /** @class */ (function (_super) {
                 _this.chatRoomsCenter.push(center);
                 lines = lines.concat(linesInGroup.slice(0, take));
             });
-            console.log("line count: " + lines.length);
             _this.linesForChatRooms = lines;
         });
     };
@@ -1540,7 +1520,7 @@ var Scene = /** @class */ (function (_super) {
         Scene.chatRoomIndex = _CommonUtility__WEBPACK_IMPORTED_MODULE_3__["CommonUtility"].getRandomIntInRange(0, this.chatRoomsCenter.length - 1);
         var chatRoom = this.chatRoomsCenter[Scene.chatRoomIndex];
         var destination = chatRoom ?
-            new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"](chatRoom.x * 3, chatRoom.y * 3, 0) :
+            new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"](chatRoom.x * 2.5, chatRoom.y * 2.5, 0) :
             babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"].Zero();
         var curve = babylonjs__WEBPACK_IMPORTED_MODULE_1__["Curve3"].CreateHermiteSpline(this.camera.position, babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"].Zero(), destination, babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"].Zero(), 60 * 5);
         var points = curve.getPoints();
@@ -2615,4 +2595,4 @@ module.exports = ReactDOM;
 /***/ })
 
 /******/ });
-//# sourceMappingURL=bundle.main.js.map
+//# sourceMappingURL=bundle.main.7c0e07fb42ab010a14bb.js.map

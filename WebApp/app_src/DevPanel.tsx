@@ -24,7 +24,7 @@ export class DevPanel
 
         eventCenter.on<string>(AddLogEvent, log => {
             this.state.log.push(log);
-            if (this.state.log.length > 5) this.state.log.shift();
+            if (this.state.log.length > 3) this.state.log.shift();
             this.setState(Object.assign({}, this.state));
         });
     };
