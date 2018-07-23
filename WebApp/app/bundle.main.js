@@ -895,6 +895,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "EventCenter", function() { return EventCenter; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Event", function() { return Event; });
 /* harmony import */ var _AppSetting__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./AppSetting */ "./app_src/AppSetting.ts");
+/* harmony import */ var _Scene__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Scene */ "./app_src/Scene.tsx");
+
 
 var ContentType;
 (function (ContentType) {
@@ -920,7 +922,7 @@ var MessageCenter = /** @class */ (function () {
             url: 'apis/uploadText',
             type: "post",
             contentType: "application/json",
-            data: JSON.stringify({ text: text })
+            data: JSON.stringify({ text: text, rid: _Scene__WEBPACK_IMPORTED_MODULE_1__["Scene"].chatRoomIndex })
         }).done(function (resp) {
             _this.addText(_AppSetting__WEBPACK_IMPORTED_MODULE_0__["Roles"].Algae, resp.algaeResponse);
             _this.addText(_AppSetting__WEBPACK_IMPORTED_MODULE_0__["Roles"].ChatBot, resp.chatbotResponse);
@@ -936,7 +938,7 @@ var MessageCenter = /** @class */ (function () {
             url: 'apis/uploadImage',
             type: "post",
             contentType: "application/json",
-            data: JSON.stringify({ base64Image: b64String })
+            data: JSON.stringify({ base64Image: b64String, rid: _Scene__WEBPACK_IMPORTED_MODULE_1__["Scene"].chatRoomIndex })
         }).done(function (resp) {
             _this.addText(_AppSetting__WEBPACK_IMPORTED_MODULE_0__["Roles"].ChatBot, JSON.stringify(resp));
         });
@@ -2595,4 +2597,4 @@ module.exports = ReactDOM;
 /***/ })
 
 /******/ });
-//# sourceMappingURL=bundle.main.7c0e07fb42ab010a14bb.js.map
+//# sourceMappingURL=bundle.main.js.map

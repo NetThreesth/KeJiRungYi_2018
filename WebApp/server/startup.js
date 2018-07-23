@@ -70,8 +70,8 @@ app.use('/graphql', express_graphql({
 app.route('/apis/uploadImage').post((req, res, next) => {
 
   logger.info(`${new Date()} uploadImage fired`);
-  const content = req.body;
-  if (!content) {
+  const body = req.body;
+  if (!body) {
     logger.error(`image not exist`);
     res.status(400).send('image not exist');
     return;
@@ -82,7 +82,7 @@ app.route('/apis/uploadImage').post((req, res, next) => {
   const client = new vision.ImageAnnotatorClient();
   const query = {
     image: {
-      content: content.base64Image.split(',')[1]
+      content: body.base64Image.split(',')[1]
     },
     features: [
       {
@@ -107,7 +107,7 @@ app.route('/apis/uploadImage').post((req, res, next) => {
       const translationResult = translations.join('');
       logger.info('Translations: ' + translationResult);
 
-      return sentToChatbots(translationResult);
+      return sentToChatbots(translationResult, body.rid);
     })
     .then(result => {
       logger.info(result.data);
@@ -120,9 +120,10 @@ app.route('/apis/uploadImage').post((req, res, next) => {
 
 
 app.route('/apis/uploadText').post((req, res, next) => {
-  const message = req.body.text;
+  const text = req.body.text;
+  const rid = req.body.rid;
 
-  sentToChatbots(message)
+  sentToChatbots(text, rid)
     .then(result => {
       logger.info(result.data);
       res.json(result.data);
@@ -131,11 +132,11 @@ app.route('/apis/uploadText').post((req, res, next) => {
     .catch(err => errorHandler(err, next));
 });
 
-function sentToChatbots(message) {
+function sentToChatbots(text, rid) {
   const axios = require('axios');
   return axios.post('http://35.236.167.99:5000/3sth/api/v1.0/chatbots/', {
-    msg: message,
-    rid: 1
+    msg: text,
+    rid: rid
   })
 };
 

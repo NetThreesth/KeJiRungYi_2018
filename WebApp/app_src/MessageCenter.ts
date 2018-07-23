@@ -1,4 +1,5 @@
 import { Roles } from './AppSetting';
+import { Scene } from './Scene';
 
 export enum ContentType {
     Text, Image
@@ -31,13 +32,15 @@ export class MessageCenter {
             url: 'apis/uploadText',
             type: "post",
             contentType: "application/json",
-            data: JSON.stringify({ text: text })
+            data: JSON.stringify({ text: text, rid: Scene.chatRoomIndex })
         }).done(resp => {
             this.addText(Roles.Algae, resp.algaeResponse);
             this.addText(Roles.ChatBot, resp.chatbotResponse);
             this.observable.trigger(Event.AfterSubmitMessage);
         });
     };
+
+
     addImage(role: Roles, b64String: string) {
         this.contents.push({ role: role, type: ContentType.Image, content: b64String });
         this.observable.trigger(MessageCenter.eventName);
@@ -46,7 +49,7 @@ export class MessageCenter {
             url: 'apis/uploadImage',
             type: "post",
             contentType: "application/json",
-            data: JSON.stringify({ base64Image: b64String })
+            data: JSON.stringify({ base64Image: b64String, rid: Scene.chatRoomIndex })
         }).done(resp => {
             this.addText(Roles.ChatBot, JSON.stringify(resp));
         });
@@ -76,6 +79,6 @@ export class Event {
     static readonly AfterLogin = 'AfterLogin';
     static readonly UpdateDevPanelData = 'UpdateDevPanelData';
     static readonly AfterWordCardsAnimation = 'AfterWordCardsAnimation';
-    static readonly AfterSubmitMessage= 'AfterSubmitMessage';
+    static readonly AfterSubmitMessage = 'AfterSubmitMessage';
     static readonly None = 'None';
 };
