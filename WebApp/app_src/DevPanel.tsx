@@ -23,7 +23,7 @@ export class DevPanel
         });
 
         eventCenter.on<string>(AddLogEvent, log => {
-            this.state.log.push(log);
+            this.state.log.push(JSON.stringify(log));
             if (this.state.log.length > 3) this.state.log.shift();
             this.setState(Object.assign({}, this.state));
         });

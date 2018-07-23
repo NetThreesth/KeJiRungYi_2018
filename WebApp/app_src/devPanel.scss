@@ -4,9 +4,14 @@
     top: 0;
     right: 0;
     background-color: rgba(0, 0, 0, 0.2);
+    width: 200px;
+    table {
+        width: 100%;
+    }
 }
 
 #devPanel td {
     width: 50px;
     padding: 3px;
+    word-break: break-all;
 }

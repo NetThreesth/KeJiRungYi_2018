@@ -96,4 +96,14 @@ export class CommonUtility {
     static deepClone<T>(obj: T): T {
         return CommonUtility.deepMerge(obj, {} as T);
     };
+
+
+    static asyncPost(url: string, data: any) {
+        return $.ajax({
+            url: url,
+            type: "post",
+            contentType: "application/json",
+            data: JSON.stringify(data)
+        });
+    };
 };

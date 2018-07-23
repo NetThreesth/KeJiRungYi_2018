@@ -4,7 +4,7 @@ import * as $ from 'jquery';
 import { CommonUtility } from './CommonUtility';
 import { BabylonUtility, Line } from './BabylonUtility';
 
-import { EventCenter, Event } from './MessageCenter';
+import { EventCenter, Event, TextToCmd } from './MessageCenter';
 
 
 
@@ -48,11 +48,15 @@ export class Scene
             (document.getElementById('CreateLinesWorker') as HTMLScriptElement).src
         );
 
-        this.registerRunRenderLoop();
+        this.engine.runRenderLoop(() => {
+            this.renderBefore();
+            this.scene.render();
+            this.renderAfter();
+        });
 
         this.props.eventCenter.on(Event.AfterWordCardsAnimation, this.transformation.bind(this));
         this.props.eventCenter.on(Event.AfterLogin, this.zoomIn.bind(this));
-        this.props.eventCenter.on(Event.AfterSubmitMessage, this.createAlgae.bind(this));
+        this.props.eventCenter.on(Event.AfterSubmitMessage, this.cmdHandler.bind(this));
 
 
         window.addEventListener("resize", this.engine.resize.bind(this.engine));
@@ -102,6 +106,67 @@ export class Scene
         skybox.infiniteDistance = true;
         skybox.renderingGroupId = 0;
     };
+
+
+    private renderBefore() {
+        this.updateCameraPosition();
+        this.translateLinesForTextNodes();
+        this.translateParticles();
+        this.checkAlgaes();
+        if (this.bubbleSpray) this.bubbleSpray.setParticles();
+    };
+
+
+
+    private updateCameraPosition() {
+        const cameraLocationsLen = this.cameraLocations.length;
+        if (cameraLocationsLen > 0) {
+            this.camera.position = this.cameraLocations.shift();
+            if (cameraLocationsLen > 1) {
+                this.camera.setTarget(BABYLON.Vector3.Zero());
+            } else {
+                const center = this.chatRoomsCenter[Scene.chatRoomIndex];
+                this.createBubbleSpray(center);
+
+                this.viewPort.position = this.camera.position.clone();
+                this.viewPort.rotation = this.camera.rotation.clone();
+            }
+        }
+        /*  else if (Scene.chatRoomIndex !== null) {
+             const positionCorrelationRate = 0.02;
+             const positionCorrelation = this.viewPort.position
+                 .subtract(this.camera.position)
+                 .multiply(new BABYLON.Vector3(positionCorrelationRate, positionCorrelationRate, positionCorrelationRate));
+             this.camera.position = this.camera.position.add(positionCorrelation);
+ 
+             const rotationCorrelationRate = 0.1;
+             const rotationCorrelation = this.viewPort.rotation
+                 .subtract(this.camera.rotation)
+                 .multiply(new BABYLON.Vector3(rotationCorrelationRate, rotationCorrelationRate, rotationCorrelationRate));
+             this.camera.rotation = this.camera.rotation.add(rotationCorrelation);
+         } */
+
+        this.lightOfCamera.position = this.camera.position;
+    };
+
+
+    private checkAlgaes() {
+        if (this.algaes.length === 0) return;
+        const disposeTime = new Date(Date.now() - 30 * 60 * 1000);
+        if (this.algaes[0].createTime < disposeTime) {
+            const algae = this.algaes.shift();
+            algae.sprite.dispose();
+        }
+    };
+
+
+    private renderAfter() {
+        this.props.eventCenter.trigger(Event.UpdateDevPanelData, {
+            fps: this.engine.getFps().toFixed() + ' fps',
+            coordinate: BabylonUtility.positionToString(this.camera.position)
+        });
+    };
+
 
 
     private createBubbleSpray(position: BABYLON.Vector3) {
@@ -174,73 +239,6 @@ export class Scene
     };
 
 
-    private registerRunRenderLoop() {
-
-        this.engine.runRenderLoop(() => {
-
-            /** render before */
-
-
-
-            const cameraLocationsLen = this.cameraLocations.length;
-            if (cameraLocationsLen > 0) {
-                this.camera.position = this.cameraLocations.shift();
-                if (cameraLocationsLen > 1) {
-                    this.camera.setTarget(BABYLON.Vector3.Zero());
-                } else {
-                    const center = this.chatRoomsCenter[Scene.chatRoomIndex];
-                    this.createBubbleSpray(center);
-
-                    this.viewPort.position = this.camera.position.clone();
-                    this.viewPort.rotation = this.camera.rotation.clone();
-                }
-            } else if (Scene.chatRoomIndex !== null) {
-                const distance = BABYLON.Vector3.Distance(this.viewPort.position, this.camera.position);
-                if (distance > 3) {
-                    this.camera.speed = 1 / (distance * distance);
-
-                }
-                const positionCorrelationRate = 0.01;
-                const positionCorrelation = this.viewPort.position
-                    .subtract(this.camera.position)
-                    .multiply(new BABYLON.Vector3(positionCorrelationRate, positionCorrelationRate, positionCorrelationRate));
-                this.camera.position = this.camera.position.add(positionCorrelation);
-
-                const rotationCorrelationRate = 0.1;
-                const rotationCorrelation = this.viewPort.rotation
-                    .subtract(this.camera.rotation)
-                    .multiply(new BABYLON.Vector3(rotationCorrelationRate, rotationCorrelationRate, rotationCorrelationRate));
-                this.camera.rotation = this.camera.rotation.add(rotationCorrelation);
-            }
-
-
-
-            this.lightOfCamera.position = this.camera.position;
-            this.translateLinesForTextNodes();
-            this.translateParticles();
-            if (this.bubbleSpray) this.bubbleSpray.setParticles();
-            /** render before end */
-
-
-            this.scene.render();
-
-
-            /** render after */
-            this.publishDevData();
-
-        });
-    };
-
-
-    private publishDevData() {
-        this.props.eventCenter.trigger(Event.UpdateDevPanelData, {
-            fps: this.engine.getFps().toFixed() + ' fps',
-            coordinate: BabylonUtility.positionToString(this.camera.position)
-        });
-    };
-
-
-
     private colorsSetForParticle = [
         { diffuseColor: [253, 245, 134], glowColor: [255, 252, 193, 0.85] },
         { diffuseColor: [253, 229, 210], glowColor: [255, 219, 225, 0.85] },
@@ -251,6 +249,22 @@ export class Scene
         return set;
     });
 
+    private getTextureForParticle = function () {
+        let textures: { [key: number]: BABYLON.Texture } = null;
+        return () => {
+            if (!textures) {
+                textures = {
+                    0: new BABYLON.Texture('assets/background_particles/pink_particle.png', this.scene),
+                    1: new BABYLON.Texture('assets/background_particles/white_particle.png', this.scene),
+                    2: new BABYLON.Texture('assets/background_particles/yellow_particle.png', this.scene)
+                };
+
+            }
+            const key = CommonUtility.getRandomIntInRange(0, 2);
+            return textures[key];
+        }
+    }.bind(this)();
+
 
     private particles: {
         mesh: BABYLON.Mesh,
@@ -258,41 +272,53 @@ export class Scene
         duration: number
     }[] = [];
     private createParticle(center: BABYLON.Vector3) {
-        const range = 15;
-        const position = new BABYLON.Vector3(
-            center.x + (CommonUtility.getRandomIntInRange(range * -1, range) * 0.1),
-            center.y + (CommonUtility.getRandomIntInRange(range * -1, range) * 0.1),
-            center.z + (CommonUtility.getRandomIntInRange(range * -1, range) * 0.1),
-        );
+        // const range = 15;
+
+        /*  const position = new BABYLON.Vector3(
+             center.x + (CommonUtility.getRandomIntInRange(range * -1, range) * 0.1),
+             center.y + (CommonUtility.getRandomIntInRange(range * -1, range) * 0.1),
+             center.z + (CommonUtility.getRandomIntInRange(range * -1, range) * 0.1),
+         ); */
 
 
         const colorSetIndex = CommonUtility.getRandomIntInRange(0, 2);
-        const colorSet = this.colorsSetForParticle[colorSetIndex];
-        const colorInRGB = colorSet.diffuseColor;
-        const color = new BABYLON.Color3(colorInRGB[0], colorInRGB[1], colorInRGB[2]);
+        // const colorSet = this.colorsSetForParticle[colorSetIndex];
+        // const colorInRGB = colorSet.diffuseColor;
+        // const color = new BABYLON.Color3(colorInRGB[0], colorInRGB[1], colorInRGB[2]);
 
-        const radius = CommonUtility.getRandomIntInRange(10, 20) * 0.01;
+        // const radius = CommonUtility.getRandomIntInRange(10, 20) * 0.01;
 
-        const core = BABYLON.Mesh.CreateSphere(`core-colorSetIndex:${colorSetIndex}`, 2, radius, this.scene);
-        core.position = position;
+        // const particle = BABYLON.Mesh.CreateSphere(`colorSetIndex:${colorSetIndex}`, 8, radius, this.scene);
 
-        const coreMaterial = core.material = new BABYLON.StandardMaterial(`coreMaterial`, this.scene);
-        coreMaterial.diffuseColor = color;
-        coreMaterial.emissiveColor = BABYLON.Color3.Black();
+        const particle = BABYLON.Mesh.CreatePlane(`colorSetIndex:${colorSetIndex}`, 0.5, this.scene);
+        particle.position = center.clone();
+        particle.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL;
 
-        if (!this.glowLayerForParticle) {
-            this.glowLayerForParticle = new BABYLON.GlowLayer("glowLayerForParticle", this.scene);
-            this.glowLayerForParticle.intensity = 0.5;
-            this.glowLayerForParticle.customEmissiveColorSelector = (mesh, subMesh, material, result) => {
-                const colorSetIndex = mesh.name.replace('core-colorSetIndex:', '');
-                const glowColor = this.colorsSetForParticle[colorSetIndex].glowColor;
-                result.set(glowColor[0], glowColor[1], glowColor[2], glowColor[3]);
-            }
-        }
-        this.glowLayerForParticle.addIncludedOnlyMesh(core);
+        const material = particle.material = new BABYLON.StandardMaterial(`particleMaterial`, this.scene);
+
+        material.diffuseTexture = this.getTextureForParticle();
+        material.diffuseTexture.hasAlpha = true
+
+        /*         material.diffuseColor = color;
+                material.emissiveColor = BABYLON.Color3.Black(); */
+
+
+        /*         if (!this.glowLayerForParticle) {
+                    this.glowLayerForParticle = new BABYLON.GlowLayer("glowLayerForParticle", this.scene);
+                    this.glowLayerForParticle.intensity = 0.5;
+                    this.glowLayerForParticle.customEmissiveColorSelector = (mesh, subMesh, material, result) => {
+                        const colorSetIndex = mesh.name.replace('colorSetIndex:', '');
+                        const glowColor = this.colorsSetForParticle[colorSetIndex].glowColor;
+                        result.set(glowColor[0], glowColor[1], glowColor[2], glowColor[3]);
+                    }
+                }
+                this.glowLayerForParticle.addIncludedOnlyMesh(particle); */
+
+
+
 
         this.particles.push({
-            mesh: core,
+            mesh: particle,
             translateVector: BabylonUtility.getRandomVector3(),
             duration: this.getDurationForParticle()
         });
@@ -585,16 +611,17 @@ export class Scene
         };
     };
 
-
-    private createAlgae() {
-        const algaeManager = new BABYLON.SpriteManager("algaeManager", "assets/algae_30.png", 1, 30, this.scene);
+    private algaes: { sprite: BABYLON.Sprite, createTime: Date }[] = [];
+    private cmdHandler(cmd: TextToCmd) {
+        const algaeManager = new BABYLON.SpriteManager("algaeManager", "assets/Algae_particles.png", 1, 375, this.scene);
         const center = this.chatRoomsCenter[Scene.chatRoomIndex];
         var algae = new BABYLON.Sprite("algae", algaeManager);
-        algae.size = 0.1;
+        algae.size = 1;
         algae.position.x = center.x + CommonUtility.getRandomNumberInRange(-3, 3, 2);
         algae.position.y = center.y + CommonUtility.getRandomNumberInRange(-3, 3, 2);
         algae.position.z = center.z + CommonUtility.getRandomNumberInRange(-3, 3, 2);
         algae.isPickable = false;
+        this.algaes.push({ sprite: algae, createTime: new Date() });
     };
 
 

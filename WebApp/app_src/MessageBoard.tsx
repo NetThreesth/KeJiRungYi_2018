@@ -13,7 +13,7 @@ export class MessageBoard
         super(props);
         const messageCenter = this.props.messageCenter;
         this.state = { contents: messageCenter.contents.slice() };
-        this.props.messageCenter.observable.on(MessageCenter.eventName, this.refresh.bind(this));
+        this.props.messageCenter.eventCenter.on(MessageCenter.eventName, this.refresh.bind(this));
     };
 
     render() {

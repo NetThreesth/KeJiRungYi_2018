@@ -276,6 +276,15 @@ var CommonUtility = /** @class */ (function () {
         return CommonUtility.deepMerge(obj, {});
     };
     ;
+    CommonUtility.asyncPost = function (url, data) {
+        return $.ajax({
+            url: url,
+            type: "post",
+            contentType: "application/json",
+            data: JSON.stringify(data)
+        });
+    };
+    ;
     return CommonUtility;
 }());
 
@@ -314,4 +323,4 @@ self.onmessage = function (message) {
 /***/ })
 
 /******/ });
-//# sourceMappingURL=bundle.CreateLinesWorker.js.map
+//# sourceMappingURL=bundle.CreateLinesWorker.82398e02f6dae3c7bd12.js.map

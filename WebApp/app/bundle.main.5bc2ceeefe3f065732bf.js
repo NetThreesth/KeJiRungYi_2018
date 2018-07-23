@@ -307,6 +307,15 @@ var CommonUtility = /** @class */ (function () {
         return CommonUtility.deepMerge(obj, {});
     };
     ;
+    CommonUtility.asyncPost = function (url, data) {
+        return $.ajax({
+            url: url,
+            type: "post",
+            contentType: "application/json",
+            data: JSON.stringify(data)
+        });
+    };
+    ;
     return CommonUtility;
 }());
 
@@ -467,7 +476,7 @@ var DevPanel = /** @class */ (function (_super) {
                 _this.setState(Object.assign({}, _this.state, data));
         });
         eventCenter.on(AddLogEvent, function (log) {
-            _this.state.log.push(log);
+            _this.state.log.push(JSON.stringify(log));
             if (_this.state.log.length > 3)
                 _this.state.log.shift();
             _this.setState(Object.assign({}, _this.state));
@@ -701,7 +710,7 @@ var MessageBoard = /** @class */ (function (_super) {
         var _this = _super.call(this, props) || this;
         var messageCenter = _this.props.messageCenter;
         _this.state = { contents: messageCenter.contents.slice() };
-        _this.props.messageCenter.observable.on(_MessageCenter__WEBPACK_IMPORTED_MODULE_1__["MessageCenter"].eventName, _this.refresh.bind(_this));
+        _this.props.messageCenter.eventCenter.on(_MessageCenter__WEBPACK_IMPORTED_MODULE_1__["MessageCenter"].eventName, _this.refresh.bind(_this));
         return _this;
     }
     ;
@@ -896,6 +905,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Event", function() { return Event; });
 /* harmony import */ var _AppSetting__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./AppSetting */ "./app_src/AppSetting.ts");
 /* harmony import */ var _Scene__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Scene */ "./app_src/Scene.tsx");
+/* harmony import */ var _CommonUtility__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./CommonUtility */ "./app_src/CommonUtility.ts");
+/* harmony import */ var _DevPanel__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./DevPanel */ "./app_src/DevPanel.tsx");
+
+
 
 
 var ContentType;
@@ -908,39 +921,37 @@ var ContentType;
 var MessageCenter = /** @class */ (function () {
     function MessageCenter(eventCenter) {
         this.contents = [];
-        this.observable = null;
-        this.observable = eventCenter;
+        this.eventCenter = null;
+        this.eventCenter = eventCenter;
     }
     ;
     MessageCenter.prototype.addText = function (role, text) {
         var _this = this;
         this.contents.push({ role: role, type: ContentType.Text, content: text });
-        this.observable.trigger(MessageCenter.eventName);
+        this.eventCenter.trigger(MessageCenter.eventName);
         if (role !== _AppSetting__WEBPACK_IMPORTED_MODULE_0__["Roles"].User)
             return;
-        $.ajax({
-            url: 'apis/uploadText',
-            type: "post",
-            contentType: "application/json",
-            data: JSON.stringify({ text: text, rid: _Scene__WEBPACK_IMPORTED_MODULE_1__["Scene"].chatRoomIndex })
-        }).done(function (resp) {
+        _CommonUtility__WEBPACK_IMPORTED_MODULE_2__["CommonUtility"].asyncPost('apis/uploadText', { rid: _Scene__WEBPACK_IMPORTED_MODULE_1__["Scene"].chatRoomIndex, text: text })
+            .done(function (resp) {
+            _this.eventCenter.trigger(_DevPanel__WEBPACK_IMPORTED_MODULE_3__["AddLogEvent"], resp);
             _this.addText(_AppSetting__WEBPACK_IMPORTED_MODULE_0__["Roles"].Algae, resp.algaeResponse);
             _this.addText(_AppSetting__WEBPACK_IMPORTED_MODULE_0__["Roles"].ChatBot, resp.chatbotResponse);
-            _this.observable.trigger(Event.AfterSubmitMessage);
+            _this.eventCenter.trigger(Event.AfterSubmitMessage, resp.text2cmd);
         });
     };
     ;
     MessageCenter.prototype.addImage = function (role, b64String) {
         var _this = this;
         this.contents.push({ role: role, type: ContentType.Image, content: b64String });
-        this.observable.trigger(MessageCenter.eventName);
-        $.ajax({
-            url: 'apis/uploadImage',
-            type: "post",
-            contentType: "application/json",
-            data: JSON.stringify({ base64Image: b64String, rid: _Scene__WEBPACK_IMPORTED_MODULE_1__["Scene"].chatRoomIndex })
-        }).done(function (resp) {
-            _this.addText(_AppSetting__WEBPACK_IMPORTED_MODULE_0__["Roles"].ChatBot, JSON.stringify(resp));
+        this.eventCenter.trigger(MessageCenter.eventName);
+        _CommonUtility__WEBPACK_IMPORTED_MODULE_2__["CommonUtility"].asyncPost('apis/uploadImage', { rid: _Scene__WEBPACK_IMPORTED_MODULE_1__["Scene"].chatRoomIndex, base64Image: b64String })
+            .done(function (resp) {
+            _this.eventCenter.trigger(_DevPanel__WEBPACK_IMPORTED_MODULE_3__["AddLogEvent"], resp);
+            _this.addText(_AppSetting__WEBPACK_IMPORTED_MODULE_0__["Roles"].ChatBot, resp.chatbotResponse);
+            _this.addText(_AppSetting__WEBPACK_IMPORTED_MODULE_0__["Roles"].Algae, resp.algaeResponse);
+            _this.addText(_AppSetting__WEBPACK_IMPORTED_MODULE_0__["Roles"].ChatBot, resp.chatbot2algaeResponse);
+            _this.addText(_AppSetting__WEBPACK_IMPORTED_MODULE_0__["Roles"].Algae, JSON.stringify(resp));
+            _this.eventCenter.trigger(Event.AfterSubmitMessage, resp.text2cmd);
         });
     };
     ;
@@ -948,6 +959,9 @@ var MessageCenter = /** @class */ (function () {
     return MessageCenter;
 }());
 
+;
+;
+;
 ;
 var EventCenter = /** @class */ (function () {
     function EventCenter() {
@@ -1038,6 +1052,21 @@ var Scene = /** @class */ (function (_super) {
             set.glowColor = set.glowColor.map(function (n, i) { return i !== 3 ? n / 255 : n; });
             return set;
         });
+        _this.getTextureForParticle = function () {
+            var _this = this;
+            var textures = null;
+            return function () {
+                if (!textures) {
+                    textures = {
+                        0: new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Texture"]('assets/background_particles/pink_particle.png', _this.scene),
+                        1: new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Texture"]('assets/background_particles/white_particle.png', _this.scene),
+                        2: new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Texture"]('assets/background_particles/yellow_particle.png', _this.scene)
+                    };
+                }
+                var key = _CommonUtility__WEBPACK_IMPORTED_MODULE_3__["CommonUtility"].getRandomIntInRange(0, 2);
+                return textures[key];
+            };
+        }.bind(_this)();
         _this.particles = [];
         _this.linesForLinesystem = [];
         _this.linesystem = null;
@@ -1051,6 +1080,7 @@ var Scene = /** @class */ (function (_super) {
             [192, 231, 164],
             [168, 213, 133]
         ].map(function (set) { return set.map(function (n) { return n / 255; }); });
+        _this.algaes = [];
         return _this;
     }
     Scene.prototype.render = function () {
@@ -1065,10 +1095,14 @@ var Scene = /** @class */ (function (_super) {
         this.getTexts();
         this.getPoints();
         this.createLinesWorker = new AsyncWorker(document.getElementById('CreateLinesWorker').src);
-        this.registerRunRenderLoop();
+        this.engine.runRenderLoop(function () {
+            _this.renderBefore();
+            _this.scene.render();
+            _this.renderAfter();
+        });
         this.props.eventCenter.on(_MessageCenter__WEBPACK_IMPORTED_MODULE_5__["Event"].AfterWordCardsAnimation, this.transformation.bind(this));
         this.props.eventCenter.on(_MessageCenter__WEBPACK_IMPORTED_MODULE_5__["Event"].AfterLogin, this.zoomIn.bind(this));
-        this.props.eventCenter.on(_MessageCenter__WEBPACK_IMPORTED_MODULE_5__["Event"].AfterSubmitMessage, this.createAlgae.bind(this));
+        this.props.eventCenter.on(_MessageCenter__WEBPACK_IMPORTED_MODULE_5__["Event"].AfterSubmitMessage, this.cmdHandler.bind(this));
         window.addEventListener("resize", this.engine.resize.bind(this.engine));
         var updateMask = function () {
             var setting = _CommonUtility__WEBPACK_IMPORTED_MODULE_3__["CommonUtility"].getQueryString('greenMask');
@@ -1109,6 +1143,62 @@ var Scene = /** @class */ (function (_super) {
         skybox.material = skyboxMaterial;
         skybox.infiniteDistance = true;
         skybox.renderingGroupId = 0;
+    };
+    ;
+    Scene.prototype.renderBefore = function () {
+        this.updateCameraPosition();
+        this.translateLinesForTextNodes();
+        this.translateParticles();
+        this.checkAlgaes();
+        if (this.bubbleSpray)
+            this.bubbleSpray.setParticles();
+    };
+    ;
+    Scene.prototype.updateCameraPosition = function () {
+        var cameraLocationsLen = this.cameraLocations.length;
+        if (cameraLocationsLen > 0) {
+            this.camera.position = this.cameraLocations.shift();
+            if (cameraLocationsLen > 1) {
+                this.camera.setTarget(babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"].Zero());
+            }
+            else {
+                var center = this.chatRoomsCenter[Scene.chatRoomIndex];
+                this.createBubbleSpray(center);
+                this.viewPort.position = this.camera.position.clone();
+                this.viewPort.rotation = this.camera.rotation.clone();
+            }
+        }
+        /*  else if (Scene.chatRoomIndex !== null) {
+             const positionCorrelationRate = 0.02;
+             const positionCorrelation = this.viewPort.position
+                 .subtract(this.camera.position)
+                 .multiply(new BABYLON.Vector3(positionCorrelationRate, positionCorrelationRate, positionCorrelationRate));
+             this.camera.position = this.camera.position.add(positionCorrelation);
+ 
+             const rotationCorrelationRate = 0.1;
+             const rotationCorrelation = this.viewPort.rotation
+                 .subtract(this.camera.rotation)
+                 .multiply(new BABYLON.Vector3(rotationCorrelationRate, rotationCorrelationRate, rotationCorrelationRate));
+             this.camera.rotation = this.camera.rotation.add(rotationCorrelation);
+         } */
+        this.lightOfCamera.position = this.camera.position;
+    };
+    ;
+    Scene.prototype.checkAlgaes = function () {
+        if (this.algaes.length === 0)
+            return;
+        var disposeTime = new Date(Date.now() - 30 * 60 * 1000);
+        if (this.algaes[0].createTime < disposeTime) {
+            var algae = this.algaes.shift();
+            algae.sprite.dispose();
+        }
+    };
+    ;
+    Scene.prototype.renderAfter = function () {
+        this.props.eventCenter.trigger(_MessageCenter__WEBPACK_IMPORTED_MODULE_5__["Event"].UpdateDevPanelData, {
+            fps: this.engine.getFps().toFixed() + ' fps',
+            coordinate: _BabylonUtility__WEBPACK_IMPORTED_MODULE_4__["BabylonUtility"].positionToString(this.camera.position)
+        });
     };
     ;
     Scene.prototype.createBubbleSpray = function (position) {
@@ -1163,84 +1253,39 @@ var Scene = /** @class */ (function (_super) {
         this.bubbleSpray = bubbleSpray;
     };
     ;
-    Scene.prototype.registerRunRenderLoop = function () {
-        var _this = this;
-        this.engine.runRenderLoop(function () {
-            /** render before */
-            var cameraLocationsLen = _this.cameraLocations.length;
-            if (cameraLocationsLen > 0) {
-                _this.camera.position = _this.cameraLocations.shift();
-                if (cameraLocationsLen > 1) {
-                    _this.camera.setTarget(babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"].Zero());
-                }
-                else {
-                    var center = _this.chatRoomsCenter[Scene.chatRoomIndex];
-                    _this.createBubbleSpray(center);
-                    _this.viewPort.position = _this.camera.position.clone();
-                    _this.viewPort.rotation = _this.camera.rotation.clone();
-                }
-            }
-            else if (Scene.chatRoomIndex !== null) {
-                var distance = babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"].Distance(_this.viewPort.position, _this.camera.position);
-                if (distance > 3) {
-                    _this.camera.speed = 1 / (distance * distance);
-                }
-                var positionCorrelationRate = 0.01;
-                var positionCorrelation = _this.viewPort.position
-                    .subtract(_this.camera.position)
-                    .multiply(new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"](positionCorrelationRate, positionCorrelationRate, positionCorrelationRate));
-                _this.camera.position = _this.camera.position.add(positionCorrelation);
-                var rotationCorrelationRate = 0.1;
-                var rotationCorrelation = _this.viewPort.rotation
-                    .subtract(_this.camera.rotation)
-                    .multiply(new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"](rotationCorrelationRate, rotationCorrelationRate, rotationCorrelationRate));
-                _this.camera.rotation = _this.camera.rotation.add(rotationCorrelation);
-            }
-            _this.lightOfCamera.position = _this.camera.position;
-            _this.translateLinesForTextNodes();
-            _this.translateParticles();
-            if (_this.bubbleSpray)
-                _this.bubbleSpray.setParticles();
-            /** render before end */
-            _this.scene.render();
-            /** render after */
-            _this.publishDevData();
-        });
-    };
-    ;
-    Scene.prototype.publishDevData = function () {
-        this.props.eventCenter.trigger(_MessageCenter__WEBPACK_IMPORTED_MODULE_5__["Event"].UpdateDevPanelData, {
-            fps: this.engine.getFps().toFixed() + ' fps',
-            coordinate: _BabylonUtility__WEBPACK_IMPORTED_MODULE_4__["BabylonUtility"].positionToString(this.camera.position)
-        });
-    };
-    ;
     Scene.prototype.createParticle = function (center) {
-        var _this = this;
-        var range = 15;
-        var position = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"](center.x + (_CommonUtility__WEBPACK_IMPORTED_MODULE_3__["CommonUtility"].getRandomIntInRange(range * -1, range) * 0.1), center.y + (_CommonUtility__WEBPACK_IMPORTED_MODULE_3__["CommonUtility"].getRandomIntInRange(range * -1, range) * 0.1), center.z + (_CommonUtility__WEBPACK_IMPORTED_MODULE_3__["CommonUtility"].getRandomIntInRange(range * -1, range) * 0.1));
+        // const range = 15;
+        /*  const position = new BABYLON.Vector3(
+             center.x + (CommonUtility.getRandomIntInRange(range * -1, range) * 0.1),
+             center.y + (CommonUtility.getRandomIntInRange(range * -1, range) * 0.1),
+             center.z + (CommonUtility.getRandomIntInRange(range * -1, range) * 0.1),
+         ); */
         var colorSetIndex = _CommonUtility__WEBPACK_IMPORTED_MODULE_3__["CommonUtility"].getRandomIntInRange(0, 2);
-        var colorSet = this.colorsSetForParticle[colorSetIndex];
-        var colorInRGB = colorSet.diffuseColor;
-        var color = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Color3"](colorInRGB[0], colorInRGB[1], colorInRGB[2]);
-        var radius = _CommonUtility__WEBPACK_IMPORTED_MODULE_3__["CommonUtility"].getRandomIntInRange(10, 20) * 0.01;
-        var core = babylonjs__WEBPACK_IMPORTED_MODULE_1__["Mesh"].CreateSphere("core-colorSetIndex:" + colorSetIndex, 2, radius, this.scene);
-        core.position = position;
-        var coreMaterial = core.material = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["StandardMaterial"]("coreMaterial", this.scene);
-        coreMaterial.diffuseColor = color;
-        coreMaterial.emissiveColor = babylonjs__WEBPACK_IMPORTED_MODULE_1__["Color3"].Black();
-        if (!this.glowLayerForParticle) {
-            this.glowLayerForParticle = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["GlowLayer"]("glowLayerForParticle", this.scene);
-            this.glowLayerForParticle.intensity = 0.5;
-            this.glowLayerForParticle.customEmissiveColorSelector = function (mesh, subMesh, material, result) {
-                var colorSetIndex = mesh.name.replace('core-colorSetIndex:', '');
-                var glowColor = _this.colorsSetForParticle[colorSetIndex].glowColor;
-                result.set(glowColor[0], glowColor[1], glowColor[2], glowColor[3]);
-            };
-        }
-        this.glowLayerForParticle.addIncludedOnlyMesh(core);
+        // const colorSet = this.colorsSetForParticle[colorSetIndex];
+        // const colorInRGB = colorSet.diffuseColor;
+        // const color = new BABYLON.Color3(colorInRGB[0], colorInRGB[1], colorInRGB[2]);
+        // const radius = CommonUtility.getRandomIntInRange(10, 20) * 0.01;
+        // const particle = BABYLON.Mesh.CreateSphere(`colorSetIndex:${colorSetIndex}`, 8, radius, this.scene);
+        var particle = babylonjs__WEBPACK_IMPORTED_MODULE_1__["Mesh"].CreatePlane("colorSetIndex:" + colorSetIndex, 0.5, this.scene);
+        particle.position = center.clone();
+        particle.billboardMode = babylonjs__WEBPACK_IMPORTED_MODULE_1__["Mesh"].BILLBOARDMODE_ALL;
+        var material = particle.material = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["StandardMaterial"]("particleMaterial", this.scene);
+        material.diffuseTexture = this.getTextureForParticle();
+        material.diffuseTexture.hasAlpha = true;
+        /*         material.diffuseColor = color;
+                material.emissiveColor = BABYLON.Color3.Black(); */
+        /*         if (!this.glowLayerForParticle) {
+                    this.glowLayerForParticle = new BABYLON.GlowLayer("glowLayerForParticle", this.scene);
+                    this.glowLayerForParticle.intensity = 0.5;
+                    this.glowLayerForParticle.customEmissiveColorSelector = (mesh, subMesh, material, result) => {
+                        const colorSetIndex = mesh.name.replace('colorSetIndex:', '');
+                        const glowColor = this.colorsSetForParticle[colorSetIndex].glowColor;
+                        result.set(glowColor[0], glowColor[1], glowColor[2], glowColor[3]);
+                    }
+                }
+                this.glowLayerForParticle.addIncludedOnlyMesh(particle); */
         this.particles.push({
-            mesh: core,
+            mesh: particle,
             translateVector: _BabylonUtility__WEBPACK_IMPORTED_MODULE_4__["BabylonUtility"].getRandomVector3(),
             duration: this.getDurationForParticle()
         });
@@ -1494,15 +1539,16 @@ var Scene = /** @class */ (function (_super) {
         };
     };
     ;
-    Scene.prototype.createAlgae = function () {
-        var algaeManager = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["SpriteManager"]("algaeManager", "assets/algae_30.png", 1, 30, this.scene);
+    Scene.prototype.cmdHandler = function (cmd) {
+        var algaeManager = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["SpriteManager"]("algaeManager", "assets/Algae_particles.png", 1, 375, this.scene);
         var center = this.chatRoomsCenter[Scene.chatRoomIndex];
         var algae = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Sprite"]("algae", algaeManager);
-        algae.size = 0.1;
+        algae.size = 1;
         algae.position.x = center.x + _CommonUtility__WEBPACK_IMPORTED_MODULE_3__["CommonUtility"].getRandomNumberInRange(-3, 3, 2);
         algae.position.y = center.y + _CommonUtility__WEBPACK_IMPORTED_MODULE_3__["CommonUtility"].getRandomNumberInRange(-3, 3, 2);
         algae.position.z = center.z + _CommonUtility__WEBPACK_IMPORTED_MODULE_3__["CommonUtility"].getRandomNumberInRange(-3, 3, 2);
         algae.isPickable = false;
+        this.algaes.push({ sprite: algae, createTime: new Date() });
     };
     ;
     Scene.prototype.transformation = function () {
@@ -1891,7 +1937,7 @@ exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/li
 
 
 // module
-exports.push([module.i, "#devPanel {\n  display: none;\n  position: fixed;\n  top: 0;\n  right: 0;\n  background-color: rgba(0, 0, 0, 0.2); }\n\n#devPanel td {\n  width: 50px;\n  padding: 3px; }\n", ""]);
+exports.push([module.i, "#devPanel {\n  display: none;\n  position: fixed;\n  top: 0;\n  right: 0;\n  background-color: rgba(0, 0, 0, 0.2);\n  width: 200px; }\n  #devPanel table {\n    width: 100%; }\n\n#devPanel td {\n  width: 50px;\n  padding: 3px;\n  word-break: break-all; }\n", ""]);
 
 // exports
 
@@ -2597,4 +2643,4 @@ module.exports = ReactDOM;
 /***/ })
 
 /******/ });
-//# sourceMappingURL=bundle.main.js.map
+//# sourceMappingURL=bundle.main.5bc2ceeefe3f065732bf.js.map
