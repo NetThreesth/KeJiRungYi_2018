@@ -1168,19 +1168,18 @@ var Scene = /** @class */ (function (_super) {
                 this.viewPort.rotation = this.camera.rotation.clone();
             }
         }
-        /*  else if (Scene.chatRoomIndex !== null) {
-             const positionCorrelationRate = 0.02;
-             const positionCorrelation = this.viewPort.position
-                 .subtract(this.camera.position)
-                 .multiply(new BABYLON.Vector3(positionCorrelationRate, positionCorrelationRate, positionCorrelationRate));
-             this.camera.position = this.camera.position.add(positionCorrelation);
- 
-             const rotationCorrelationRate = 0.1;
-             const rotationCorrelation = this.viewPort.rotation
-                 .subtract(this.camera.rotation)
-                 .multiply(new BABYLON.Vector3(rotationCorrelationRate, rotationCorrelationRate, rotationCorrelationRate));
-             this.camera.rotation = this.camera.rotation.add(rotationCorrelation);
-         } */
+        else if (Scene.chatRoomIndex !== null) {
+            var positionCorrelationRate = 0.02;
+            var positionCorrelation = this.viewPort.position
+                .subtract(this.camera.position)
+                .multiply(new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"](positionCorrelationRate, positionCorrelationRate, positionCorrelationRate));
+            this.camera.position = this.camera.position.add(positionCorrelation);
+            var rotationCorrelationRate = 0.1;
+            var rotationCorrelation = this.viewPort.rotation
+                .subtract(this.camera.rotation)
+                .multiply(new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"](rotationCorrelationRate, rotationCorrelationRate, rotationCorrelationRate));
+            this.camera.rotation = this.camera.rotation.add(rotationCorrelation);
+        }
         this.lightOfCamera.position = this.camera.position;
     };
     ;
@@ -1205,24 +1204,17 @@ var Scene = /** @class */ (function (_super) {
         // creation
         var sphere = babylonjs__WEBPACK_IMPORTED_MODULE_1__["MeshBuilder"].CreateSphere("s", { diameter: 0.3, segments: 12 }, this.scene);
         var bubbleSpray = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["SolidParticleSystem"]('bubbleSpray', this.scene);
+        bubbleSpray.computeParticleColor = false;
+        bubbleSpray.computeParticleTexture = false;
+        bubbleSpray.computeParticleRotation = false;
         bubbleSpray.addShape(sphere, 20);
-        var mesh = bubbleSpray.buildMesh();
-        mesh.material = function () {
-            var bubbleMat = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["StandardMaterial"]("bubbleMat", this.scene);
-            //mat.backFaceCulling = false;
-            bubbleMat.alpha = 0.2;
-            return bubbleMat;
-        }.bind(this)();
-        mesh.position = position;
         sphere.dispose();
+        var mesh = bubbleSpray.buildMesh();
+        mesh.material = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["StandardMaterial"]("bubbleMat", this.scene);
+        mesh.material.alpha = 0.2;
+        mesh.position = position;
         var speed = 0.01;
-        // init
-        bubbleSpray.initParticles = function () {
-            for (var p = 0; p < this.nbParticles; p++) {
-                this.recycleParticle(this.particles[p]);
-            }
-        };
-        bubbleSpray.recycleParticle = function (particle) {
+        var recycleParticle = function (particle) {
             particle.position.x = 0;
             particle.position.y = 0;
             particle.position.z = 0;
@@ -1238,18 +1230,17 @@ var Scene = /** @class */ (function (_super) {
         };
         bubbleSpray.updateParticle = function (particle) {
             if (particle.position.y < 0 || particle['age'] < 0) {
-                bubbleSpray.recycleParticle(particle);
+                recycleParticle(particle);
             }
             particle.position.addInPlace(particle.velocity);
             particle.position.y += speed / 2;
             particle['age'] -= 0.01;
             return particle;
         };
-        bubbleSpray.initParticles();
+        for (var p = 0; p < bubbleSpray.nbParticles; p++) {
+            recycleParticle(bubbleSpray.particles[p]);
+        }
         bubbleSpray.setParticles();
-        bubbleSpray.computeParticleColor = false;
-        bubbleSpray.computeParticleTexture = false;
-        bubbleSpray.computeParticleRotation = false;
         this.bubbleSpray = bubbleSpray;
     };
     ;
@@ -1540,7 +1531,7 @@ var Scene = /** @class */ (function (_super) {
     };
     ;
     Scene.prototype.cmdHandler = function (cmd) {
-        var algaeManager = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["SpriteManager"]("algaeManager", "assets/Algae_particles.png", 1, 375, this.scene);
+        var algaeManager = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["SpriteManager"]("algaeManager", "assets/algae_particles.png", 1, 375, this.scene);
         var center = this.chatRoomsCenter[Scene.chatRoomIndex];
         var algae = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Sprite"]("algae", algaeManager);
         algae.size = 1;
@@ -2643,4 +2634,4 @@ module.exports = ReactDOM;
 /***/ })
 
 /******/ });
-//# sourceMappingURL=bundle.main.5bc2ceeefe3f065732bf.js.map
+//# sourceMappingURL=bundle.main.72b812873311a2d21325.js.map

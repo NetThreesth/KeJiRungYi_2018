@@ -132,19 +132,19 @@ export class Scene
                 this.viewPort.rotation = this.camera.rotation.clone();
             }
         }
-        /*  else if (Scene.chatRoomIndex !== null) {
-             const positionCorrelationRate = 0.02;
-             const positionCorrelation = this.viewPort.position
-                 .subtract(this.camera.position)
-                 .multiply(new BABYLON.Vector3(positionCorrelationRate, positionCorrelationRate, positionCorrelationRate));
-             this.camera.position = this.camera.position.add(positionCorrelation);
- 
-             const rotationCorrelationRate = 0.1;
-             const rotationCorrelation = this.viewPort.rotation
-                 .subtract(this.camera.rotation)
-                 .multiply(new BABYLON.Vector3(rotationCorrelationRate, rotationCorrelationRate, rotationCorrelationRate));
-             this.camera.rotation = this.camera.rotation.add(rotationCorrelation);
-         } */
+        else if (Scene.chatRoomIndex !== null) {
+            const positionCorrelationRate = 0.02;
+            const positionCorrelation = this.viewPort.position
+                .subtract(this.camera.position)
+                .multiply(new BABYLON.Vector3(positionCorrelationRate, positionCorrelationRate, positionCorrelationRate));
+            this.camera.position = this.camera.position.add(positionCorrelation);
+
+            const rotationCorrelationRate = 0.1;
+            const rotationCorrelation = this.viewPort.rotation
+                .subtract(this.camera.rotation)
+                .multiply(new BABYLON.Vector3(rotationCorrelationRate, rotationCorrelationRate, rotationCorrelationRate));
+            this.camera.rotation = this.camera.rotation.add(rotationCorrelation);
+        }
 
         this.lightOfCamera.position = this.camera.position;
     };
@@ -173,33 +173,23 @@ export class Scene
         // creation
         const sphere = BABYLON.MeshBuilder.CreateSphere("s", { diameter: 0.3, segments: 12 }, this.scene);
         const bubbleSpray = new BABYLON.SolidParticleSystem('bubbleSpray', this.scene);
+        bubbleSpray.computeParticleColor = false;
+        bubbleSpray.computeParticleTexture = false;
+        bubbleSpray.computeParticleRotation = false;
 
         bubbleSpray.addShape(sphere, 20);
+        sphere.dispose();
+
         const mesh = bubbleSpray.buildMesh();
-        mesh.material = function () {
-            const bubbleMat = new BABYLON.StandardMaterial("bubbleMat", this.scene);
-            //mat.backFaceCulling = false;
-            bubbleMat.alpha = 0.2;
-
-            return bubbleMat;
-        }.bind(this)();
-
+        mesh.material = new BABYLON.StandardMaterial("bubbleMat", this.scene);
+        mesh.material.alpha = 0.2;
         mesh.position = position;
 
-        sphere.dispose();
 
 
         const speed = 0.01;
 
-        // init
-        bubbleSpray.initParticles = function () {
-            for (var p = 0; p < this.nbParticles; p++) {
-                this.recycleParticle(this.particles[p]);
-            }
-        };
-
-
-        bubbleSpray.recycleParticle = (particle) => {
+        const recycleParticle = (particle: BABYLON.SolidParticle) => {
             particle.position.x = 0;
             particle.position.y = 0;
             particle.position.z = 0;
@@ -217,7 +207,7 @@ export class Scene
 
         bubbleSpray.updateParticle = (particle) => {
             if (particle.position.y < 0 || particle['age'] < 0) {
-                bubbleSpray.recycleParticle(particle);
+                recycleParticle(particle);
             }
             particle.position.addInPlace(particle.velocity);
             particle.position.y += speed / 2;
@@ -228,12 +218,10 @@ export class Scene
         };
 
 
-        bubbleSpray.initParticles();
+        for (var p = 0; p < bubbleSpray.nbParticles; p++) {
+            recycleParticle(bubbleSpray.particles[p]);
+        }
         bubbleSpray.setParticles();
-
-        bubbleSpray.computeParticleColor = false;
-        bubbleSpray.computeParticleTexture = false;
-        bubbleSpray.computeParticleRotation = false;
 
         this.bubbleSpray = bubbleSpray;
     };
@@ -613,7 +601,7 @@ export class Scene
 
     private algaes: { sprite: BABYLON.Sprite, createTime: Date }[] = [];
     private cmdHandler(cmd: TextToCmd) {
-        const algaeManager = new BABYLON.SpriteManager("algaeManager", "assets/Algae_particles.png", 1, 375, this.scene);
+        const algaeManager = new BABYLON.SpriteManager("algaeManager", "assets/algae_particles.png", 1, 375, this.scene);
         const center = this.chatRoomsCenter[Scene.chatRoomIndex];
         var algae = new BABYLON.Sprite("algae", algaeManager);
         algae.size = 1;
