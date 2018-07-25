@@ -14,7 +14,8 @@
         "allowJs": false,
         "types": [
             "jquery",
-            "babylonjs"
+            "babylonjs",
+            "socket.io-client"
         ]
     }
 }

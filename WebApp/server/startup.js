@@ -7,7 +7,6 @@ const morgan = require('morgan');
 const logger = require('./logger');
 
 const app = express();
-
 app.use(morgan('combined', { stream: logger.accessLogStream }));
 const setting = { limit: '50mb' };
 app.use(bodyParser.urlencoded(Object.assign({ extended: false }, setting)));
@@ -24,11 +23,22 @@ app.use((err, req, res, next) => {
 const path = require('path').resolve(__dirname, `../app`);
 app.use(express.static(path));
 const PORT = 8080;
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   logger.info(`App listening. serve path: ${path}, port: ${PORT}`);
   logger.info('Press Ctrl+C to quit.');
 });
 // [END Setup]
+
+
+const backgroundParticles = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0 };
+
+
+// [socket.io]
+var io = require('socket.io')(server);
+io.on('connection', socket => {
+  socket.emit('updateBackgroundParticles', backgroundParticles);
+});
+// [END socket.io]
 
 
 
@@ -134,6 +144,14 @@ app.route('/apis/uploadText').post((req, res, next) => {
 
 function sentToChatbots(text, rid) {
   const axios = require('axios');
+  backgroundParticles[rid] += 1;
+  io.sockets.emit('updateBackgroundParticles', backgroundParticles);
+
+  setTimeout(function () {
+    backgroundParticles[rid] -= 1;
+    io.sockets.emit('updateBackgroundParticles', backgroundParticles);
+  }, 5000);
+
   return axios.post('http://35.236.167.99:5000/3sth/api/v1.0/chatbots/', {
     msg: text,
     rid: rid

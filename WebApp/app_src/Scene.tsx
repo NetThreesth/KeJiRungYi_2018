@@ -1,5 +1,6 @@
 import * as React from "react";
 import * as BABYLON from 'babylonjs';
+import * as io from 'socket.io-client';
 import * as $ from 'jquery';
 import { CommonUtility } from './CommonUtility';
 import { BabylonUtility, Line } from './BabylonUtility';
@@ -25,6 +26,7 @@ export class Scene
 
     private glowLayerForParticle: BABYLON.GlowLayer;
     private bubbleSpray: BABYLON.SolidParticleSystem;
+    private backgroundParticles: { [id: string]: { targetCount: number } } = {};
 
     private createLinesWorker: AsyncWorker<BABYLON.Vector3[], BABYLON.Vector3[][]>;
 
@@ -72,6 +74,14 @@ export class Scene
             }, 2000);
         };
         updateMask();
+
+
+        io().on('updateBackgroundParticles', data => {
+            Object.keys(data).forEach(i => {
+                this.backgroundParticles[i] = this.backgroundParticles[i] || {} as any;
+                this.backgroundParticles[i].targetCount = data[i];
+            });
+        });
     };
 
     private initScene() {
@@ -259,6 +269,23 @@ export class Scene
         translateVector: BABYLON.Vector3,
         duration: number
     }[] = [];
+
+    private createParticles() {
+        this.chatRoomsCenter.forEach((center, i) => {
+            const count = this.backgroundParticles[i].targetCount;
+            for (let i = 0; i < count; i++) {
+                const particle = this.createParticle(center);
+
+
+                this.particles.push({
+                    mesh: particle,
+                    translateVector: BabylonUtility.getRandomVector3(),
+                    duration: this.getDurationForParticle()
+                });
+            }
+        });
+    };
+
     private createParticle(center: BABYLON.Vector3) {
         // const range = 15;
 
@@ -303,13 +330,7 @@ export class Scene
                 this.glowLayerForParticle.addIncludedOnlyMesh(particle); */
 
 
-
-
-        this.particles.push({
-            mesh: particle,
-            translateVector: BabylonUtility.getRandomVector3(),
-            duration: this.getDurationForParticle()
-        });
+        return particle;
     };
 
 
@@ -437,10 +458,10 @@ export class Scene
         });
     };
 
+
     private getDurationForParticle() {
         return CommonUtility.getRandomIntInRange(60 * 3, 60 * 6);
     };
-
 
     private chatRoomsNodes: BABYLON.Vector3[] = [];
     private chatRoomsCenter: BABYLON.Vector3[] = [];
@@ -478,15 +499,6 @@ export class Scene
     };
 
 
-    private createParticles() {
-        this.chatRoomsCenter.forEach(center => {
-            for (let i = 0; i < 10; i++) {
-                this.createParticle(center);
-            }
-        });
-    };
-
-
 
     private colorSetForLines = [
         [199, 222, 205],
@@ -495,7 +507,6 @@ export class Scene
     ].map(set => set.map(n => n / 255));
 
     private drawLine() {
-
         if (this.linesForChatRooms.length === 0) return;
 
         const highlightForLine = new BABYLON.HighlightLayer("highlightForLine", this.scene);
