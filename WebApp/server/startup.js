@@ -150,7 +150,7 @@ app.route('/apis/getPoints').get((req, res) => {
   });
 
   const fs = require('fs');
-  fs.readFile('MockPoints.json', (err, content) => {
+  fs.readFile('nineChatrooms.json', (err, content) => {
     res.write(content);
     res.end();
   });

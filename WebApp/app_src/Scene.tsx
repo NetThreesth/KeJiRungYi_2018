@@ -451,9 +451,10 @@ export class Scene
             'apis/getPoints',
             (data: { 'key': BABYLON.Vector3[] }) => {
                 let pointInGroups: BABYLON.Vector3[][] = [];
+                const rate = 0.006;
                 Object.keys(data).forEach((key, i) => {
                     const pointInGroup = data[key].map(p =>
-                        new BABYLON.Vector3(p.x, p.y, CommonUtility.getRandomNumber(3) * 0.006)
+                        new BABYLON.Vector3(p.x * rate, p.y * rate, CommonUtility.getRandomNumber(3) * 0.0025)
                     );
                     this.chatRoomsNodes = this.chatRoomsNodes.concat(pointInGroup);
                     pointInGroups[i] = pointInGroup;

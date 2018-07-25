@@ -1413,9 +1413,10 @@ var Scene = /** @class */ (function (_super) {
         var _this = this;
         jquery__WEBPACK_IMPORTED_MODULE_2__["getJSON"]('apis/getPoints', function (data) {
             var pointInGroups = [];
+            var rate = 0.006;
             Object.keys(data).forEach(function (key, i) {
                 var pointInGroup = data[key].map(function (p) {
-                    return new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"](p.x, p.y, _CommonUtility__WEBPACK_IMPORTED_MODULE_3__["CommonUtility"].getRandomNumber(3) * 0.006);
+                    return new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"](p.x * rate, p.y * rate, _CommonUtility__WEBPACK_IMPORTED_MODULE_3__["CommonUtility"].getRandomNumber(3) * 0.0025);
                 });
                 _this.chatRoomsNodes = _this.chatRoomsNodes.concat(pointInGroup);
                 pointInGroups[i] = pointInGroup;
@@ -2634,4 +2635,4 @@ module.exports = ReactDOM;
 /***/ })
 
 /******/ });
-//# sourceMappingURL=bundle.main.72b812873311a2d21325.js.map
+//# sourceMappingURL=bundle.main.js.map

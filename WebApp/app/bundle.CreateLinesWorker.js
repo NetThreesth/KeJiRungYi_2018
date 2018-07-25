@@ -323,4 +323,4 @@ self.onmessage = function (message) {
 /***/ })
 
 /******/ });
-//# sourceMappingURL=bundle.CreateLinesWorker.82398e02f6dae3c7bd12.js.map
+//# sourceMappingURL=bundle.CreateLinesWorker.js.map
