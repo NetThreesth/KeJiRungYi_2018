@@ -1048,7 +1048,7 @@ var Scene = /** @class */ (function (_super) {
         _this.viewPort = { position: babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"].Zero(), rotation: babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"].Zero() };
         _this.backgroundParticles = function () {
             var dic = {};
-            for (var i = 0; 1 < 9; i++) {
+            for (var i = 0; i < 9; i++) {
                 dic[i] = {
                     targetCount: 0,
                     particles: []
@@ -1166,6 +1166,7 @@ var Scene = /** @class */ (function (_super) {
     Scene.prototype.renderBefore = function () {
         this.updateCameraPosition();
         this.translateLinesForTextNodes();
+        this.updateParticles();
         this.translateParticles();
         this.checkAlgaes();
         if (this.bubbleSpray)
@@ -1262,7 +1263,7 @@ var Scene = /** @class */ (function (_super) {
         this.bubbleSpray = bubbleSpray;
     };
     ;
-    Scene.prototype.createParticles = function () {
+    Scene.prototype.updateParticles = function () {
         var _this = this;
         this.chatRoomsCenter.forEach(function (center, i) {
             var particlesSetting = _this.backgroundParticles[i];
@@ -1582,7 +1583,6 @@ var Scene = /** @class */ (function (_super) {
             setTimeout(function () {
                 _this.linesForLinesystem.length = 0;
                 _this.drawLine();
-                setTimeout(function () { return _this.createParticles(); });
             }, 0.8 * 1000);
         }, 2 * 1000);
     };
@@ -12506,4 +12506,4 @@ module.exports = ReactDOM;
 /***/ })
 
 /******/ });
-//# sourceMappingURL=bundle.main.6ed22fda4b17270ba6a2.js.map
+//# sourceMappingURL=bundle.main.js.map

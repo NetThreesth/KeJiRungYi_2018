@@ -37,7 +37,7 @@ export class Scene
         }
     } = function () {
         const dic = {};
-        for (let i = 0; 1 < 9; i++) {
+        for (let i = 0; i < 9; i++) {
             dic[i] = {
                 targetCount: 0,
                 particles: []
@@ -139,6 +139,7 @@ export class Scene
     private renderBefore() {
         this.updateCameraPosition();
         this.translateLinesForTextNodes();
+        this.updateParticles();
         this.translateParticles();
         this.checkAlgaes();
         if (this.bubbleSpray) this.bubbleSpray.setParticles();
@@ -283,7 +284,7 @@ export class Scene
 
 
 
-    private createParticles() {
+    private updateParticles() {
         this.chatRoomsCenter.forEach((center, i) => {
             const particlesSetting = this.backgroundParticles[i];
             const count = particlesSetting.targetCount - particlesSetting.particles.length;
@@ -654,7 +655,6 @@ export class Scene
             setTimeout(() => {
                 this.linesForLinesystem.length = 0;
                 this.drawLine();
-                setTimeout(() => this.createParticles());
             }, 0.8 * 1000);
         }, 2 * 1000);
     };
