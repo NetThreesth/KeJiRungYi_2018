@@ -26,7 +26,25 @@ export class Scene
 
     private glowLayerForParticle: BABYLON.GlowLayer;
     private bubbleSpray: BABYLON.SolidParticleSystem;
-    private backgroundParticles: { [id: string]: { targetCount: number } } = {};
+    private backgroundParticles: {
+        [id: string]: {
+            targetCount: number,
+            particles: {
+                mesh: BABYLON.Mesh,
+                translateVector: BABYLON.Vector3,
+                duration: number
+            }[]
+        }
+    } = function () {
+        const dic = {};
+        for (let i = 0; 1 < 9; i++) {
+            dic[i] = {
+                targetCount: 0,
+                particles: []
+            };
+        }
+        return dic;
+    }();
 
     private createLinesWorker: AsyncWorker<BABYLON.Vector3[], BABYLON.Vector3[][]>;
 
@@ -264,24 +282,24 @@ export class Scene
     }.bind(this)();
 
 
-    private particles: {
-        mesh: BABYLON.Mesh,
-        translateVector: BABYLON.Vector3,
-        duration: number
-    }[] = [];
 
     private createParticles() {
         this.chatRoomsCenter.forEach((center, i) => {
-            const count = this.backgroundParticles[i].targetCount;
-            for (let i = 0; i < count; i++) {
-                const particle = this.createParticle(center);
+            const particlesSetting = this.backgroundParticles[i];
+            const count = particlesSetting.targetCount - particlesSetting.particles.length;
+            if (count > 0) {
+                for (let i = 0; i < count; i++) {
+                    const particle = this.createParticle(center);
 
-
-                this.particles.push({
-                    mesh: particle,
-                    translateVector: BabylonUtility.getRandomVector3(),
-                    duration: this.getDurationForParticle()
-                });
+                    particlesSetting.particles.push({
+                        mesh: particle,
+                        translateVector: BabylonUtility.getRandomVector3(),
+                        duration: this.getDurationForParticle()
+                    });
+                }
+            } else if (count < 0) {
+                const toRemove = particlesSetting.particles.splice(0, count * -1);
+                toRemove.forEach(e => e.mesh.dispose());
             }
         });
     };
@@ -446,9 +464,13 @@ export class Scene
     };
 
     private translateParticles() {
-        if (this.particles.length === 0) return;
+        let particles = [];
+        Object.keys(this.backgroundParticles).forEach(key => {
+            particles = particles.concat(this.backgroundParticles[key].particles);
+        });
+        if (particles.length === 0) return;
         const scale = 0.003;
-        this.particles.forEach(p => {
+        particles.forEach(p => {
             if (p.duration <= 0) {
                 p.translateVector = BabylonUtility.getRandomVector3();
                 p.duration = this.getDurationForParticle();// unit: frame number
@@ -472,9 +494,10 @@ export class Scene
             'apis/getPoints',
             (data: { 'key': BABYLON.Vector3[] }) => {
                 let pointInGroups: BABYLON.Vector3[][] = [];
+                const rate = 0.006;
                 Object.keys(data).forEach((key, i) => {
                     const pointInGroup = data[key].map(p =>
-                        new BABYLON.Vector3(p.x, p.y, CommonUtility.getRandomNumber(3) * 0.006)
+                        new BABYLON.Vector3(p.x * rate, p.y * rate, CommonUtility.getRandomNumber(3) * 0.0025)
                     );
                     this.chatRoomsNodes = this.chatRoomsNodes.concat(pointInGroup);
                     pointInGroups[i] = pointInGroup;

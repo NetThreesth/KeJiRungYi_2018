@@ -30,11 +30,11 @@ const server = app.listen(PORT, () => {
 // [END Setup]
 
 
-const backgroundParticles = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0 };
+const backgroundParticles = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0 };
 
 
 // [socket.io]
-var io = require('socket.io')(server);
+const io = require('socket.io')(server);
 io.on('connection', socket => {
   socket.emit('updateBackgroundParticles', backgroundParticles);
 });
@@ -43,7 +43,7 @@ io.on('connection', socket => {
 
 
 // [GraphQL]
-const express_graphql = require('express-graphql');
+/* const express_graphql = require('express-graphql');
 const graphql = require('graphql');
 const repo = require('./repository.js');
 
@@ -71,7 +71,7 @@ const rootQuery = new graphql.GraphQLObjectType({
 app.use('/graphql', express_graphql({
   schema: new graphql.GraphQLSchema({ query: rootQuery }),
   graphiql: true
-}));
+})); */
 // [END GraphQL]
 
 
@@ -168,7 +168,7 @@ app.route('/apis/getPoints').get((req, res) => {
   });
 
   const fs = require('fs');
-  fs.readFile('MockPoints.json', (err, content) => {
+  fs.readFile('nineChatrooms.json', (err, content) => {
     res.write(content);
     res.end();
   });
