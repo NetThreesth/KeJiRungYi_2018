@@ -47,7 +47,7 @@ export class MessageBoard
     private createTextMessage(content: Content) {
         const isUser = content.role === Roles.User;
         const name = isUser ? AppSetting.userName : '';
-        const float = isUser ? 'left' : 'right';
+        const float = isUser ?'right' :'left' ;
         return <div className="messageBox" style={{ float: float }}>
             <img src={this.getAvatar(content.role)} className="avatar" />
             <div className="name">{name}</div>
@@ -62,7 +62,7 @@ export class MessageBoard
         };
         const isUser = content.role === Roles.User;
         const name = isUser ? AppSetting.userName : '';
-        const float = isUser ? 'left' : 'right';
+        const float = isUser ?'right' :'left' ;
         return <div className="messageBox" style={{ float: float }}>
             <img src={this.getAvatar(content.role)} className="avatar" />
             <div className="name">{name}</div>

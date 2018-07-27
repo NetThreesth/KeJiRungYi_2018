@@ -7,4 +7,5 @@
 #greenMask {
     @extend .full-page;
     @extend .untouchable;
+    @extend .transition-all;
 }

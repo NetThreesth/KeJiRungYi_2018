@@ -35,7 +35,7 @@ export class MessageCenter {
                 this.eventCenter.trigger(AddLogEvent, resp);
                 this.addText(Roles.Algae, resp.algaeResponse);
                 this.addText(Roles.ChatBot, resp.chatbotResponse);
-                this.eventCenter.trigger(Event.AfterSubmitMessage, resp.text2cmd);
+                this.eventCenter.trigger(Event.AfterSubmitMessage, resp);
             });
     };
 
@@ -51,25 +51,24 @@ export class MessageCenter {
                 this.addText(Roles.Algae, resp.algaeResponse);
                 this.addText(Roles.ChatBot, resp.chatbot2algaeResponse);
                 this.addText(Roles.Algae, JSON.stringify(resp));
-                this.eventCenter.trigger(Event.AfterSubmitMessage, resp.text2cmd);
+                this.eventCenter.trigger(Event.AfterSubmitMessage, resp);
             });
     };
 };
 
-interface ChatBotResponse extends AlgaeInfo {
+export interface ChatBotResponse {
     active: string,
     algaeResponse: string,
     chatbot2algaeResponse: string,
     chatbotResponse: string,
-    inputMsg: string,
+    color: number[]
+    density: number,
+    led: number,
+    pump: number
+    roomId: number,
     text2cmd: TextToCmd
 };
 
-interface AlgaeInfo {
-    roomId: number,
-    led: number,
-    pump: number
-};
 
 export interface TextToCmd { pumpValue: number, ledValue: number };
 

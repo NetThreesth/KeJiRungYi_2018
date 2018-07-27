@@ -5,7 +5,7 @@ import * as $ from 'jquery';
 import { CommonUtility } from './CommonUtility';
 import { BabylonUtility, Line } from './BabylonUtility';
 
-import { EventCenter, Event, TextToCmd } from './MessageCenter';
+import { EventCenter, Event, ChatBotResponse } from './MessageCenter';
 
 
 
@@ -48,6 +48,7 @@ export class Scene
 
     private createLinesWorker: AsyncWorker<BABYLON.Vector3[], BABYLON.Vector3[][]>;
 
+    private maskColor = { r: 0, g: 255, b: 0, a: 0.1 };
 
     render() {
         return <div>
@@ -58,11 +59,9 @@ export class Scene
 
 
     componentDidMount() {
-
         this.initScene();
         this.getTexts();
         this.getPoints();
-
 
         this.createLinesWorker = new AsyncWorker(
             (document.getElementById('CreateLinesWorker') as HTMLScriptElement).src
@@ -78,22 +77,20 @@ export class Scene
         this.props.eventCenter.on(Event.AfterLogin, this.zoomIn.bind(this));
         this.props.eventCenter.on(Event.AfterSubmitMessage, this.cmdHandler.bind(this));
 
-
         window.addEventListener("resize", this.engine.resize.bind(this.engine));
 
-        const updateMask = () => {
-            const setting = CommonUtility.getQueryString('greenMask');
-            const color = setting || `rgba(0, 255, 0, ${CommonUtility.getRandomNumberInRange(0, 0.5, 2)})`;
-            $('#greenMask').css('background-color', color);
-            this.props.eventCenter.trigger(Event.UpdateDevPanelData, { greenMask: color });
-            if (setting) return;
-            setTimeout(() => {
-                updateMask();
-            }, 2000);
-        };
-        updateMask();
+        this.updateMask();
+    };
 
 
+    private updateMask() {
+        const color = this.maskColor;
+        const setting = `rgba(${color.r},${color.g},${color.b},${color.a})`;
+        $('#greenMask').css('background-color', setting);
+        this.props.eventCenter.trigger(Event.UpdateDevPanelData, { greenMask: setting });
+    };
+
+    private startUpdateBackgroundParticles() {
         io().on('updateBackgroundParticles', data => {
             Object.keys(data).forEach(i => {
                 this.backgroundParticles[i] = this.backgroundParticles[i] || {} as any;
@@ -182,10 +179,17 @@ export class Scene
     private checkAlgaes() {
         if (this.algaes.length === 0) return;
         const disposeTime = new Date(Date.now() - 30 * 60 * 1000);
-        if (this.algaes[0].createTime < disposeTime) {
+        if (this.algaes[0].mesh.scaling.x <= 0) {
             const algae = this.algaes.shift();
-            algae.sprite.dispose();
+            algae.mesh.dispose();
         }
+        this.algaes.forEach(algae => {
+            let scaling = algae.mesh.scaling.x;
+            const step = 0.01
+            if (algae.createTime < disposeTime) scaling -= step;
+            else if (algae.mesh.scaling.x <= 1) scaling += step;
+            algae.mesh.scaling = new BABYLON.Vector3(scaling, scaling, scaling);
+        });
     };
 
 
@@ -214,8 +218,6 @@ export class Scene
         mesh.material.alpha = 0.2;
         mesh.position = position;
 
-
-
         const speed = 0.01;
 
         const recycleParticle = (particle: BABYLON.SolidParticle) => {
@@ -225,7 +227,7 @@ export class Scene
             particle.velocity.x = (Math.random() - 0.5) * speed / 3;
             particle.velocity.y = Math.random() * speed;
             particle.velocity.z = (Math.random() - 0.5) * speed / 3;
-            const scale = 1 * Math.random() + 0.2;
+            const scale = Math.random() + 0.2;
             particle.scale.x = scale;
             particle.scale.y = scale;
             particle.scale.z = scale;
@@ -234,12 +236,23 @@ export class Scene
             return particle;
         };
 
+        const direction = this.camera.rotation.clone();
+        if (position.x > 0) {
+            direction.x = direction.x * -1;
+            direction.y = direction.y * -1;
+        }
         bubbleSpray.updateParticle = (particle) => {
-            if (particle.position.y < 0 || particle['age'] < 0) {
+            if (particle['age'] < 0) {
                 recycleParticle(particle);
             }
             particle.position.addInPlace(particle.velocity);
-            particle.position.y += speed / 2;
+            particle.position.x += direction.x / 100;
+            particle.position.y += direction.y / 100;
+
+            const scale = particle.scale.x + 0.005;
+            particle.scale.x = scale;
+            particle.scale.y = scale;
+            particle.scale.z = scale;
 
             particle['age'] -= 0.01;
 
@@ -634,17 +647,28 @@ export class Scene
         };
     };
 
-    private algaes: { sprite: BABYLON.Sprite, createTime: Date }[] = [];
-    private cmdHandler(cmd: TextToCmd) {
-        const algaeManager = new BABYLON.SpriteManager("algaeManager", "assets/algae_particles.png", 1, 375, this.scene);
+    private algaes: { mesh: BABYLON.Mesh, createTime: Date }[] = [];
+    private cmdHandler(chatBotResponse: ChatBotResponse) {
+        const color = chatBotResponse.color;
+        this.maskColor.r = color[0];
+        this.maskColor.g = color[1];
+        this.maskColor.b = color[2];
+        let alpha = this.maskColor.a * ((100 + chatBotResponse.text2cmd.ledValue) / 100);
+        this.maskColor.a = (alpha < 0.3) ? Number(alpha.toFixed(3)) : 0.3;
+        this.updateMask();
+
+        const algae = BABYLON.Mesh.CreatePlane(`algae-${this.algaes.length}`, 0.5, this.scene);
         const center = this.chatRoomsCenter[Scene.chatRoomIndex];
-        var algae = new BABYLON.Sprite("algae", algaeManager);
-        algae.size = 1;
-        algae.position.x = center.x + CommonUtility.getRandomNumberInRange(-3, 3, 2);
-        algae.position.y = center.y + CommonUtility.getRandomNumberInRange(-3, 3, 2);
-        algae.position.z = center.z + CommonUtility.getRandomNumberInRange(-3, 3, 2);
-        algae.isPickable = false;
-        this.algaes.push({ sprite: algae, createTime: new Date() });
+        algae.position.x = center.x + CommonUtility.getRandomNumberInRange(-1, 1, 2);
+        algae.position.y = center.y + CommonUtility.getRandomNumberInRange(-1, 1, 2);
+        algae.position.z = center.z + CommonUtility.getRandomNumberInRange(-1, 1, 2);
+        algae.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL;
+        algae.scaling = new BABYLON.Vector3(0.1, 0.1, 0.1);
+
+        const material = algae.material = new BABYLON.StandardMaterial(`algaeMaterial`, this.scene);
+        material.diffuseTexture = new BABYLON.Texture('assets/algae_particles.png', this.scene);
+        material.diffuseTexture.hasAlpha = true;
+        this.algaes.push({ mesh: algae, createTime: new Date() });
     };
 
 
@@ -655,12 +679,13 @@ export class Scene
             setTimeout(() => {
                 this.linesForLinesystem.length = 0;
                 this.drawLine();
+                this.startUpdateBackgroundParticles();
             }, 0.8 * 1000);
         }, 2 * 1000);
     };
 
     private zoomIn() {
-        Scene.chatRoomIndex = CommonUtility.getRandomIntInRange(0, this.chatRoomsCenter.length - 1);
+        Scene.chatRoomIndex = Scene.chatRoomIndex || CommonUtility.getRandomIntInRange(0, this.chatRoomsCenter.length - 1);
         const chatRoom = this.chatRoomsCenter[Scene.chatRoomIndex];
         const destination = chatRoom ?
             new BABYLON.Vector3(chatRoom.x * 2.5, chatRoom.y * 2.5, 0) :

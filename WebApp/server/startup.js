@@ -150,7 +150,7 @@ function sentToChatbots(text, rid) {
   setTimeout(function () {
     backgroundParticles[rid] -= 1;
     io.sockets.emit('updateBackgroundParticles', backgroundParticles);
-  }, 5000);
+  }, 30 * 60 * 1000);
 
   return axios.post('http://35.236.167.99:5000/3sth/api/v1.0/chatbots/', {
     msg: text,
