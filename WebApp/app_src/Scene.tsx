@@ -137,8 +137,8 @@ export class Scene
         this.updateCameraPosition();
         this.translateLinesForTextNodes();
         this.updateParticles();
-        this.translateParticles();
         this.checkAlgaes();
+        this.translateParticles();
         if (this.bubbleSpray) this.bubbleSpray.setParticles();
     };
 
@@ -260,8 +260,9 @@ export class Scene
                 particle['age'] -= 0.01; 
              */
             particle.position.addInPlace(particle.velocity); // 擴散
-            particle.position.x += direction.x / 200; // 上升x
-            particle.position.y += direction.y / 200; // 上升y 
+            const rise = 0.01;
+            particle.position.x += (direction.x * rise); // 上升x
+            particle.position.y += (direction.y * rise); // 上升y 
 
             const scale = particle.scale.x + 0.002;
             particle.scale.x = scale;
@@ -489,7 +490,9 @@ export class Scene
         Object.keys(this.backgroundParticles).forEach(key => {
             particles = particles.concat(this.backgroundParticles[key].particles);
         });
+        particles = particles.concat(this.algaes);
         if (particles.length === 0) return;
+
         const scale = 0.003;
         particles.forEach(p => {
             if (p.duration <= 0) {
@@ -654,7 +657,12 @@ export class Scene
         };
     };
 
-    private algaes: { mesh: BABYLON.Mesh, createTime: Date }[] = [];
+    private algaes: {
+        mesh: BABYLON.Mesh,
+        createTime: Date,
+        translateVector: BABYLON.Vector3,
+        duration: number
+    }[] = [];
     private cmdHandler(chatBotResponse: ChatBotResponse) {
 
         // Mask
@@ -679,7 +687,12 @@ export class Scene
         const material = algae.material = new BABYLON.StandardMaterial(`algaeMaterial`, this.scene);
         material.diffuseTexture = new BABYLON.Texture('assets/algae_particles.png', this.scene);
         material.diffuseTexture.hasAlpha = true;
-        this.algaes.push({ mesh: algae, createTime: new Date() });
+        this.algaes.push({
+            mesh: algae,
+            createTime: new Date(),
+            translateVector: BabylonUtility.getRandomVector3(),
+            duration: this.getDurationForParticle()
+        });
 
         // Bubble
         this.createBubbleSpray(center, 12 + (chatBotResponse.text2cmd.pumpValue * 2));

@@ -367,8 +367,7 @@ var ControlPanel = /** @class */ (function (_super) {
                     react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("i", { className: "far fa-comment-dots" })),
                 react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("label", { htmlFor: "fileUpload", className: "button white-text" },
                     react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("i", { className: "fas fa-camera-retro" })),
-                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("input", { id: "fileUpload", type: "file", accept: "image/*", style: { display: 'none' }, onChange: this.handleFiles.bind(this) })),
-            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "flashMask" }));
+                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("input", { id: "fileUpload", type: "file", accept: "image/*", style: { display: 'none' }, onChange: this.handleFiles.bind(this) })));
     };
     ;
     ControlPanel.prototype.componentDidMount = function () {
@@ -405,11 +404,6 @@ var ControlPanel = /** @class */ (function (_super) {
         $input.val('');
         this.onTextAdd(String(text));
         this.switchTextInput();
-        var $mask = $('.flashMask');
-        $mask.addClass('flash');
-        setTimeout(function () {
-            $mask.removeClass('flash');
-        }, 500);
     };
     ;
     ControlPanel.prototype.handleFiles = function ($ele) {
@@ -1168,8 +1162,8 @@ var Scene = /** @class */ (function (_super) {
         this.updateCameraPosition();
         this.translateLinesForTextNodes();
         this.updateParticles();
-        this.translateParticles();
         this.checkAlgaes();
+        this.translateParticles();
         if (this.bubbleSpray)
             this.bubbleSpray.setParticles();
     };
@@ -1275,8 +1269,9 @@ var Scene = /** @class */ (function (_super) {
                 particle['age'] -= 0.01;
              */
             particle.position.addInPlace(particle.velocity); // 擴散
-            particle.position.x += direction.x / 200; // 上升x
-            particle.position.y += direction.y / 200; // 上升y 
+            var rise = 0.01;
+            particle.position.x += (direction.x * rise); // 上升x
+            particle.position.y += (direction.y * rise); // 上升y 
             var scale = particle.scale.x + 0.002;
             particle.scale.x = scale;
             particle.scale.y = scale;
@@ -1456,6 +1451,7 @@ var Scene = /** @class */ (function (_super) {
         Object.keys(this.backgroundParticles).forEach(function (key) {
             particles = particles.concat(_this.backgroundParticles[key].particles);
         });
+        particles = particles.concat(this.algaes);
         if (particles.length === 0)
             return;
         var scale = 0.003;
@@ -1606,7 +1602,12 @@ var Scene = /** @class */ (function (_super) {
         var material = algae.material = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["StandardMaterial"]("algaeMaterial", this.scene);
         material.diffuseTexture = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Texture"]('assets/algae_particles.png', this.scene);
         material.diffuseTexture.hasAlpha = true;
-        this.algaes.push({ mesh: algae, createTime: new Date() });
+        this.algaes.push({
+            mesh: algae,
+            createTime: new Date(),
+            translateVector: _BabylonUtility__WEBPACK_IMPORTED_MODULE_5__["BabylonUtility"].getRandomVector3(),
+            duration: this.getDurationForParticle()
+        });
         // Bubble
         this.createBubbleSpray(center, 12 + (chatBotResponse.text2cmd.pumpValue * 2));
     };
@@ -4529,7 +4530,7 @@ exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/li
 
 
 // module
-exports.push([module.i, "html,\nbody {\n  font-family: Microsoft JhengHei;\n  overflow: hidden;\n  width: 100%;\n  height: 100%;\n  margin: 0;\n  padding: 0; }\n\n.full-page, .flashMask {\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  overflow: hidden; }\n\n/* flash */\n.flash {\n  -webkit-animation-name: flash-animation;\n  -webkit-animation-duration: 1s;\n  animation-name: flash-animation;\n  animation-duration: 1s; }\n\n@-webkit-keyframes flash-animation {\n  from {\n    background: rgba(255, 255, 255, 0.8); }\n  to {\n    background: default; } }\n\n@keyframes flash-animation {\n  from {\n    background: rgba(255, 255, 255, 0.8); }\n  to {\n    background: default; } }\n\n.untouchable, .flashMask {\n  pointer-events: none; }\n\ninput[type=text] {\n  background-color: transparent;\n  border: 1px solid #ffffff;\n  border-radius: 3px;\n  height: 24px;\n  color: #ffffff; }\n\n.button {\n  background-color: transparent;\n  cursor: pointer; }\n\n.white-text, .control-panel .textInput button {\n  color: white;\n  text-shadow: 0px 0px 6px #404040; }\n\n.text-center {\n  text-align: center; }\n\n.visible {\n  opacity: 1; }\n\n.invisible {\n  opacity: 0; }\n\n.transition-all, .control-panel, .control-panel .textInput {\n  -webkit-transition: all 0.3s ease;\n  -moz-transition: all 0.3s ease;\n  -o-transition: all 0.3s ease;\n  transition: all 0.3s ease; }\n\n.clearfix::after {\n  content: \"\";\n  clear: both;\n  display: table; }\n\n.flex, .control-panel, .control-panel .textInput {\n  display: flex; }\n\n.flex-row {\n  flex-direction: row; }\n\n.flex-column, .control-panel {\n  flex-direction: column; }\n\n.flex-verticalCenter, .flex-center, .control-panel, .control-panel .textInput {\n  align-items: center; }\n\n.flex-horizontalCenter, .flex-center, .control-panel, .control-panel .textInput {\n  justify-content: center; }\n\n.flex-end {\n  align-items: flex-end; }\n\n.control-panel {\n  position: fixed;\n  bottom: 30px;\n  left: 0;\n  width: 100%;\n  height: 70px; }\n  .control-panel .buttons .button {\n    font-size: 1.8em;\n    border: 0; }\n  .control-panel .textInput {\n    width: 100%;\n    max-width: 35em; }\n  .control-panel .textInput input {\n    background-color: transparent;\n    border: solid 1px white;\n    border-radius: 1px;\n    width: 80%; }\n  .control-panel .textInput button {\n    border: solid 1px white;\n    border-radius: 1px;\n    margin: 0; }\n", ""]);
+exports.push([module.i, "html,\nbody {\n  font-family: Microsoft JhengHei;\n  overflow: hidden;\n  width: 100%;\n  height: 100%;\n  margin: 0;\n  padding: 0; }\n\n.full-page {\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  overflow: hidden; }\n\n/* flash */\n.flash {\n  -webkit-animation-name: flash-animation;\n  -webkit-animation-duration: 1s;\n  animation-name: flash-animation;\n  animation-duration: 1s; }\n\n@-webkit-keyframes flash-animation {\n  from {\n    background: rgba(255, 255, 255, 0.8); }\n  to {\n    background: default; } }\n\n@keyframes flash-animation {\n  from {\n    background: rgba(255, 255, 255, 0.8); }\n  to {\n    background: default; } }\n\n.untouchable {\n  pointer-events: none; }\n\ninput[type=text] {\n  background-color: transparent;\n  border: 1px solid #ffffff;\n  border-radius: 3px;\n  height: 24px;\n  color: #ffffff; }\n\n.button {\n  background-color: transparent;\n  cursor: pointer; }\n\n.white-text, .control-panel .textInput button {\n  color: white;\n  text-shadow: 0px 0px 6px #404040; }\n\n.text-center {\n  text-align: center; }\n\n.visible {\n  opacity: 1; }\n\n.invisible {\n  opacity: 0; }\n\n.transition-all, .control-panel, .control-panel .textInput {\n  -webkit-transition: all 0.3s ease;\n  -moz-transition: all 0.3s ease;\n  -o-transition: all 0.3s ease;\n  transition: all 0.3s ease; }\n\n.clearfix::after {\n  content: \"\";\n  clear: both;\n  display: table; }\n\n.flex, .control-panel, .control-panel .textInput {\n  display: flex; }\n\n.flex-row {\n  flex-direction: row; }\n\n.flex-column, .control-panel {\n  flex-direction: column; }\n\n.flex-verticalCenter, .flex-center, .control-panel, .control-panel .textInput {\n  align-items: center; }\n\n.flex-horizontalCenter, .flex-center, .control-panel, .control-panel .textInput {\n  justify-content: center; }\n\n.flex-end {\n  align-items: flex-end; }\n\n.control-panel {\n  position: fixed;\n  bottom: 30px;\n  left: 0;\n  width: 100%;\n  height: 70px; }\n  .control-panel .buttons .button {\n    font-size: 1.8em;\n    border: 0; }\n  .control-panel .textInput {\n    width: 100%;\n    max-width: 35em; }\n  .control-panel .textInput input {\n    background-color: transparent;\n    border: solid 1px white;\n    border-radius: 1px;\n    width: 80%; }\n  .control-panel .textInput button {\n    border: solid 1px white;\n    border-radius: 1px;\n    margin: 0; }\n", ""]);
 
 // exports
 
@@ -4548,7 +4549,7 @@ exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/li
 
 
 // module
-exports.push([module.i, "#devPanel {\n  display: none;\n  position: fixed;\n  top: 0;\n  right: 0;\n  background-color: rgba(0, 0, 0, 0.2);\n  width: 200px; }\n  #devPanel table {\n    width: 100%; }\n\n#devPanel td {\n  width: 50px;\n  padding: 3px;\n  word-break: break-all; }\n", ""]);
+exports.push([module.i, "#devPanel {\n  display: none;\n  position: fixed;\n  top: 0;\n  right: 0;\n  background-color: rgba(0, 0, 0, 0.2);\n  width: 200px; }\n  #devPanel table {\n    width: 100%; }\n    #devPanel table ul {\n      padding-left: 15px; }\n\n#devPanel td {\n  width: 50px;\n  padding: 3px;\n  word-break: break-all; }\n", ""]);
 
 // exports
 
@@ -11657,4 +11658,4 @@ module.exports = ReactDOM;
 /***/ })
 
 /******/ });
-//# sourceMappingURL=bundle.main.724ce0b07ce22b95d9fd.js.map
+//# sourceMappingURL=bundle.main.9cf9b774d31fb5ff515c.js.map

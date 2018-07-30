@@ -23,7 +23,6 @@ export class ControlPanel
                 <input id="fileUpload" type="file" accept="image/*" style={{ display: 'none' }}
                     onChange={this.handleFiles.bind(this)} />
             </div>
-            <div className="flashMask" />
         </div>;
     };
 
@@ -62,12 +61,6 @@ export class ControlPanel
         $input.val('');
         this.onTextAdd(String(text));
         this.switchTextInput();
-
-        const $mask = $('.flashMask');
-        $mask.addClass('flash');
-        setTimeout(() => {
-            $mask.removeClass('flash');
-        }, 500);
     };
 
 
