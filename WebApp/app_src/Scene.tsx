@@ -126,7 +126,7 @@ export class Scene
         skyboxMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
         skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
         skyboxMaterial.disableLighting = true;
-        const skybox = BABYLON.Mesh.CreateBox("skyBox", 1500.0, scene);
+        const skybox = BABYLON.Mesh.CreateBox("skyBox", 1500, scene);
         skybox.material = skyboxMaterial;
         skybox.infiniteDistance = true;
         skybox.renderingGroupId = 0;
@@ -468,13 +468,7 @@ export class Scene
             this.linesForLinesystem[index] = [toExchange.from, toExchange.to];
         }
 
-        if (linesForChatRoomLen === linesystemLen) return;
-        else if (linesForChatRoomLen > linesystemLen) {
-            const toAdd = this.linesForChatRooms[linesystemLen - 1];
-            this.linesForLinesystem.push([toAdd.from, toAdd.to]);
-        } else if (linesForChatRoomLen < linesystemLen) {
-            this.linesForLinesystem.pop();
-        }
+        if (linesForChatRoomLen < linesystemLen) this.linesForLinesystem.pop();
     };
 
     private translateParticles() {
@@ -506,14 +500,46 @@ export class Scene
     private linesForChatRooms: Line[] = [];
 
     private getPoints() {
+        const addNodeCount = Number(CommonUtility.getQueryString('addNodeCount'));
         $.getJSON('apis/getPoints').then((data: { [key: string]: BABYLON.Vector3[] }) => {
-            const take = 140;
+            const take = 120;
             Object.keys(data).forEach((key, i) => {
-                const pointInGroup = data[key].map(p => new BABYLON.Vector3(p.x, p.y, p.z));
+                const range = { x: { from: 0, to: 0 }, y: { from: 0, to: 0 }, z: { from: 0, to: 0 } };
+                const pointInGroup = data[key].map(p => {
+                    ['x', 'y', 'z'].forEach(axis => {
+                        const oneAxis = range[axis];
+                        oneAxis.from = Math.min(oneAxis.from, p[axis]);
+                        oneAxis.to = Math.max(oneAxis.to, p[axis]);
+                    });
+                    const position = new BABYLON.Vector3(p.x, p.y, p.z)
+                    const box1 = BABYLON.MeshBuilder.CreateBox("box", { size: 0.3 }, this.scene);
+                    box1.position = position;
+                    return position;
+                });
+                if (key === 'chatroom0') {
+                    for (let c = 0; c < addNodeCount; c++) {
+                        const new1 = new BABYLON.Vector3(
+                            CommonUtility.getRandomNumberInRange(range.x.from, range.x.to, 5),
+                            CommonUtility.getRandomNumberInRange(range.y.from, range.y.to, 5),
+                            range.z.from
+                        );
+                        const new2 = new BABYLON.Vector3(
+                            CommonUtility.getRandomNumberInRange(range.x.from, range.x.to, 5),
+                            CommonUtility.getRandomNumberInRange(range.y.from, range.y.to, 5),
+                            range.z.to
+                        );
+                        pointInGroup.push(new1);
+                        pointInGroup.push(new2);
+                        const box1 = BABYLON.MeshBuilder.CreateBox("box", { size: 0.3 }, this.scene);
+                        box1.position = new1;
+                        const box2 = BABYLON.MeshBuilder.CreateBox("box", { size: 0.3 }, this.scene);
+                        box2.position = new2;
+                    }
+                }
                 this.chatRoomsNodes = this.chatRoomsNodes.concat(pointInGroup);
 
                 const linesInGroup = BabylonUtility.getLineToEachOther(pointInGroup);
-                const maxLine = CommonUtility.sort(linesInGroup, e => e.distance)[linesInGroup.length - 1];
+                const maxLine = CommonUtility.sort(linesInGroup, e => e.distance * -1)[0];
                 const center = new BABYLON.Vector3(0, 0, 0);
                 ['x', 'y', 'z'].forEach(axis => {
                     center[axis] = (maxLine.from[axis] + maxLine.to[axis]) / 2

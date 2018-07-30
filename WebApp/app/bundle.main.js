@@ -1149,7 +1149,7 @@ var Scene = /** @class */ (function (_super) {
         skyboxMaterial.diffuseColor = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Color3"](0, 0, 0);
         skyboxMaterial.specularColor = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Color3"](0, 0, 0);
         skyboxMaterial.disableLighting = true;
-        var skybox = babylonjs__WEBPACK_IMPORTED_MODULE_1__["Mesh"].CreateBox("skyBox", 1500.0, scene);
+        var skybox = babylonjs__WEBPACK_IMPORTED_MODULE_1__["Mesh"].CreateBox("skyBox", 1500, scene);
         skybox.material = skyboxMaterial;
         skybox.infiniteDistance = true;
         skybox.renderingGroupId = 0;
@@ -1435,15 +1435,8 @@ var Scene = /** @class */ (function (_super) {
             var toExchange = this.linesForChatRooms[index];
             this.linesForLinesystem[index] = [toExchange.from, toExchange.to];
         }
-        if (linesForChatRoomLen === linesystemLen)
-            return;
-        else if (linesForChatRoomLen > linesystemLen) {
-            var toAdd = this.linesForChatRooms[linesystemLen - 1];
-            this.linesForLinesystem.push([toAdd.from, toAdd.to]);
-        }
-        else if (linesForChatRoomLen < linesystemLen) {
+        if (linesForChatRoomLen < linesystemLen)
             this.linesForLinesystem.pop();
-        }
     };
     ;
     Scene.prototype.translateParticles = function () {
@@ -1473,13 +1466,37 @@ var Scene = /** @class */ (function (_super) {
     ;
     Scene.prototype.getPoints = function () {
         var _this = this;
+        var addNodeCount = Number(_CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getQueryString('addNodeCount'));
         jquery__WEBPACK_IMPORTED_MODULE_3__["getJSON"]('apis/getPoints').then(function (data) {
-            var take = 140;
+            var take = 120;
             Object.keys(data).forEach(function (key, i) {
-                var pointInGroup = data[key].map(function (p) { return new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"](p.x, p.y, p.z); });
+                var range = { x: { from: 0, to: 0 }, y: { from: 0, to: 0 }, z: { from: 0, to: 0 } };
+                var pointInGroup = data[key].map(function (p) {
+                    ['x', 'y', 'z'].forEach(function (axis) {
+                        var oneAxis = range[axis];
+                        oneAxis.from = Math.min(oneAxis.from, p[axis]);
+                        oneAxis.to = Math.max(oneAxis.to, p[axis]);
+                    });
+                    var position = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"](p.x, p.y, p.z);
+                    var box1 = babylonjs__WEBPACK_IMPORTED_MODULE_1__["MeshBuilder"].CreateBox("box", { size: 0.3 }, _this.scene);
+                    box1.position = position;
+                    return position;
+                });
+                if (key === 'chatroom0') {
+                    for (var c = 0; c < addNodeCount; c++) {
+                        var new1 = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"](_CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getRandomNumberInRange(range.x.from, range.x.to, 5), _CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getRandomNumberInRange(range.y.from, range.y.to, 5), range.z.from);
+                        var new2 = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"](_CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getRandomNumberInRange(range.x.from, range.x.to, 5), _CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getRandomNumberInRange(range.y.from, range.y.to, 5), range.z.to);
+                        pointInGroup.push(new1);
+                        pointInGroup.push(new2);
+                        var box1 = babylonjs__WEBPACK_IMPORTED_MODULE_1__["MeshBuilder"].CreateBox("box", { size: 0.3 }, _this.scene);
+                        box1.position = new1;
+                        var box2 = babylonjs__WEBPACK_IMPORTED_MODULE_1__["MeshBuilder"].CreateBox("box", { size: 0.3 }, _this.scene);
+                        box2.position = new2;
+                    }
+                }
                 _this.chatRoomsNodes = _this.chatRoomsNodes.concat(pointInGroup);
                 var linesInGroup = _BabylonUtility__WEBPACK_IMPORTED_MODULE_5__["BabylonUtility"].getLineToEachOther(pointInGroup);
-                var maxLine = _CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].sort(linesInGroup, function (e) { return e.distance; })[linesInGroup.length - 1];
+                var maxLine = _CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].sort(linesInGroup, function (e) { return e.distance * -1; })[0];
                 var center = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"](0, 0, 0);
                 ['x', 'y', 'z'].forEach(function (axis) {
                     center[axis] = (maxLine.from[axis] + maxLine.to[axis]) / 2;
@@ -11653,4 +11670,4 @@ module.exports = ReactDOM;
 /***/ })
 
 /******/ });
-//# sourceMappingURL=bundle.main.a96c07d113e20d6a4399.js.map
+//# sourceMappingURL=bundle.main.js.map
