@@ -151,9 +151,6 @@ export class Scene
             if (cameraLocationsLen > 1) {
                 this.camera.setTarget(BABYLON.Vector3.Zero());
             } else {
-                const center = this.chatRoomsCenter[Scene.chatRoomIndex];
-                this.createBubbleSpray(center);
-
                 this.viewPort.position = this.camera.position.clone();
                 this.viewPort.rotation = this.camera.rotation.clone();
             }
@@ -179,15 +176,14 @@ export class Scene
     private checkAlgaes() {
         if (this.algaes.length === 0) return;
         const disposeTime = new Date(Date.now() - 30 * 60 * 1000);
-        if (this.algaes[0].mesh.scaling.x <= 0) {
+        if (this.algaes[0].mesh.scaling.x < 0.01) {
             const algae = this.algaes.shift();
             algae.mesh.dispose();
         }
         this.algaes.forEach(algae => {
             let scaling = algae.mesh.scaling.x;
-            const step = 0.01
-            if (algae.createTime < disposeTime) scaling -= step;
-            else if (algae.mesh.scaling.x <= 1) scaling += step;
+            if (algae.createTime < disposeTime) scaling -= 0.01;
+            else if (scaling <= 1) scaling += ((1 - scaling) * 0.007);
             algae.mesh.scaling = new BABYLON.Vector3(scaling, scaling, scaling);
         });
     };
@@ -202,36 +198,53 @@ export class Scene
 
 
 
-    private createBubbleSpray(position: BABYLON.Vector3) {
+    private createBubbleSpray(position: BABYLON.Vector3, shapeCount: number) {
+
+        if (this.bubbleSpray) this.bubbleSpray.dispose();
+
         // creation
-        const sphere = BABYLON.MeshBuilder.CreateSphere("s", { diameter: 0.3, segments: 12 }, this.scene);
         const bubbleSpray = new BABYLON.SolidParticleSystem('bubbleSpray', this.scene);
         bubbleSpray.computeParticleColor = false;
-        bubbleSpray.computeParticleTexture = false;
         bubbleSpray.computeParticleRotation = false;
+        bubbleSpray.billboard = true;
 
-        bubbleSpray.addShape(sphere, 20);
-        sphere.dispose();
+        const bubbleMash = BABYLON.MeshBuilder.CreateBox("bubbleMash", { size: 0.5 }, this.scene);
+        bubbleSpray.addShape(bubbleMash, shapeCount);
+        bubbleMash.dispose();
+
+
+        const texture = new BABYLON.Texture('assets/bubbles/all.png', this.scene);
+        texture.hasAlpha = true;
+
+        const bubbles2 = new BABYLON.StandardMaterial("bubbles2", this.scene);
+        bubbles2.backFaceCulling = false;
+        bubbles2.diffuseTexture = texture;
 
         const mesh = bubbleSpray.buildMesh();
-        mesh.material = new BABYLON.StandardMaterial("bubbleMat", this.scene);
-        mesh.material.alpha = 0.2;
         mesh.position = position;
+        mesh.material = bubbles2;
 
-        const speed = 0.01;
 
-        const recycleParticle = (particle: BABYLON.SolidParticle) => {
+        const initParticle = (particle: BABYLON.SolidParticle) => {
             particle.position.x = 0;
             particle.position.y = 0;
             particle.position.z = 0;
+
+            const speed = 0.01;
             particle.velocity.x = (Math.random() - 0.5) * speed / 3;
             particle.velocity.y = Math.random() * speed;
             particle.velocity.z = (Math.random() - 0.5) * speed / 3;
+
             const scale = Math.random() + 0.2;
             particle.scale.x = scale;
             particle.scale.y = scale;
             particle.scale.z = scale;
-            particle['age'] = Math.random() * 2 + 2;
+
+            particle.uvs.x = Math.random() >= 0.5 ? 0.5 : 0;
+            particle.uvs.y = Math.random() >= 0.5 ? 0.5 : 0;
+            particle.uvs.z = particle.uvs.x + 0.5;
+            particle.uvs.w = particle.uvs.y + 0.5;
+            // particle['age'] = Math.random() * 2 + 2;
 
             return particle;
         };
@@ -242,30 +255,26 @@ export class Scene
             direction.y = direction.y * -1;
         }
         bubbleSpray.updateParticle = (particle) => {
-            if (particle['age'] < 0) {
-                recycleParticle(particle);
-            }
-            particle.position.addInPlace(particle.velocity);
-            particle.position.x += direction.x / 100;
-            particle.position.y += direction.y / 100;
+            /*             
+                if (particle['age'] < 0)  initParticle(particle);
+                particle['age'] -= 0.01; 
+             */
+            particle.position.addInPlace(particle.velocity); // 擴散
+            particle.position.x += direction.x / 200; // 上升x
+            particle.position.y += direction.y / 200; // 上升y 
 
-            const scale = particle.scale.x + 0.005;
+            const scale = particle.scale.x + 0.002;
             particle.scale.x = scale;
             particle.scale.y = scale;
             particle.scale.z = scale;
 
-            particle['age'] -= 0.01;
 
             return particle;
         };
 
 
-        for (var p = 0; p < bubbleSpray.nbParticles; p++) {
-            recycleParticle(bubbleSpray.particles[p]);
-        }
-        bubbleSpray.setParticles();
-
-        this.bubbleSpray = bubbleSpray;
+        bubbleSpray.particles.forEach(particle => initParticle(particle));
+        this.bubbleSpray = bubbleSpray.setParticles();
     };
 
 
@@ -288,7 +297,7 @@ export class Scene
                     1: new BABYLON.Texture('assets/background_particles/white_particle.png', this.scene),
                     2: new BABYLON.Texture('assets/background_particles/yellow_particle.png', this.scene)
                 };
-
+                Object.keys(textures).forEach(key => textures[key].hasAlpha = true);
             }
             const key = CommonUtility.getRandomIntInRange(0, 2);
             return textures[key];
@@ -342,9 +351,7 @@ export class Scene
         particle.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL;
 
         const material = particle.material = new BABYLON.StandardMaterial(`particleMaterial`, this.scene);
-
         material.diffuseTexture = this.getTextureForParticle();
-        material.diffuseTexture.hasAlpha = true
 
         /*         material.diffuseColor = color;
                 material.emissiveColor = BABYLON.Color3.Black(); */
@@ -649,6 +656,8 @@ export class Scene
 
     private algaes: { mesh: BABYLON.Mesh, createTime: Date }[] = [];
     private cmdHandler(chatBotResponse: ChatBotResponse) {
+
+        // Mask
         const color = chatBotResponse.color;
         this.maskColor.r = color[0];
         this.maskColor.g = color[1];
@@ -657,8 +666,10 @@ export class Scene
         this.maskColor.a = (alpha < 0.3) ? Number(alpha.toFixed(3)) : 0.3;
         this.updateMask();
 
-        const algae = BABYLON.Mesh.CreatePlane(`algae-${this.algaes.length}`, 0.5, this.scene);
         const center = this.chatRoomsCenter[Scene.chatRoomIndex];
+
+        // Algae
+        const algae = BABYLON.Mesh.CreatePlane(`algae-${this.algaes.length}`, 0.5, this.scene);
         algae.position.x = center.x + CommonUtility.getRandomNumberInRange(-1, 1, 2);
         algae.position.y = center.y + CommonUtility.getRandomNumberInRange(-1, 1, 2);
         algae.position.z = center.z + CommonUtility.getRandomNumberInRange(-1, 1, 2);
@@ -669,6 +680,9 @@ export class Scene
         material.diffuseTexture = new BABYLON.Texture('assets/algae_particles.png', this.scene);
         material.diffuseTexture.hasAlpha = true;
         this.algaes.push({ mesh: algae, createTime: new Date() });
+
+        // Bubble
+        this.createBubbleSpray(center, 12 + (chatBotResponse.text2cmd.pumpValue * 2));
     };
 
 

@@ -1075,6 +1075,7 @@ var Scene = /** @class */ (function (_super) {
                         1: new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Texture"]('assets/background_particles/white_particle.png', _this.scene),
                         2: new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Texture"]('assets/background_particles/yellow_particle.png', _this.scene)
                     };
+                    Object.keys(textures).forEach(function (key) { return textures[key].hasAlpha = true; });
                 }
                 var key = _CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getRandomIntInRange(0, 2);
                 return textures[key];
@@ -1181,8 +1182,6 @@ var Scene = /** @class */ (function (_super) {
                 this.camera.setTarget(babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"].Zero());
             }
             else {
-                var center = this.chatRoomsCenter[Scene.chatRoomIndex];
-                this.createBubbleSpray(center);
                 this.viewPort.position = this.camera.position.clone();
                 this.viewPort.rotation = this.camera.rotation.clone();
             }
@@ -1206,17 +1205,16 @@ var Scene = /** @class */ (function (_super) {
         if (this.algaes.length === 0)
             return;
         var disposeTime = new Date(Date.now() - 30 * 60 * 1000);
-        if (this.algaes[0].mesh.scaling.x <= 0) {
+        if (this.algaes[0].mesh.scaling.x < 0.01) {
             var algae = this.algaes.shift();
             algae.mesh.dispose();
         }
         this.algaes.forEach(function (algae) {
             var scaling = algae.mesh.scaling.x;
-            var step = 0.01;
             if (algae.createTime < disposeTime)
-                scaling -= step;
-            else if (algae.mesh.scaling.x <= 1)
-                scaling += step;
+                scaling -= 0.01;
+            else if (scaling <= 1)
+                scaling += ((1 - scaling) * 0.007);
             algae.mesh.scaling = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"](scaling, scaling, scaling);
         });
     };
@@ -1228,24 +1226,30 @@ var Scene = /** @class */ (function (_super) {
         });
     };
     ;
-    Scene.prototype.createBubbleSpray = function (position) {
+    Scene.prototype.createBubbleSpray = function (position, shapeCount) {
+        if (this.bubbleSpray)
+            this.bubbleSpray.dispose();
         // creation
-        var sphere = babylonjs__WEBPACK_IMPORTED_MODULE_1__["MeshBuilder"].CreateSphere("s", { diameter: 0.3, segments: 12 }, this.scene);
         var bubbleSpray = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["SolidParticleSystem"]('bubbleSpray', this.scene);
         bubbleSpray.computeParticleColor = false;
-        bubbleSpray.computeParticleTexture = false;
         bubbleSpray.computeParticleRotation = false;
-        bubbleSpray.addShape(sphere, 20);
-        sphere.dispose();
+        bubbleSpray.billboard = true;
+        var bubbleMash = babylonjs__WEBPACK_IMPORTED_MODULE_1__["MeshBuilder"].CreateBox("bubbleMash", { size: 0.5 }, this.scene);
+        bubbleSpray.addShape(bubbleMash, shapeCount);
+        bubbleMash.dispose();
+        var texture = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Texture"]('assets/bubbles/all.png', this.scene);
+        texture.hasAlpha = true;
+        var bubbles2 = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["StandardMaterial"]("bubbles2", this.scene);
+        bubbles2.backFaceCulling = false;
+        bubbles2.diffuseTexture = texture;
         var mesh = bubbleSpray.buildMesh();
-        mesh.material = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["StandardMaterial"]("bubbleMat", this.scene);
-        mesh.material.alpha = 0.2;
         mesh.position = position;
-        var speed = 0.01;
-        var recycleParticle = function (particle) {
+        mesh.material = bubbles2;
+        var initParticle = function (particle) {
             particle.position.x = 0;
             particle.position.y = 0;
             particle.position.z = 0;
+            var speed = 0.01;
             particle.velocity.x = (Math.random() - 0.5) * speed / 3;
             particle.velocity.y = Math.random() * speed;
             particle.velocity.z = (Math.random() - 0.5) * speed / 3;
@@ -1253,7 +1257,11 @@ var Scene = /** @class */ (function (_super) {
             particle.scale.x = scale;
             particle.scale.y = scale;
             particle.scale.z = scale;
-            particle['age'] = Math.random() * 2 + 2;
+            particle.uvs.x = Math.random() >= 0.5 ? 0.5 : 0;
+            particle.uvs.y = Math.random() >= 0.5 ? 0.5 : 0;
+            particle.uvs.z = particle.uvs.x + 0.5;
+            particle.uvs.w = particle.uvs.y + 0.5;
+            // particle['age'] = Math.random() * 2 + 2;
             return particle;
         };
         var direction = this.camera.rotation.clone();
@@ -1262,24 +1270,21 @@ var Scene = /** @class */ (function (_super) {
             direction.y = direction.y * -1;
         }
         bubbleSpray.updateParticle = function (particle) {
-            if (particle['age'] < 0) {
-                recycleParticle(particle);
-            }
-            particle.position.addInPlace(particle.velocity);
-            particle.position.x += direction.x / 100;
-            particle.position.y += direction.y / 100;
-            var scale = particle.scale.x + 0.005;
+            /*
+                if (particle['age'] < 0)  initParticle(particle);
+                particle['age'] -= 0.01;
+             */
+            particle.position.addInPlace(particle.velocity); // 擴散
+            particle.position.x += direction.x / 200; // 上升x
+            particle.position.y += direction.y / 200; // 上升y 
+            var scale = particle.scale.x + 0.002;
             particle.scale.x = scale;
             particle.scale.y = scale;
             particle.scale.z = scale;
-            particle['age'] -= 0.01;
             return particle;
         };
-        for (var p = 0; p < bubbleSpray.nbParticles; p++) {
-            recycleParticle(bubbleSpray.particles[p]);
-        }
-        bubbleSpray.setParticles();
-        this.bubbleSpray = bubbleSpray;
+        bubbleSpray.particles.forEach(function (particle) { return initParticle(particle); });
+        this.bubbleSpray = bubbleSpray.setParticles();
     };
     ;
     Scene.prototype.updateParticles = function () {
@@ -1322,7 +1327,6 @@ var Scene = /** @class */ (function (_super) {
         particle.billboardMode = babylonjs__WEBPACK_IMPORTED_MODULE_1__["Mesh"].BILLBOARDMODE_ALL;
         var material = particle.material = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["StandardMaterial"]("particleMaterial", this.scene);
         material.diffuseTexture = this.getTextureForParticle();
-        material.diffuseTexture.hasAlpha = true;
         /*         material.diffuseColor = color;
                 material.emissiveColor = BABYLON.Color3.Black(); */
         /*         if (!this.glowLayerForParticle) {
@@ -1583,6 +1587,7 @@ var Scene = /** @class */ (function (_super) {
     };
     ;
     Scene.prototype.cmdHandler = function (chatBotResponse) {
+        // Mask
         var color = chatBotResponse.color;
         this.maskColor.r = color[0];
         this.maskColor.g = color[1];
@@ -1590,8 +1595,9 @@ var Scene = /** @class */ (function (_super) {
         var alpha = this.maskColor.a * ((100 + chatBotResponse.text2cmd.ledValue) / 100);
         this.maskColor.a = (alpha < 0.3) ? Number(alpha.toFixed(3)) : 0.3;
         this.updateMask();
-        var algae = babylonjs__WEBPACK_IMPORTED_MODULE_1__["Mesh"].CreatePlane("algae-" + this.algaes.length, 0.5, this.scene);
         var center = this.chatRoomsCenter[Scene.chatRoomIndex];
+        // Algae
+        var algae = babylonjs__WEBPACK_IMPORTED_MODULE_1__["Mesh"].CreatePlane("algae-" + this.algaes.length, 0.5, this.scene);
         algae.position.x = center.x + _CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getRandomNumberInRange(-1, 1, 2);
         algae.position.y = center.y + _CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getRandomNumberInRange(-1, 1, 2);
         algae.position.z = center.z + _CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getRandomNumberInRange(-1, 1, 2);
@@ -1601,6 +1607,8 @@ var Scene = /** @class */ (function (_super) {
         material.diffuseTexture = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Texture"]('assets/algae_particles.png', this.scene);
         material.diffuseTexture.hasAlpha = true;
         this.algaes.push({ mesh: algae, createTime: new Date() });
+        // Bubble
+        this.createBubbleSpray(center, 12 + (chatBotResponse.text2cmd.pumpValue * 2));
     };
     ;
     Scene.prototype.transformation = function () {
@@ -11649,4 +11657,4 @@ module.exports = ReactDOM;
 /***/ })
 
 /******/ });
-//# sourceMappingURL=bundle.main.js.map
+//# sourceMappingURL=bundle.main.724ce0b07ce22b95d9fd.js.map
