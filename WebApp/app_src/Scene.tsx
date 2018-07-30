@@ -168,7 +168,6 @@ export class Scene
                 .multiply(new BABYLON.Vector3(rotationCorrelationRate, rotationCorrelationRate, rotationCorrelationRate));
             this.camera.rotation = this.camera.rotation.add(rotationCorrelation);
         }
-
         this.lightOfCamera.position = this.camera.position;
     };
 
@@ -199,10 +198,8 @@ export class Scene
 
 
     private createBubbleSpray(position: BABYLON.Vector3, shapeCount: number) {
-
         if (this.bubbleSpray) this.bubbleSpray.dispose();
 
-        // creation
         const bubbleSpray = new BABYLON.SolidParticleSystem('bubbleSpray', this.scene);
         bubbleSpray.computeParticleColor = false;
         bubbleSpray.computeParticleRotation = false;
@@ -216,13 +213,13 @@ export class Scene
         const texture = new BABYLON.Texture('assets/bubbles/all.png', this.scene);
         texture.hasAlpha = true;
 
-        const bubbles2 = new BABYLON.StandardMaterial("bubbles2", this.scene);
-        bubbles2.backFaceCulling = false;
-        bubbles2.diffuseTexture = texture;
+        const bubbles = new BABYLON.StandardMaterial("bubbles", this.scene);
+        bubbles.backFaceCulling = false;
+        bubbles.diffuseTexture = texture;
 
         const mesh = bubbleSpray.buildMesh();
         mesh.position = position;
-        mesh.material = bubbles2;
+        mesh.material = bubbles;
 
 
         const initParticle = (particle: BABYLON.SolidParticle) => {
@@ -269,42 +266,12 @@ export class Scene
             particle.scale.y = scale;
             particle.scale.z = scale;
 
-
             return particle;
         };
-
 
         bubbleSpray.particles.forEach(particle => initParticle(particle));
         this.bubbleSpray = bubbleSpray.setParticles();
     };
-
-
-    private colorsSetForParticle = [
-        { diffuseColor: [253, 245, 134], glowColor: [255, 252, 193, 0.85] },
-        { diffuseColor: [253, 229, 210], glowColor: [255, 219, 225, 0.85] },
-        { diffuseColor: [252, 247, 255], glowColor: [255, 249, 254, 0.85] }
-    ].map(set => {
-        set.diffuseColor = set.diffuseColor.map(n => n / 255);
-        set.glowColor = set.glowColor.map((n, i) => i !== 3 ? n / 255 : n);
-        return set;
-    });
-
-    private getTextureForParticle = function () {
-        let textures: { [key: number]: BABYLON.Texture } = null;
-        return () => {
-            if (!textures) {
-                textures = {
-                    0: new BABYLON.Texture('assets/background_particles/pink_particle.png', this.scene),
-                    1: new BABYLON.Texture('assets/background_particles/white_particle.png', this.scene),
-                    2: new BABYLON.Texture('assets/background_particles/yellow_particle.png', this.scene)
-                };
-                Object.keys(textures).forEach(key => textures[key].hasAlpha = true);
-            }
-            const key = CommonUtility.getRandomIntInRange(0, 2);
-            return textures[key];
-        }
-    }.bind(this)();
-
 
 
     private updateParticles() {
@@ -328,23 +295,49 @@ export class Scene
         });
     };
 
-    private createParticle(center: BABYLON.Vector3) {
-        // const range = 15;
+    /*     
+        private colorsSetForParticle = [
+            { diffuseColor: [253, 245, 134], glowColor: [255, 252, 193, 0.85] },
+            { diffuseColor: [253, 229, 210], glowColor: [255, 219, 225, 0.85] },
+            { diffuseColor: [252, 247, 255], glowColor: [255, 249, 254, 0.85] }
+        ].map(set => {
+            set.diffuseColor = set.diffuseColor.map(n => n / 255);
+            set.glowColor = set.glowColor.map((n, i) => i !== 3 ? n / 255 : n);
+            return set;
+        }); 
+    */
 
-        /*  const position = new BABYLON.Vector3(
+    private getTextureForParticle = function () {
+        let textures: { [key: number]: BABYLON.Texture } = null;
+        return () => {
+            if (!textures) {
+                textures = {
+                    0: new BABYLON.Texture('assets/background_particles/pink_particle.png', this.scene),
+                    1: new BABYLON.Texture('assets/background_particles/white_particle.png', this.scene),
+                    2: new BABYLON.Texture('assets/background_particles/yellow_particle.png', this.scene)
+                };
+                Object.keys(textures).forEach(key => textures[key].hasAlpha = true);
+            }
+            const key = CommonUtility.getRandomIntInRange(0, 2);
+            return textures[key];
+        }
+    }.bind(this)();
+
+    private createParticle(center: BABYLON.Vector3) {
+        /*  
+            const range = 15;
+            const position = new BABYLON.Vector3(
              center.x + (CommonUtility.getRandomIntInRange(range * -1, range) * 0.1),
              center.y + (CommonUtility.getRandomIntInRange(range * -1, range) * 0.1),
              center.z + (CommonUtility.getRandomIntInRange(range * -1, range) * 0.1),
-         ); */
-
+            ); 
+        */
 
         const colorSetIndex = CommonUtility.getRandomIntInRange(0, 2);
         // const colorSet = this.colorsSetForParticle[colorSetIndex];
         // const colorInRGB = colorSet.diffuseColor;
         // const color = new BABYLON.Color3(colorInRGB[0], colorInRGB[1], colorInRGB[2]);
-
         // const radius = CommonUtility.getRandomIntInRange(10, 20) * 0.01;
-
         // const particle = BABYLON.Mesh.CreateSphere(`colorSetIndex:${colorSetIndex}`, 8, radius, this.scene);
 
         const particle = BABYLON.Mesh.CreatePlane(`colorSetIndex:${colorSetIndex}`, 0.5, this.scene);
@@ -354,21 +347,21 @@ export class Scene
         const material = particle.material = new BABYLON.StandardMaterial(`particleMaterial`, this.scene);
         material.diffuseTexture = this.getTextureForParticle();
 
-        /*         material.diffuseColor = color;
-                material.emissiveColor = BABYLON.Color3.Black(); */
+        /*         
+            material.diffuseColor = color;
+            material.emissiveColor = BABYLON.Color3.Black(); 
 
-
-        /*         if (!this.glowLayerForParticle) {
-                    this.glowLayerForParticle = new BABYLON.GlowLayer("glowLayerForParticle", this.scene);
-                    this.glowLayerForParticle.intensity = 0.5;
-                    this.glowLayerForParticle.customEmissiveColorSelector = (mesh, subMesh, material, result) => {
-                        const colorSetIndex = mesh.name.replace('colorSetIndex:', '');
-                        const glowColor = this.colorsSetForParticle[colorSetIndex].glowColor;
-                        result.set(glowColor[0], glowColor[1], glowColor[2], glowColor[3]);
-                    }
+            if (!this.glowLayerForParticle) {
+                this.glowLayerForParticle = new BABYLON.GlowLayer("glowLayerForParticle", this.scene);
+                this.glowLayerForParticle.intensity = 0.5;
+                this.glowLayerForParticle.customEmissiveColorSelector = (mesh, subMesh, material, result) => {
+                    const colorSetIndex = mesh.name.replace('colorSetIndex:', '');
+                    const glowColor = this.colorsSetForParticle[colorSetIndex].glowColor;
+                    result.set(glowColor[0], glowColor[1], glowColor[2], glowColor[3]);
                 }
-                this.glowLayerForParticle.addIncludedOnlyMesh(particle); */
-
+            }
+            this.glowLayerForParticle.addIncludedOnlyMesh(particle); 
+        */
 
         return particle;
     };
@@ -379,7 +372,6 @@ export class Scene
     private linesystem: BABYLON.LinesMesh = null;
     private translateType: TranslateType = TranslateType.Simple;
     private linesystemPerformance = 0;
-
 
     private startUpdateTextNodes(textNodes: TranslatableNode[]) {
         let updatedNodes: TranslatableNode[];
@@ -497,14 +489,14 @@ export class Scene
         particles.forEach(p => {
             if (p.duration <= 0) {
                 p.translateVector = BabylonUtility.getRandomVector3();
-                p.duration = this.getDurationForParticle();// unit: frame number
+                p.duration = this.getDurationForParticle();
             }
             BabylonUtility.updatePosition(p.mesh.position, p.translateVector, scale);
             p.duration -= 1;
         });
     };
 
-
+    /** unit in frame number */
     private getDurationForParticle() {
         return CommonUtility.getRandomIntInRange(60 * 3, 60 * 6);
     };
@@ -514,44 +506,25 @@ export class Scene
     private linesForChatRooms: Line[] = [];
 
     private getPoints() {
-        $.getJSON(
-            'apis/getPoints',
-            (data: { 'key': BABYLON.Vector3[] }) => {
-                let pointInGroups: BABYLON.Vector3[][] = [];
-                const rate = 0.006;
-                Object.keys(data).forEach((key, i) => {
-                    const pointInGroup = data[key].map(p =>
-                        new BABYLON.Vector3(p.x * rate, p.y * rate, CommonUtility.getRandomNumber(3) * 0.0025)
-                    );
-                    this.chatRoomsNodes = this.chatRoomsNodes.concat(pointInGroup);
-                    pointInGroups[i] = pointInGroup;
-                });
-                this.chatRoomsNodes = CommonUtility.shuffle(this.chatRoomsNodes);
-                let lines: Line[] = [];
+        $.getJSON('apis/getPoints').then((data: { [key: string]: BABYLON.Vector3[] }) => {
+            const take = 140;
+            Object.keys(data).forEach((key, i) => {
+                const pointInGroup = data[key].map(p => new BABYLON.Vector3(p.x, p.y, p.z));
+                this.chatRoomsNodes = this.chatRoomsNodes.concat(pointInGroup);
 
-                const take = 120;
-                pointInGroups.forEach(points => {
-                    const linesInGroup = BabylonUtility.getLineToEachOther(points);
-                    const maxLine = CommonUtility.sort(linesInGroup, e => e.distance)[linesInGroup.length - 1];
-                    const center = new BABYLON.Vector3(0, 0, 0);
-                    Object.keys(center).forEach(axis => {
-                        center[axis] = (maxLine.from[axis] + maxLine.to[axis]) / 2
-                    });
-                    this.chatRoomsCenter.push(center);
-                    lines = lines.concat(linesInGroup.slice(0, take));
+                const linesInGroup = BabylonUtility.getLineToEachOther(pointInGroup);
+                const maxLine = CommonUtility.sort(linesInGroup, e => e.distance)[linesInGroup.length - 1];
+                const center = new BABYLON.Vector3(0, 0, 0);
+                ['x', 'y', 'z'].forEach(axis => {
+                    center[axis] = (maxLine.from[axis] + maxLine.to[axis]) / 2
                 });
-                this.linesForChatRooms = lines;
-            }
-        );
+                this.chatRoomsCenter.push(center);
+                this.linesForChatRooms = this.linesForChatRooms.concat(linesInGroup.slice(0, take));
+            });
+            this.chatRoomsNodes = CommonUtility.shuffle(this.chatRoomsNodes);
+        });
     };
 
-
-
-    private colorSetForLines = [
-        [199, 222, 205],
-        [192, 231, 164],
-        [168, 213, 133]
-    ].map(set => set.map(n => n / 255));
 
     private drawLine() {
         if (this.linesForChatRooms.length === 0) return;
@@ -560,7 +533,12 @@ export class Scene
         highlightForLine.innerGlow = false;
         const glowColor = new BABYLON.Color3(246 / 255, 255 / 255, 201 / 255);
 
-        const materials = this.colorSetForLines.map((colorInRGB, i) => {
+        const colorSetForLines = [
+            [199, 222, 205],
+            [192, 231, 164],
+            [168, 213, 133]
+        ].map(set => set.map(n => n / 255));
+        const materials = colorSetForLines.map((colorInRGB, i) => {
             const color = new BABYLON.Color3(colorInRGB[0], colorInRGB[1], colorInRGB[2]);
             const mat = new BABYLON.StandardMaterial(`lineMat${i}`, this.scene);
             mat.diffuseColor = color;
@@ -597,7 +575,6 @@ export class Scene
             const context = canvas.getContext('2d');
             context.drawImage(img, 0, 0, width, height);
 
-
             // inputs
             const startX = 64 * CommonUtility.getRandomIntInRange(0, 6);
             const startY = 64 * CommonUtility.getRandomIntInRange(0, 6);
@@ -607,13 +584,9 @@ export class Scene
             const takeHeight = takeWidth / rateOfWoverH;
             const imgData = context.getImageData(startX, startY, takeWidth, takeHeight);
 
-
             const pixels: {
-                x: number,
-                y: number,
-                r: number,
-                g: number,
-                b: number,
+                x: number, y: number,
+                r: number, g: number, b: number,
                 brightness: number
             }[] = [];
             const len = imgData.data.length;
@@ -628,11 +601,8 @@ export class Scene
                 const rowNumber = Math.floor(pixelNumber / takeWidth);
                 const culNumber = pixelNumber % takeWidth;
                 pixels.push({
-                    x: culNumber,
-                    y: rowNumber,
-                    r: r,
-                    g: g,
-                    b: b,
+                    x: culNumber, y: rowNumber,
+                    r: r, g: g, b: b,
                     brightness: brightness
                 });
             }
@@ -663,6 +633,7 @@ export class Scene
         translateVector: BABYLON.Vector3,
         duration: number
     }[] = [];
+
     private cmdHandler(chatBotResponse: ChatBotResponse) {
 
         // Mask

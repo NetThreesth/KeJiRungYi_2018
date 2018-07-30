@@ -155,21 +155,28 @@ function sentToChatbots(text, rid) {
   return axios.post('http://35.236.167.99:5000/3sth/api/v1.0/chatbots/', {
     msg: text,
     rid: rid
-  })
+  });
 };
 
 
-app.route('/apis/getPoints').get((req, res) => {
-
-  res.writeHead(200, {
-    'Content-Type': 'text/json',
-    'Access-Control-Allow-Origin': '*',
-    'X-Powered-By': 'nodejs'
-  });
+app.route('/apis/getPoints').get((req, res, next) => {
 
   const fs = require('fs');
-  fs.readFile('nineChatrooms.json', (err, content) => {
-    res.write(content);
+  fs.readFile('nineChatrooms.json', 'utf8', (err, content) => {
+    if (err) errorHandler(err, next);
+
+    const data = JSON.parse(content);
+    const rate = 0.006;
+    Object.keys(data).forEach((key, i) => {
+      const nodesOfRoom = data[key]
+      nodesOfRoom.forEach(n => {
+        n.x = n.x * rate;
+        n.y = n.y * rate;
+        n.z = (Math.random() - Math.random()) * 2;
+      });
+    });
+
+    res.json(data);
     res.end();
   });
 });

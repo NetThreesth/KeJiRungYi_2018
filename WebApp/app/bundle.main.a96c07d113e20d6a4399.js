@@ -1050,15 +1050,17 @@ var Scene = /** @class */ (function (_super) {
             return dic;
         }();
         _this.maskColor = { r: 0, g: 255, b: 0, a: 0.1 };
-        _this.colorsSetForParticle = [
-            { diffuseColor: [253, 245, 134], glowColor: [255, 252, 193, 0.85] },
-            { diffuseColor: [253, 229, 210], glowColor: [255, 219, 225, 0.85] },
-            { diffuseColor: [252, 247, 255], glowColor: [255, 249, 254, 0.85] }
-        ].map(function (set) {
-            set.diffuseColor = set.diffuseColor.map(function (n) { return n / 255; });
-            set.glowColor = set.glowColor.map(function (n, i) { return i !== 3 ? n / 255 : n; });
-            return set;
-        });
+        /*
+            private colorsSetForParticle = [
+                { diffuseColor: [253, 245, 134], glowColor: [255, 252, 193, 0.85] },
+                { diffuseColor: [253, 229, 210], glowColor: [255, 219, 225, 0.85] },
+                { diffuseColor: [252, 247, 255], glowColor: [255, 249, 254, 0.85] }
+            ].map(set => {
+                set.diffuseColor = set.diffuseColor.map(n => n / 255);
+                set.glowColor = set.glowColor.map((n, i) => i !== 3 ? n / 255 : n);
+                return set;
+            });
+        */
         _this.getTextureForParticle = function () {
             var _this = this;
             var textures = null;
@@ -1082,11 +1084,6 @@ var Scene = /** @class */ (function (_super) {
         _this.chatRoomsNodes = [];
         _this.chatRoomsCenter = [];
         _this.linesForChatRooms = [];
-        _this.colorSetForLines = [
-            [199, 222, 205],
-            [192, 231, 164],
-            [168, 213, 133]
-        ].map(function (set) { return set.map(function (n) { return n / 255; }); });
         _this.algaes = [];
         return _this;
     }
@@ -1223,7 +1220,6 @@ var Scene = /** @class */ (function (_super) {
     Scene.prototype.createBubbleSpray = function (position, shapeCount) {
         if (this.bubbleSpray)
             this.bubbleSpray.dispose();
-        // creation
         var bubbleSpray = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["SolidParticleSystem"]('bubbleSpray', this.scene);
         bubbleSpray.computeParticleColor = false;
         bubbleSpray.computeParticleRotation = false;
@@ -1233,12 +1229,12 @@ var Scene = /** @class */ (function (_super) {
         bubbleMash.dispose();
         var texture = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Texture"]('assets/bubbles/all.png', this.scene);
         texture.hasAlpha = true;
-        var bubbles2 = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["StandardMaterial"]("bubbles2", this.scene);
-        bubbles2.backFaceCulling = false;
-        bubbles2.diffuseTexture = texture;
+        var bubbles = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["StandardMaterial"]("bubbles", this.scene);
+        bubbles.backFaceCulling = false;
+        bubbles.diffuseTexture = texture;
         var mesh = bubbleSpray.buildMesh();
         mesh.position = position;
-        mesh.material = bubbles2;
+        mesh.material = bubbles;
         var initParticle = function (particle) {
             particle.position.x = 0;
             particle.position.y = 0;
@@ -1305,12 +1301,14 @@ var Scene = /** @class */ (function (_super) {
     };
     ;
     Scene.prototype.createParticle = function (center) {
-        // const range = 15;
-        /*  const position = new BABYLON.Vector3(
+        /*
+            const range = 15;
+            const position = new BABYLON.Vector3(
              center.x + (CommonUtility.getRandomIntInRange(range * -1, range) * 0.1),
              center.y + (CommonUtility.getRandomIntInRange(range * -1, range) * 0.1),
              center.z + (CommonUtility.getRandomIntInRange(range * -1, range) * 0.1),
-         ); */
+            );
+        */
         var colorSetIndex = _CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getRandomIntInRange(0, 2);
         // const colorSet = this.colorsSetForParticle[colorSetIndex];
         // const colorInRGB = colorSet.diffuseColor;
@@ -1322,18 +1320,21 @@ var Scene = /** @class */ (function (_super) {
         particle.billboardMode = babylonjs__WEBPACK_IMPORTED_MODULE_1__["Mesh"].BILLBOARDMODE_ALL;
         var material = particle.material = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["StandardMaterial"]("particleMaterial", this.scene);
         material.diffuseTexture = this.getTextureForParticle();
-        /*         material.diffuseColor = color;
-                material.emissiveColor = BABYLON.Color3.Black(); */
-        /*         if (!this.glowLayerForParticle) {
-                    this.glowLayerForParticle = new BABYLON.GlowLayer("glowLayerForParticle", this.scene);
-                    this.glowLayerForParticle.intensity = 0.5;
-                    this.glowLayerForParticle.customEmissiveColorSelector = (mesh, subMesh, material, result) => {
-                        const colorSetIndex = mesh.name.replace('colorSetIndex:', '');
-                        const glowColor = this.colorsSetForParticle[colorSetIndex].glowColor;
-                        result.set(glowColor[0], glowColor[1], glowColor[2], glowColor[3]);
-                    }
+        /*
+            material.diffuseColor = color;
+            material.emissiveColor = BABYLON.Color3.Black();
+
+            if (!this.glowLayerForParticle) {
+                this.glowLayerForParticle = new BABYLON.GlowLayer("glowLayerForParticle", this.scene);
+                this.glowLayerForParticle.intensity = 0.5;
+                this.glowLayerForParticle.customEmissiveColorSelector = (mesh, subMesh, material, result) => {
+                    const colorSetIndex = mesh.name.replace('colorSetIndex:', '');
+                    const glowColor = this.colorsSetForParticle[colorSetIndex].glowColor;
+                    result.set(glowColor[0], glowColor[1], glowColor[2], glowColor[3]);
                 }
-                this.glowLayerForParticle.addIncludedOnlyMesh(particle); */
+            }
+            this.glowLayerForParticle.addIncludedOnlyMesh(particle);
+        */
         return particle;
     };
     ;
@@ -1458,43 +1459,35 @@ var Scene = /** @class */ (function (_super) {
         particles.forEach(function (p) {
             if (p.duration <= 0) {
                 p.translateVector = _BabylonUtility__WEBPACK_IMPORTED_MODULE_5__["BabylonUtility"].getRandomVector3();
-                p.duration = _this.getDurationForParticle(); // unit: frame number
+                p.duration = _this.getDurationForParticle();
             }
             _BabylonUtility__WEBPACK_IMPORTED_MODULE_5__["BabylonUtility"].updatePosition(p.mesh.position, p.translateVector, scale);
             p.duration -= 1;
         });
     };
     ;
+    /** unit in frame number */
     Scene.prototype.getDurationForParticle = function () {
         return _CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getRandomIntInRange(60 * 3, 60 * 6);
     };
     ;
     Scene.prototype.getPoints = function () {
         var _this = this;
-        jquery__WEBPACK_IMPORTED_MODULE_3__["getJSON"]('apis/getPoints', function (data) {
-            var pointInGroups = [];
-            var rate = 0.006;
+        jquery__WEBPACK_IMPORTED_MODULE_3__["getJSON"]('apis/getPoints').then(function (data) {
+            var take = 140;
             Object.keys(data).forEach(function (key, i) {
-                var pointInGroup = data[key].map(function (p) {
-                    return new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"](p.x * rate, p.y * rate, _CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getRandomNumber(3) * 0.0025);
-                });
+                var pointInGroup = data[key].map(function (p) { return new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"](p.x, p.y, p.z); });
                 _this.chatRoomsNodes = _this.chatRoomsNodes.concat(pointInGroup);
-                pointInGroups[i] = pointInGroup;
-            });
-            _this.chatRoomsNodes = _CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].shuffle(_this.chatRoomsNodes);
-            var lines = [];
-            var take = 120;
-            pointInGroups.forEach(function (points) {
-                var linesInGroup = _BabylonUtility__WEBPACK_IMPORTED_MODULE_5__["BabylonUtility"].getLineToEachOther(points);
+                var linesInGroup = _BabylonUtility__WEBPACK_IMPORTED_MODULE_5__["BabylonUtility"].getLineToEachOther(pointInGroup);
                 var maxLine = _CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].sort(linesInGroup, function (e) { return e.distance; })[linesInGroup.length - 1];
                 var center = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"](0, 0, 0);
-                Object.keys(center).forEach(function (axis) {
+                ['x', 'y', 'z'].forEach(function (axis) {
                     center[axis] = (maxLine.from[axis] + maxLine.to[axis]) / 2;
                 });
                 _this.chatRoomsCenter.push(center);
-                lines = lines.concat(linesInGroup.slice(0, take));
+                _this.linesForChatRooms = _this.linesForChatRooms.concat(linesInGroup.slice(0, take));
             });
-            _this.linesForChatRooms = lines;
+            _this.chatRoomsNodes = _CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].shuffle(_this.chatRoomsNodes);
         });
     };
     ;
@@ -1505,7 +1498,12 @@ var Scene = /** @class */ (function (_super) {
         var highlightForLine = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["HighlightLayer"]("highlightForLine", this.scene);
         highlightForLine.innerGlow = false;
         var glowColor = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Color3"](246 / 255, 255 / 255, 201 / 255);
-        var materials = this.colorSetForLines.map(function (colorInRGB, i) {
+        var colorSetForLines = [
+            [199, 222, 205],
+            [192, 231, 164],
+            [168, 213, 133]
+        ].map(function (set) { return set.map(function (n) { return n / 255; }); });
+        var materials = colorSetForLines.map(function (colorInRGB, i) {
             var color = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Color3"](colorInRGB[0], colorInRGB[1], colorInRGB[2]);
             var mat = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["StandardMaterial"]("lineMat" + i, _this.scene);
             mat.diffuseColor = color;
@@ -1558,11 +1556,8 @@ var Scene = /** @class */ (function (_super) {
                 var rowNumber = Math.floor(pixelNumber / takeWidth);
                 var culNumber = pixelNumber % takeWidth;
                 pixels.push({
-                    x: culNumber,
-                    y: rowNumber,
-                    r: r,
-                    g: g,
-                    b: b,
+                    x: culNumber, y: rowNumber,
+                    r: r, g: g, b: b,
                     brightness: brightness
                 });
             }
@@ -11658,4 +11653,4 @@ module.exports = ReactDOM;
 /***/ })
 
 /******/ });
-//# sourceMappingURL=bundle.main.9cf9b774d31fb5ff515c.js.map
+//# sourceMappingURL=bundle.main.a96c07d113e20d6a4399.js.map

@@ -141,5 +141,4 @@ export class LoginPanel
         $loginPanel.animate({ opacity: 0 }, 2000, () => $loginPanel.hide());
         this.props.eventCenter.trigger(Event.AfterLogin);
     };
-
 };
