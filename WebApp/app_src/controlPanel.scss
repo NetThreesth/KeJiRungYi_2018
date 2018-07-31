@@ -33,4 +33,20 @@
         border-radius: 1px;
         margin: 0;
     }
+    .userRecord {
+        display: none;
+        position: absolute;
+        top: -10px;
+        left: 50%;
+        transform: translate(-50%, -100%);
+        padding: 10px;
+        background-color: rgba(255, 255, 255, 0.6);
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+        div {
+            padding: 2px 0;
+        }
+    }
 }

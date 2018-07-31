@@ -1,4 +1,3 @@
-
 export class CommonUtility {
 
     static getRandomBoolean() {
@@ -75,7 +74,7 @@ export class CommonUtility {
         const href = url ? url : window.location.href;
         const reg = new RegExp('[?&]' + field + '=([^&#]*)', 'i');
         const string = reg.exec(href);
-        return string ? decodeURIComponent(string[1]) : null;
+        return string ? decodeURIComponent(string[1]) : undefined;
     };
 
     static deepMerge<T>(from: T, to: T, propName?): T {
@@ -105,5 +104,13 @@ export class CommonUtility {
             contentType: "application/json",
             data: JSON.stringify(data)
         });
+    };
+
+    static loop(count: number, func: (finishedTimes: number) => void) {
+        let finished = 0;
+        while (finished < count) {
+            func(finished);
+            finished++;
+        };
     };
 };

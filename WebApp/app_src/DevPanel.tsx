@@ -1,8 +1,10 @@
 import * as React from "react";
 import { EventCenter, Event } from './MessageCenter';
-import { CommonUtility } from './CommonUtility';
+import { CommonUtility } from './common/CommonUtility';
 
 export const AddLogEvent = 'AddLogEvent';
+
+import "./DevPanel.scss";
 
 export class DevPanel
     extends React.Component<{ eventCenter: EventCenter }, DevPanelData> {

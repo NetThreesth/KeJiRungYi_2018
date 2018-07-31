@@ -1,10 +1,29 @@
 import * as React from "react";
 import { MessageCenter, EventCenter, Event } from './MessageCenter';
-import { Roles } from './AppSetting';
+import { Roles, GlobalData } from './common/GlobalData';
 
-export class ControlPanel
-    extends React.Component<{ messageCenter: MessageCenter, eventCenter: EventCenter }>
-{
+import "./ControlPanel.scss";
+
+export class ControlPanel extends React.Component<
+    {
+        messageCenter: MessageCenter,
+        eventCenter: EventCenter
+    },
+    {
+        userName: string,
+        roomID: number,
+        time: number,
+        touchEventCount: number
+    }
+    >{
+
+    state = {
+        userName: '',
+        roomID: null,
+        time: 0,
+        touchEventCount: 0
+    };
+
     render() {
         return <div className="control-panel invisible untouchable">
             <span className="textInput invisible">
@@ -14,7 +33,7 @@ export class ControlPanel
                 </button>
             </span>
             <div className="buttons">
-                <button id="textInputSwitch" className="button white-text" onClick={this.switchTextInput.bind(this)}>
+                <button className="button white-text" onClick={this.switchTextInput.bind(this)}>
                     <i className="far fa-comment-dots"></i>
                 </button>
                 <label htmlFor="fileUpload" className="button white-text">
@@ -22,6 +41,15 @@ export class ControlPanel
                 </label>
                 <input id="fileUpload" type="file" accept="image/*" style={{ display: 'none' }}
                     onChange={this.handleFiles.bind(this)} />
+                <button className="button white-text" onClick={this.switchUserRecord.bind(this)}>
+                    <i className="fas fa-ellipsis-h"></i>
+                </button>
+            </div>
+            <div className="userRecord">
+                <div>用戶: {GlobalData.userName}</div>
+                <div>聊天室編號: {GlobalData.chatRoomIndex}</div>
+                <div>使用時間: {this.state.time} ms</div>
+                <div>觸碰事件: {this.state.touchEventCount} 次</div>
             </div>
         </div>;
     };
@@ -29,7 +57,30 @@ export class ControlPanel
     componentDidMount() {
         this.props.eventCenter.on(Event.AfterLogin, () => {
             $('.control-panel').removeClass(['invisible', 'untouchable']).addClass('visible');
+            this.setState({
+                time: new Date().getTime() - GlobalData.signInTime.getTime(),
+                touchEventCount: 0
+            });
         });
+
+        $(document).on('mouseup touchend click', () => {
+            const newState = Object.assign({}, this.state, {
+                touchEventCount: this.state.touchEventCount + 1
+            });
+            this.setState(newState);
+        });
+        setInterval(() => {
+            if (!GlobalData.signInTime) return;
+            const newState = Object.assign({}, this.state, {
+                time: new Date().getTime() - GlobalData.signInTime.getTime(),
+            });
+            this.setState(newState);
+        }, 200);
+    };
+
+    private switchUserRecord() {
+        const $userRecord = $('.userRecord');
+        $userRecord.is(":visible") ? $userRecord.fadeOut() : $userRecord.fadeIn();
     };
 
     private onTextAdd(text: string) {

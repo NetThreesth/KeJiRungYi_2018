@@ -1,5 +1,5 @@
-import { CommonUtility } from './CommonUtility';
-import { BabylonUtility } from './BabylonUtility';
+import { CommonUtility } from './common/CommonUtility';
+import { BabylonUtility } from './common/BabylonUtility';
 
 self.onmessage = function (message) {
     const textNodes: BABYLON.Vector3[] = message.data

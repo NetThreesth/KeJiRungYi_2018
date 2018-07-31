@@ -2,11 +2,16 @@ import * as React from "react";
 
 import { MessageCenter, Content, ContentType, EventCenter } from './MessageCenter';
 import { AddLogEvent } from './DevPanel';
-import { AppSetting, Roles } from './AppSetting';
+import { GlobalData, Roles } from './common/GlobalData';
+
+import "./MessageBoard.scss";
 
 
 export class MessageBoard
-    extends React.Component<{ messageCenter: MessageCenter, eventCenter: EventCenter }, { contents: Content[] }>{
+    extends React.Component<
+    { messageCenter: MessageCenter, eventCenter: EventCenter },
+    { contents: Content[] }
+    >{
 
 
     constructor(props) {
@@ -46,8 +51,8 @@ export class MessageBoard
 
     private createTextMessage(content: Content) {
         const isUser = content.role === Roles.User;
-        const name = isUser ? AppSetting.userName : '';
-        const float = isUser ?'right' :'left' ;
+        const name = isUser ? GlobalData.userName : '';
+        const float = isUser ? 'right' : 'left';
         return <div className="messageBox" style={{ float: float }}>
             <img src={this.getAvatar(content.role)} className="avatar" />
             <div className="name">{name}</div>
@@ -61,8 +66,8 @@ export class MessageBoard
             maxWidth: '600px'
         };
         const isUser = content.role === Roles.User;
-        const name = isUser ? AppSetting.userName : '';
-        const float = isUser ?'right' :'left' ;
+        const name = isUser ? GlobalData.userName : '';
+        const float = isUser ? 'right' : 'left';
         return <div className="messageBox" style={{ float: float }}>
             <img src={this.getAvatar(content.role)} className="avatar" />
             <div className="name">{name}</div>

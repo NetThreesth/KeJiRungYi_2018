@@ -1,12 +1,6 @@
 import "./base.scss";
 import "./flexbox.scss";
 
-import "./scene.scss";
-import "./controlPanel.scss";
-import "./loginPanel.scss";
-import "./messageBoard.scss";
-import "./devPanel.scss";
-
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 
@@ -16,7 +10,7 @@ import { DevPanel } from './DevPanel';
 import { LoginPanel } from './LoginPanel';
 import { ControlPanel } from './ControlPanel';
 import { MessageBoard } from './MessageBoard';
-import { CommonUtility } from './CommonUtility';
+import { CommonUtility } from './common/CommonUtility';
 
 
 
@@ -37,4 +31,3 @@ ReactDOM.render(
     </div>,
     document.getElementById("app")
 );
-

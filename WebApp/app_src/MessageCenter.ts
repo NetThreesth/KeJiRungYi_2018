@@ -1,6 +1,6 @@
-import { Roles } from './AppSetting';
+import { Roles,GlobalData } from './common/GlobalData';
 import { Scene } from './Scene';
-import { CommonUtility } from './CommonUtility';
+import { CommonUtility } from './common/CommonUtility';
 import { AddLogEvent } from './DevPanel';
 
 export enum ContentType {
@@ -30,7 +30,7 @@ export class MessageCenter {
         this.eventCenter.trigger(MessageCenter.eventName);
 
         if (role !== Roles.User) return;
-        CommonUtility.asyncPost('apis/uploadText', { rid: Scene.chatRoomIndex, text: text })
+        CommonUtility.asyncPost('apis/uploadText', { rid: GlobalData.chatRoomIndex, text: text })
             .done((resp: ChatBotResponse) => {
                 this.eventCenter.trigger(AddLogEvent, resp);
                 this.addText(Roles.Algae, resp.algaeResponse);
@@ -44,7 +44,7 @@ export class MessageCenter {
         this.contents.push({ role: role, type: ContentType.Image, content: b64String });
         this.eventCenter.trigger(MessageCenter.eventName);
 
-        CommonUtility.asyncPost('apis/uploadImage', { rid: Scene.chatRoomIndex, base64Image: b64String })
+        CommonUtility.asyncPost('apis/uploadImage', { rid: GlobalData.chatRoomIndex, base64Image: b64String })
             .done((resp: ChatBotResponse) => {
                 this.eventCenter.trigger(AddLogEvent, resp);
                 this.addText(Roles.ChatBot, resp.chatbotResponse);

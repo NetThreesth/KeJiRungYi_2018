@@ -1,6 +1,8 @@
 import * as React from "react";
-import { AppSetting } from './AppSetting';
 import { EventCenter, Event } from './MessageCenter';
+import { GlobalData } from './common/GlobalData';
+
+import "./LoginPanel.scss";
 
 export class LoginPanel
     extends React.Component<{ eventCenter: EventCenter }> {
@@ -132,7 +134,9 @@ export class LoginPanel
     private signInButtonClickHandler() {
         const signInName = $('#signInName').val() as string;
         if (signInName.length === 0) return;
-        AppSetting.userName = signInName;
+
+        GlobalData.userName = signInName;
+        GlobalData.signInTime = new Date();
         this.login();
     };
 

@@ -86,17 +86,46 @@
 /************************************************************************/
 /******/ ({
 
-/***/ "./app_src/BabylonUtility.ts":
-/*!***********************************!*\
-  !*** ./app_src/BabylonUtility.ts ***!
-  \***********************************/
+/***/ "./app_src/CreateLinesWorker.ts":
+/*!**************************************!*\
+  !*** ./app_src/CreateLinesWorker.ts ***!
+  \**************************************/
+/*! no exports provided */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _common_CommonUtility__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./common/CommonUtility */ "./app_src/common/CommonUtility.ts");
+/* harmony import */ var _common_BabylonUtility__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./common/BabylonUtility */ "./app_src/common/BabylonUtility.ts");
+
+
+self.onmessage = function (message) {
+    var textNodes = message.data;
+    var lines = _common_BabylonUtility__WEBPACK_IMPORTED_MODULE_1__["BabylonUtility"].getLineToEachOther(textNodes);
+    var linesToSelect = lines.filter(function (l) { return l.distance > 0.2; });
+    linesToSelect = _common_CommonUtility__WEBPACK_IMPORTED_MODULE_0__["CommonUtility"]
+        .sort(linesToSelect, function (l) { return l.distance; })
+        .slice(0, 1200);
+    var linesToDraw = linesToSelect.map(function (l) { return [l.from, l.to]; });
+    //.shuffle(linesToSelect)
+    //.slice(0, 900)
+    postMessage(linesToDraw, undefined);
+};
+
+
+/***/ }),
+
+/***/ "./app_src/common/BabylonUtility.ts":
+/*!******************************************!*\
+  !*** ./app_src/common/BabylonUtility.ts ***!
+  \******************************************/
 /*! exports provided: BabylonUtility */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "BabylonUtility", function() { return BabylonUtility; });
-/* harmony import */ var _CommonUtility__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./CommonUtility */ "./app_src/CommonUtility.ts");
+/* harmony import */ var _CommonUtility__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./CommonUtility */ "./app_src/common/CommonUtility.ts");
 
 var BabylonUtility = /** @class */ (function () {
     function BabylonUtility() {
@@ -170,10 +199,10 @@ var BabylonUtility = /** @class */ (function () {
 
 /***/ }),
 
-/***/ "./app_src/CommonUtility.ts":
-/*!**********************************!*\
-  !*** ./app_src/CommonUtility.ts ***!
-  \**********************************/
+/***/ "./app_src/common/CommonUtility.ts":
+/*!*****************************************!*\
+  !*** ./app_src/common/CommonUtility.ts ***!
+  \*****************************************/
 /*! exports provided: CommonUtility */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -252,7 +281,7 @@ var CommonUtility = /** @class */ (function () {
         var href = url ? url : window.location.href;
         var reg = new RegExp('[?&]' + field + '=([^&#]*)', 'i');
         var string = reg.exec(href);
-        return string ? decodeURIComponent(string[1]) : null;
+        return string ? decodeURIComponent(string[1]) : undefined;
     };
     ;
     CommonUtility.deepMerge = function (from, to, propName) {
@@ -285,42 +314,22 @@ var CommonUtility = /** @class */ (function () {
         });
     };
     ;
+    CommonUtility.loop = function (count, func) {
+        var finished = 0;
+        while (finished < count) {
+            func(finished);
+            finished++;
+        }
+        ;
+    };
+    ;
     return CommonUtility;
 }());
 
 ;
 
 
-/***/ }),
-
-/***/ "./app_src/CreateLinesWorker.ts":
-/*!**************************************!*\
-  !*** ./app_src/CreateLinesWorker.ts ***!
-  \**************************************/
-/*! no exports provided */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _CommonUtility__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./CommonUtility */ "./app_src/CommonUtility.ts");
-/* harmony import */ var _BabylonUtility__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./BabylonUtility */ "./app_src/BabylonUtility.ts");
-
-
-self.onmessage = function (message) {
-    var textNodes = message.data;
-    var lines = _BabylonUtility__WEBPACK_IMPORTED_MODULE_1__["BabylonUtility"].getLineToEachOther(textNodes);
-    var linesToSelect = lines.filter(function (l) { return l.distance > 0.2; });
-    linesToSelect = _CommonUtility__WEBPACK_IMPORTED_MODULE_0__["CommonUtility"]
-        .sort(linesToSelect, function (l) { return l.distance; })
-        .slice(0, 1200);
-    var linesToDraw = linesToSelect.map(function (l) { return [l.from, l.to]; });
-    //.shuffle(linesToSelect)
-    //.slice(0, 900)
-    postMessage(linesToDraw, undefined);
-};
-
-
 /***/ })
 
 /******/ });
-//# sourceMappingURL=bundle.CreateLinesWorker.js.map
+//# sourceMappingURL=bundle.CreateLinesWorker.bef41e18e0126651b591.js.map

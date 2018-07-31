@@ -86,241 +86,33 @@
 /************************************************************************/
 /******/ ({
 
-/***/ "./app_src/AppSetting.ts":
-/*!*******************************!*\
-  !*** ./app_src/AppSetting.ts ***!
-  \*******************************/
-/*! exports provided: AppSetting, Roles */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "AppSetting", function() { return AppSetting; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Roles", function() { return Roles; });
-var AppSetting = /** @class */ (function () {
-    function AppSetting() {
-    }
-    AppSetting.userName = 'TestUser';
-    return AppSetting;
-}());
-
-;
-var Roles;
-(function (Roles) {
-    Roles[Roles["User"] = 0] = "User";
-    Roles[Roles["ChatBot"] = 1] = "ChatBot";
-    Roles[Roles["Algae"] = 2] = "Algae";
-    Roles[Roles["AI"] = 3] = "AI";
-})(Roles || (Roles = {}));
-;
-
-
-/***/ }),
-
-/***/ "./app_src/BabylonUtility.ts":
+/***/ "./app_src/ControlPanel.scss":
 /*!***********************************!*\
-  !*** ./app_src/BabylonUtility.ts ***!
+  !*** ./app_src/ControlPanel.scss ***!
   \***********************************/
-/*! exports provided: BabylonUtility */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "BabylonUtility", function() { return BabylonUtility; });
-/* harmony import */ var _CommonUtility__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./CommonUtility */ "./app_src/CommonUtility.ts");
-
-var BabylonUtility = /** @class */ (function () {
-    function BabylonUtility() {
-    }
-    BabylonUtility.distance = function (v1, v2) {
-        var dx = v1.x - v2.x;
-        var dy = v1.y - v2.y;
-        var dz = v1.z - v2.z;
-        return Math.sqrt(dx * dx + dy * dy + dz * dz);
-    };
-    ;
-    BabylonUtility.degrees = function (v1, v2) {
-        var rad = Math.acos(BABYLON.Vector3.Dot(v1, v2) / (v1.length() * v2.length()));
-        return BABYLON.Angle.FromRadians(rad).degrees() || 0;
-    };
-    ;
-    BabylonUtility.addVector = function (v1, v2) {
-        return new BABYLON.Vector3(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z);
-    };
-    ;
-    BabylonUtility.subtractVector = function (v1, v2) {
-        return new BABYLON.Vector3(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
-    };
-    ;
-    BabylonUtility.getRandomVector3 = function (randomOnX, randomOnY, randomOnZ) {
-        if (randomOnX === void 0) { randomOnX = true; }
-        if (randomOnY === void 0) { randomOnY = true; }
-        if (randomOnZ === void 0) { randomOnZ = true; }
-        return new BABYLON.Vector3(randomOnX ? _CommonUtility__WEBPACK_IMPORTED_MODULE_0__["CommonUtility"].getRandomInt() : 0, randomOnY ? _CommonUtility__WEBPACK_IMPORTED_MODULE_0__["CommonUtility"].getRandomInt() : 0, randomOnZ ? _CommonUtility__WEBPACK_IMPORTED_MODULE_0__["CommonUtility"].getRandomInt() : 0).normalize();
-    };
-    ;
-    BabylonUtility.updatePosition = function (position, translateVector, scale) {
-        position.x += (translateVector.x * scale);
-        position.y += (translateVector.y * scale);
-        position.z += (translateVector.z * scale);
-        return position;
-    };
-    ;
-    BabylonUtility.positionToString = function (position) {
-        var positions = ['x', 'y', 'z'].map(function (k) {
-            return position[k].toFixed(2);
-        });
-        return positions.join(', ');
-    };
-    ;
-    BabylonUtility.getLineToEachOther = function (points) {
-        var lines = [];
-        points.forEach(function (from, iOfFrom) {
-            points.forEach(function (to, iOfTo) {
-                if (iOfFrom < iOfTo) {
-                    var distance = BabylonUtility.distance(from, to);
-                    var key = iOfFrom + "-" + iOfTo;
-                    lines.push({
-                        key: key,
-                        from: from,
-                        to: to,
-                        distance: distance
-                    });
-                }
-            });
-        });
-        return lines;
-    };
-    ;
-    return BabylonUtility;
-}());
-
-;
-;
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
 
 
-/***/ }),
+var content = __webpack_require__(/*! !../node_modules/css-loader!../node_modules/sass-loader/lib/loader.js!./ControlPanel.scss */ "./node_modules/css-loader/index.js!./node_modules/sass-loader/lib/loader.js!./app_src/ControlPanel.scss");
 
-/***/ "./app_src/CommonUtility.ts":
-/*!**********************************!*\
-  !*** ./app_src/CommonUtility.ts ***!
-  \**********************************/
-/*! exports provided: CommonUtility */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+if(typeof content === 'string') content = [[module.i, content, '']];
 
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CommonUtility", function() { return CommonUtility; });
-var CommonUtility = /** @class */ (function () {
-    function CommonUtility() {
-    }
-    CommonUtility.getRandomBoolean = function () {
-        return Math.random() >= 0.5;
-    };
-    ;
-    CommonUtility.getRandomNumberInRange = function (min, max, digits) {
-        var rate = Math.pow(10, digits);
-        return CommonUtility.getRandomIntInRange(min * rate, max * rate) / rate;
-    };
-    ;
-    CommonUtility.getRandomIntInRange = function (min, max) {
-        return Math.floor(Math.random() * (max - min + 1)) + min;
-    };
-    ;
-    CommonUtility.getRandomInt = function (digits) {
-        var r = CommonUtility.getRandomBoolean() ? 1 : -1;
-        return CommonUtility.getRandomNegativeInt(digits) * r;
-    };
-    ;
-    CommonUtility.getRandomNegativeInt = function (digits) {
-        return CommonUtility.getRandomNegativeNumber(digits);
-    };
-    ;
-    CommonUtility.getRandomNumber = function (digitsOnInt, digitsOnFloat) {
-        var r = CommonUtility.getRandomBoolean() ? 1 : -1;
-        return CommonUtility.getRandomNegativeNumber(digitsOnInt, digitsOnFloat) * r;
-    };
-    ;
-    CommonUtility.getRandomNegativeNumber = function (digitsOnInt, digitsOnFloat) {
-        digitsOnInt = digitsOnInt || 1;
-        digitsOnFloat = digitsOnFloat || 0;
-        var result = Math.round(Math.random() * Math.pow(10, digitsOnInt + digitsOnFloat));
-        if (digitsOnFloat !== 0)
-            result = result / Math.pow(10, digitsOnFloat);
-        return result;
-    };
-    ;
-    CommonUtility.sort = function (array, func) {
-        array.sort(function (a, b) {
-            return func(a) - func(b);
-        });
-        return array;
-    };
-    ;
-    CommonUtility.shuffle = function (array) {
-        var currentIndex = array.length;
-        var temporaryValue;
-        var randomIndex;
-        // While there remain elements to shuffle...
-        while (0 !== currentIndex) {
-            // Pick a remaining element...
-            randomIndex = Math.floor(Math.random() * currentIndex);
-            currentIndex -= 1;
-            // And swap it with the current element.
-            temporaryValue = array[currentIndex];
-            array[currentIndex] = array[randomIndex];
-            array[randomIndex] = temporaryValue;
-        }
-        return array;
-    };
-    ;
-    CommonUtility.createArray = function (length) {
-        var array = Array.apply(null, { length: length });
-        return array;
-    };
-    ;
-    CommonUtility.getQueryString = function (field, url) {
-        var href = url ? url : window.location.href;
-        var reg = new RegExp('[?&]' + field + '=([^&#]*)', 'i');
-        var string = reg.exec(href);
-        return string ? decodeURIComponent(string[1]) : null;
-    };
-    ;
-    CommonUtility.deepMerge = function (from, to, propName) {
-        if (from instanceof Object && !(from instanceof Date)) {
-            if (from instanceof Array)
-                to = to || [];
-            to = to || {};
-            var fromKeys = Object.keys(from);
-            if (fromKeys) {
-                fromKeys.forEach(function (prop) {
-                    to[prop] = CommonUtility.deepMerge(from[prop], to[prop], prop);
-                });
-            }
-        }
-        else
-            to = from;
-        return to;
-    };
-    ;
-    CommonUtility.deepClone = function (obj) {
-        return CommonUtility.deepMerge(obj, {});
-    };
-    ;
-    CommonUtility.asyncPost = function (url, data) {
-        return $.ajax({
-            url: url,
-            type: "post",
-            contentType: "application/json",
-            data: JSON.stringify(data)
-        });
-    };
-    ;
-    return CommonUtility;
-}());
+var transform;
+var insertInto;
 
-;
 
+
+var options = {"hmr":true}
+
+options.transform = transform
+options.insertInto = undefined;
+
+var update = __webpack_require__(/*! ../node_modules/style-loader/lib/addStyles.js */ "./node_modules/style-loader/lib/addStyles.js")(content, options);
+
+if(content.locals) module.exports = content.locals;
+
+if(false) {}
 
 /***/ }),
 
@@ -337,7 +129,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _MessageCenter__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./MessageCenter */ "./app_src/MessageCenter.ts");
-/* harmony import */ var _AppSetting__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./AppSetting */ "./app_src/AppSetting.ts");
+/* harmony import */ var _common_GlobalData__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./common/GlobalData */ "./app_src/common/GlobalData.ts");
+/* harmony import */ var _ControlPanel_scss__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./ControlPanel.scss */ "./app_src/ControlPanel.scss");
+/* harmony import */ var _ControlPanel_scss__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_ControlPanel_scss__WEBPACK_IMPORTED_MODULE_3__);
 var __extends = (undefined && undefined.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -351,10 +145,18 @@ var __extends = (undefined && undefined.__extends) || (function () {
 
 
 
+
 var ControlPanel = /** @class */ (function (_super) {
     __extends(ControlPanel, _super);
     function ControlPanel() {
-        return _super !== null && _super.apply(this, arguments) || this;
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.state = {
+            userName: '',
+            roomID: null,
+            time: 0,
+            touchEventCount: 0
+        };
+        return _this;
     }
     ControlPanel.prototype.render = function () {
         return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "control-panel invisible untouchable" },
@@ -363,25 +165,66 @@ var ControlPanel = /** @class */ (function (_super) {
                 react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("button", { className: "button", onClick: this.handleText.bind(this) },
                     react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("i", { className: "fas fa-share" }))),
             react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "buttons" },
-                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("button", { id: "textInputSwitch", className: "button white-text", onClick: this.switchTextInput.bind(this) },
+                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("button", { className: "button white-text", onClick: this.switchTextInput.bind(this) },
                     react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("i", { className: "far fa-comment-dots" })),
                 react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("label", { htmlFor: "fileUpload", className: "button white-text" },
                     react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("i", { className: "fas fa-camera-retro" })),
-                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("input", { id: "fileUpload", type: "file", accept: "image/*", style: { display: 'none' }, onChange: this.handleFiles.bind(this) })));
+                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("input", { id: "fileUpload", type: "file", accept: "image/*", style: { display: 'none' }, onChange: this.handleFiles.bind(this) }),
+                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("button", { className: "button white-text", onClick: this.switchUserRecord.bind(this) },
+                    react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("i", { className: "fas fa-ellipsis-h" }))),
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "userRecord" },
+                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", null,
+                    "\u7528\u6236: ",
+                    _common_GlobalData__WEBPACK_IMPORTED_MODULE_2__["GlobalData"].userName),
+                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", null,
+                    "\u804A\u5929\u5BA4\u7DE8\u865F: ",
+                    _common_GlobalData__WEBPACK_IMPORTED_MODULE_2__["GlobalData"].chatRoomIndex),
+                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", null,
+                    "\u4F7F\u7528\u6642\u9593: ",
+                    this.state.time,
+                    " ms"),
+                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", null,
+                    "\u89F8\u78B0\u4E8B\u4EF6: ",
+                    this.state.touchEventCount,
+                    " \u6B21")));
     };
     ;
     ControlPanel.prototype.componentDidMount = function () {
+        var _this = this;
         this.props.eventCenter.on(_MessageCenter__WEBPACK_IMPORTED_MODULE_1__["Event"].AfterLogin, function () {
             $('.control-panel').removeClass(['invisible', 'untouchable']).addClass('visible');
+            _this.setState({
+                time: new Date().getTime() - _common_GlobalData__WEBPACK_IMPORTED_MODULE_2__["GlobalData"].signInTime.getTime(),
+                touchEventCount: 0
+            });
         });
+        $(document).on('mouseup touchend click', function () {
+            var newState = Object.assign({}, _this.state, {
+                touchEventCount: _this.state.touchEventCount + 1
+            });
+            _this.setState(newState);
+        });
+        setInterval(function () {
+            if (!_common_GlobalData__WEBPACK_IMPORTED_MODULE_2__["GlobalData"].signInTime)
+                return;
+            var newState = Object.assign({}, _this.state, {
+                time: new Date().getTime() - _common_GlobalData__WEBPACK_IMPORTED_MODULE_2__["GlobalData"].signInTime.getTime(),
+            });
+            _this.setState(newState);
+        }, 200);
+    };
+    ;
+    ControlPanel.prototype.switchUserRecord = function () {
+        var $userRecord = $('.userRecord');
+        $userRecord.is(":visible") ? $userRecord.fadeOut() : $userRecord.fadeIn();
     };
     ;
     ControlPanel.prototype.onTextAdd = function (text) {
-        this.props.messageCenter.addText(_AppSetting__WEBPACK_IMPORTED_MODULE_2__["Roles"].User, text);
+        this.props.messageCenter.addText(_common_GlobalData__WEBPACK_IMPORTED_MODULE_2__["Roles"].User, text);
     };
     ;
     ControlPanel.prototype.onImageAdd = function (image) {
-        this.props.messageCenter.addImage(_AppSetting__WEBPACK_IMPORTED_MODULE_2__["Roles"].User, image);
+        this.props.messageCenter.addImage(_common_GlobalData__WEBPACK_IMPORTED_MODULE_2__["Roles"].User, image);
     };
     ;
     ControlPanel.prototype.switchTextInput = function () {
@@ -427,6 +270,36 @@ var ControlPanel = /** @class */ (function (_super) {
 
 /***/ }),
 
+/***/ "./app_src/DevPanel.scss":
+/*!*******************************!*\
+  !*** ./app_src/DevPanel.scss ***!
+  \*******************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+
+var content = __webpack_require__(/*! !../node_modules/css-loader!../node_modules/sass-loader/lib/loader.js!./DevPanel.scss */ "./node_modules/css-loader/index.js!./node_modules/sass-loader/lib/loader.js!./app_src/DevPanel.scss");
+
+if(typeof content === 'string') content = [[module.i, content, '']];
+
+var transform;
+var insertInto;
+
+
+
+var options = {"hmr":true}
+
+options.transform = transform
+options.insertInto = undefined;
+
+var update = __webpack_require__(/*! ../node_modules/style-loader/lib/addStyles.js */ "./node_modules/style-loader/lib/addStyles.js")(content, options);
+
+if(content.locals) module.exports = content.locals;
+
+if(false) {}
+
+/***/ }),
+
 /***/ "./app_src/DevPanel.tsx":
 /*!******************************!*\
   !*** ./app_src/DevPanel.tsx ***!
@@ -441,7 +314,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _MessageCenter__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./MessageCenter */ "./app_src/MessageCenter.ts");
-/* harmony import */ var _CommonUtility__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./CommonUtility */ "./app_src/CommonUtility.ts");
+/* harmony import */ var _common_CommonUtility__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./common/CommonUtility */ "./app_src/common/CommonUtility.ts");
+/* harmony import */ var _DevPanel_scss__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./DevPanel.scss */ "./app_src/DevPanel.scss");
+/* harmony import */ var _DevPanel_scss__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_DevPanel_scss__WEBPACK_IMPORTED_MODULE_3__);
 var __extends = (undefined && undefined.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -456,11 +331,12 @@ var __extends = (undefined && undefined.__extends) || (function () {
 
 
 var AddLogEvent = 'AddLogEvent';
+
 var DevPanel = /** @class */ (function (_super) {
     __extends(DevPanel, _super);
     function DevPanel(props) {
         var _this = _super.call(this, props) || this;
-        _this.isdev = _CommonUtility__WEBPACK_IMPORTED_MODULE_2__["CommonUtility"].getQueryString('isdev');
+        _this.isdev = _common_CommonUtility__WEBPACK_IMPORTED_MODULE_2__["CommonUtility"].getQueryString('isdev');
         _this.state = { log: [] };
         if (!_this.isdev)
             return _this;
@@ -518,6 +394,36 @@ var DevPanel = /** @class */ (function (_super) {
 
 /***/ }),
 
+/***/ "./app_src/LoginPanel.scss":
+/*!*********************************!*\
+  !*** ./app_src/LoginPanel.scss ***!
+  \*********************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+
+var content = __webpack_require__(/*! !../node_modules/css-loader!../node_modules/sass-loader/lib/loader.js!./LoginPanel.scss */ "./node_modules/css-loader/index.js!./node_modules/sass-loader/lib/loader.js!./app_src/LoginPanel.scss");
+
+if(typeof content === 'string') content = [[module.i, content, '']];
+
+var transform;
+var insertInto;
+
+
+
+var options = {"hmr":true}
+
+options.transform = transform
+options.insertInto = undefined;
+
+var update = __webpack_require__(/*! ../node_modules/style-loader/lib/addStyles.js */ "./node_modules/style-loader/lib/addStyles.js")(content, options);
+
+if(content.locals) module.exports = content.locals;
+
+if(false) {}
+
+/***/ }),
+
 /***/ "./app_src/LoginPanel.tsx":
 /*!********************************!*\
   !*** ./app_src/LoginPanel.tsx ***!
@@ -530,8 +436,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "LoginPanel", function() { return LoginPanel; });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _AppSetting__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./AppSetting */ "./app_src/AppSetting.ts");
-/* harmony import */ var _MessageCenter__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./MessageCenter */ "./app_src/MessageCenter.ts");
+/* harmony import */ var _MessageCenter__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./MessageCenter */ "./app_src/MessageCenter.ts");
+/* harmony import */ var _common_GlobalData__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./common/GlobalData */ "./app_src/common/GlobalData.ts");
+/* harmony import */ var _LoginPanel_scss__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./LoginPanel.scss */ "./app_src/LoginPanel.scss");
+/* harmony import */ var _LoginPanel_scss__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_LoginPanel_scss__WEBPACK_IMPORTED_MODULE_3__);
 var __extends = (undefined && undefined.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -542,6 +450,7 @@ var __extends = (undefined && undefined.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+
 
 
 
@@ -634,7 +543,7 @@ var LoginPanel = /** @class */ (function (_super) {
     ;
     LoginPanel.prototype.afterWordCardsAnimation = function () {
         $('.skipAnimation').hide();
-        this.props.eventCenter.trigger(_MessageCenter__WEBPACK_IMPORTED_MODULE_2__["Event"].AfterWordCardsAnimation);
+        this.props.eventCenter.trigger(_MessageCenter__WEBPACK_IMPORTED_MODULE_1__["Event"].AfterWordCardsAnimation);
     };
     ;
     LoginPanel.prototype.focus = function () {
@@ -650,14 +559,15 @@ var LoginPanel = /** @class */ (function (_super) {
         var signInName = $('#signInName').val();
         if (signInName.length === 0)
             return;
-        _AppSetting__WEBPACK_IMPORTED_MODULE_1__["AppSetting"].userName = signInName;
+        _common_GlobalData__WEBPACK_IMPORTED_MODULE_2__["GlobalData"].userName = signInName;
+        _common_GlobalData__WEBPACK_IMPORTED_MODULE_2__["GlobalData"].signInTime = new Date();
         this.login();
     };
     ;
     LoginPanel.prototype.login = function () {
         var $loginPanel = $('#loginPanel');
         $loginPanel.animate({ opacity: 0 }, 2000, function () { return $loginPanel.hide(); });
-        this.props.eventCenter.trigger(_MessageCenter__WEBPACK_IMPORTED_MODULE_2__["Event"].AfterLogin);
+        this.props.eventCenter.trigger(_MessageCenter__WEBPACK_IMPORTED_MODULE_1__["Event"].AfterLogin);
     };
     ;
     return LoginPanel;
@@ -665,6 +575,36 @@ var LoginPanel = /** @class */ (function (_super) {
 
 ;
 
+
+/***/ }),
+
+/***/ "./app_src/MessageBoard.scss":
+/*!***********************************!*\
+  !*** ./app_src/MessageBoard.scss ***!
+  \***********************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+
+var content = __webpack_require__(/*! !../node_modules/css-loader!../node_modules/sass-loader/lib/loader.js!./MessageBoard.scss */ "./node_modules/css-loader/index.js!./node_modules/sass-loader/lib/loader.js!./app_src/MessageBoard.scss");
+
+if(typeof content === 'string') content = [[module.i, content, '']];
+
+var transform;
+var insertInto;
+
+
+
+var options = {"hmr":true}
+
+options.transform = transform
+options.insertInto = undefined;
+
+var update = __webpack_require__(/*! ../node_modules/style-loader/lib/addStyles.js */ "./node_modules/style-loader/lib/addStyles.js")(content, options);
+
+if(content.locals) module.exports = content.locals;
+
+if(false) {}
 
 /***/ }),
 
@@ -683,7 +623,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _MessageCenter__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./MessageCenter */ "./app_src/MessageCenter.ts");
 /* harmony import */ var _DevPanel__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./DevPanel */ "./app_src/DevPanel.tsx");
-/* harmony import */ var _AppSetting__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./AppSetting */ "./app_src/AppSetting.ts");
+/* harmony import */ var _common_GlobalData__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./common/GlobalData */ "./app_src/common/GlobalData.ts");
+/* harmony import */ var _MessageBoard_scss__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./MessageBoard.scss */ "./app_src/MessageBoard.scss");
+/* harmony import */ var _MessageBoard_scss__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_MessageBoard_scss__WEBPACK_IMPORTED_MODULE_4__);
 var __extends = (undefined && undefined.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -694,6 +636,7 @@ var __extends = (undefined && undefined.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+
 
 
 
@@ -738,8 +681,8 @@ var MessageBoard = /** @class */ (function (_super) {
     };
     ;
     MessageBoard.prototype.createTextMessage = function (content) {
-        var isUser = content.role === _AppSetting__WEBPACK_IMPORTED_MODULE_3__["Roles"].User;
-        var name = isUser ? _AppSetting__WEBPACK_IMPORTED_MODULE_3__["AppSetting"].userName : '';
+        var isUser = content.role === _common_GlobalData__WEBPACK_IMPORTED_MODULE_3__["Roles"].User;
+        var name = isUser ? _common_GlobalData__WEBPACK_IMPORTED_MODULE_3__["GlobalData"].userName : '';
         var float = isUser ? 'right' : 'left';
         return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "messageBox", style: { float: float } },
             react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("img", { src: this.getAvatar(content.role), className: "avatar" }),
@@ -752,8 +695,8 @@ var MessageBoard = /** @class */ (function (_super) {
             width: '100%',
             maxWidth: '600px'
         };
-        var isUser = content.role === _AppSetting__WEBPACK_IMPORTED_MODULE_3__["Roles"].User;
-        var name = isUser ? _AppSetting__WEBPACK_IMPORTED_MODULE_3__["AppSetting"].userName : '';
+        var isUser = content.role === _common_GlobalData__WEBPACK_IMPORTED_MODULE_3__["Roles"].User;
+        var name = isUser ? _common_GlobalData__WEBPACK_IMPORTED_MODULE_3__["GlobalData"].userName : '';
         var float = isUser ? 'right' : 'left';
         return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "messageBox", style: { float: float } },
             react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("img", { src: this.getAvatar(content.role), className: "avatar" }),
@@ -772,11 +715,11 @@ var MessageBoard = /** @class */ (function (_super) {
     };
     ;
     MessageBoard.prototype.getAvatar = function (role) {
-        if (role === _AppSetting__WEBPACK_IMPORTED_MODULE_3__["Roles"].User)
+        if (role === _common_GlobalData__WEBPACK_IMPORTED_MODULE_3__["Roles"].User)
             return 'assets/avatar_white.png';
-        if (role === _AppSetting__WEBPACK_IMPORTED_MODULE_3__["Roles"].Algae)
+        if (role === _common_GlobalData__WEBPACK_IMPORTED_MODULE_3__["Roles"].Algae)
             return 'assets/avatar_yellow.png';
-        if (role === _AppSetting__WEBPACK_IMPORTED_MODULE_3__["Roles"].ChatBot)
+        if (role === _common_GlobalData__WEBPACK_IMPORTED_MODULE_3__["Roles"].ChatBot)
             return 'assets/avatar_pink.png';
     };
     ;
@@ -897,11 +840,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MessageCenter", function() { return MessageCenter; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "EventCenter", function() { return EventCenter; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Event", function() { return Event; });
-/* harmony import */ var _AppSetting__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./AppSetting */ "./app_src/AppSetting.ts");
-/* harmony import */ var _Scene__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Scene */ "./app_src/Scene.tsx");
-/* harmony import */ var _CommonUtility__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./CommonUtility */ "./app_src/CommonUtility.ts");
-/* harmony import */ var _DevPanel__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./DevPanel */ "./app_src/DevPanel.tsx");
-
+/* harmony import */ var _common_GlobalData__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./common/GlobalData */ "./app_src/common/GlobalData.ts");
+/* harmony import */ var _common_CommonUtility__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./common/CommonUtility */ "./app_src/common/CommonUtility.ts");
+/* harmony import */ var _DevPanel__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./DevPanel */ "./app_src/DevPanel.tsx");
 
 
 
@@ -923,13 +864,13 @@ var MessageCenter = /** @class */ (function () {
         var _this = this;
         this.contents.push({ role: role, type: ContentType.Text, content: text });
         this.eventCenter.trigger(MessageCenter.eventName);
-        if (role !== _AppSetting__WEBPACK_IMPORTED_MODULE_0__["Roles"].User)
+        if (role !== _common_GlobalData__WEBPACK_IMPORTED_MODULE_0__["Roles"].User)
             return;
-        _CommonUtility__WEBPACK_IMPORTED_MODULE_2__["CommonUtility"].asyncPost('apis/uploadText', { rid: _Scene__WEBPACK_IMPORTED_MODULE_1__["Scene"].chatRoomIndex, text: text })
+        _common_CommonUtility__WEBPACK_IMPORTED_MODULE_1__["CommonUtility"].asyncPost('apis/uploadText', { rid: _common_GlobalData__WEBPACK_IMPORTED_MODULE_0__["GlobalData"].chatRoomIndex, text: text })
             .done(function (resp) {
-            _this.eventCenter.trigger(_DevPanel__WEBPACK_IMPORTED_MODULE_3__["AddLogEvent"], resp);
-            _this.addText(_AppSetting__WEBPACK_IMPORTED_MODULE_0__["Roles"].Algae, resp.algaeResponse);
-            _this.addText(_AppSetting__WEBPACK_IMPORTED_MODULE_0__["Roles"].ChatBot, resp.chatbotResponse);
+            _this.eventCenter.trigger(_DevPanel__WEBPACK_IMPORTED_MODULE_2__["AddLogEvent"], resp);
+            _this.addText(_common_GlobalData__WEBPACK_IMPORTED_MODULE_0__["Roles"].Algae, resp.algaeResponse);
+            _this.addText(_common_GlobalData__WEBPACK_IMPORTED_MODULE_0__["Roles"].ChatBot, resp.chatbotResponse);
             _this.eventCenter.trigger(Event.AfterSubmitMessage, resp);
         });
     };
@@ -938,13 +879,13 @@ var MessageCenter = /** @class */ (function () {
         var _this = this;
         this.contents.push({ role: role, type: ContentType.Image, content: b64String });
         this.eventCenter.trigger(MessageCenter.eventName);
-        _CommonUtility__WEBPACK_IMPORTED_MODULE_2__["CommonUtility"].asyncPost('apis/uploadImage', { rid: _Scene__WEBPACK_IMPORTED_MODULE_1__["Scene"].chatRoomIndex, base64Image: b64String })
+        _common_CommonUtility__WEBPACK_IMPORTED_MODULE_1__["CommonUtility"].asyncPost('apis/uploadImage', { rid: _common_GlobalData__WEBPACK_IMPORTED_MODULE_0__["GlobalData"].chatRoomIndex, base64Image: b64String })
             .done(function (resp) {
-            _this.eventCenter.trigger(_DevPanel__WEBPACK_IMPORTED_MODULE_3__["AddLogEvent"], resp);
-            _this.addText(_AppSetting__WEBPACK_IMPORTED_MODULE_0__["Roles"].ChatBot, resp.chatbotResponse);
-            _this.addText(_AppSetting__WEBPACK_IMPORTED_MODULE_0__["Roles"].Algae, resp.algaeResponse);
-            _this.addText(_AppSetting__WEBPACK_IMPORTED_MODULE_0__["Roles"].ChatBot, resp.chatbot2algaeResponse);
-            _this.addText(_AppSetting__WEBPACK_IMPORTED_MODULE_0__["Roles"].Algae, JSON.stringify(resp));
+            _this.eventCenter.trigger(_DevPanel__WEBPACK_IMPORTED_MODULE_2__["AddLogEvent"], resp);
+            _this.addText(_common_GlobalData__WEBPACK_IMPORTED_MODULE_0__["Roles"].ChatBot, resp.chatbotResponse);
+            _this.addText(_common_GlobalData__WEBPACK_IMPORTED_MODULE_0__["Roles"].Algae, resp.algaeResponse);
+            _this.addText(_common_GlobalData__WEBPACK_IMPORTED_MODULE_0__["Roles"].ChatBot, resp.chatbot2algaeResponse);
+            _this.addText(_common_GlobalData__WEBPACK_IMPORTED_MODULE_0__["Roles"].Algae, JSON.stringify(resp));
             _this.eventCenter.trigger(Event.AfterSubmitMessage, resp);
         });
     };
@@ -995,6 +936,36 @@ var Event = /** @class */ (function () {
 
 /***/ }),
 
+/***/ "./app_src/Scene.scss":
+/*!****************************!*\
+  !*** ./app_src/Scene.scss ***!
+  \****************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+
+var content = __webpack_require__(/*! !../node_modules/css-loader!../node_modules/sass-loader/lib/loader.js!./Scene.scss */ "./node_modules/css-loader/index.js!./node_modules/sass-loader/lib/loader.js!./app_src/Scene.scss");
+
+if(typeof content === 'string') content = [[module.i, content, '']];
+
+var transform;
+var insertInto;
+
+
+
+var options = {"hmr":true}
+
+options.transform = transform
+options.insertInto = undefined;
+
+var update = __webpack_require__(/*! ../node_modules/style-loader/lib/addStyles.js */ "./node_modules/style-loader/lib/addStyles.js")(content, options);
+
+if(content.locals) module.exports = content.locals;
+
+if(false) {}
+
+/***/ }),
+
 /***/ "./app_src/Scene.tsx":
 /*!***************************!*\
   !*** ./app_src/Scene.tsx ***!
@@ -1013,9 +984,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var socket_io_client__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(socket_io_client__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! jquery */ "jquery");
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _CommonUtility__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./CommonUtility */ "./app_src/CommonUtility.ts");
-/* harmony import */ var _BabylonUtility__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./BabylonUtility */ "./app_src/BabylonUtility.ts");
-/* harmony import */ var _MessageCenter__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./MessageCenter */ "./app_src/MessageCenter.ts");
+/* harmony import */ var _common_CommonUtility__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./common/CommonUtility */ "./app_src/common/CommonUtility.ts");
+/* harmony import */ var _common_BabylonUtility__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./common/BabylonUtility */ "./app_src/common/BabylonUtility.ts");
+/* harmony import */ var _common_AsyncWorker__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./common/AsyncWorker */ "./app_src/common/AsyncWorker.ts");
+/* harmony import */ var _common_GlobalData__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./common/GlobalData */ "./app_src/common/GlobalData.ts");
+/* harmony import */ var _MessageCenter__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./MessageCenter */ "./app_src/MessageCenter.ts");
+/* harmony import */ var _Scene_scss__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./Scene.scss */ "./app_src/Scene.scss");
+/* harmony import */ var _Scene_scss__WEBPACK_IMPORTED_MODULE_9___default = /*#__PURE__*/__webpack_require__.n(_Scene_scss__WEBPACK_IMPORTED_MODULE_9__);
 var __extends = (undefined && undefined.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -1026,6 +1001,9 @@ var __extends = (undefined && undefined.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+
+
+
 
 
 
@@ -1049,6 +1027,7 @@ var Scene = /** @class */ (function (_super) {
             }
             return dic;
         }();
+        _this.algaes = [];
         _this.maskColor = { r: 0, g: 255, b: 0, a: 0.1 };
         /*
             private colorsSetForParticle = [
@@ -1073,7 +1052,7 @@ var Scene = /** @class */ (function (_super) {
                     };
                     Object.keys(textures).forEach(function (key) { return textures[key].hasAlpha = true; });
                 }
-                var key = _CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getRandomIntInRange(0, 2);
+                var key = _common_CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getRandomIntInRange(0, 2);
                 return textures[key];
             };
         }.bind(_this)();
@@ -1084,7 +1063,6 @@ var Scene = /** @class */ (function (_super) {
         _this.chatRoomsNodes = [];
         _this.chatRoomsCenter = [];
         _this.linesForChatRooms = [];
-        _this.algaes = [];
         return _this;
     }
     Scene.prototype.render = function () {
@@ -1098,15 +1076,15 @@ var Scene = /** @class */ (function (_super) {
         this.initScene();
         this.getTexts();
         this.getPoints();
-        this.createLinesWorker = new AsyncWorker(document.getElementById('CreateLinesWorker').src);
+        this.createLinesWorker = new _common_AsyncWorker__WEBPACK_IMPORTED_MODULE_6__["AsyncWorker"](document.getElementById('CreateLinesWorker').src);
         this.engine.runRenderLoop(function () {
             _this.renderBefore();
             _this.scene.render();
             _this.renderAfter();
         });
-        this.props.eventCenter.on(_MessageCenter__WEBPACK_IMPORTED_MODULE_6__["Event"].AfterWordCardsAnimation, this.transformation.bind(this));
-        this.props.eventCenter.on(_MessageCenter__WEBPACK_IMPORTED_MODULE_6__["Event"].AfterLogin, this.zoomIn.bind(this));
-        this.props.eventCenter.on(_MessageCenter__WEBPACK_IMPORTED_MODULE_6__["Event"].AfterSubmitMessage, this.cmdHandler.bind(this));
+        this.props.eventCenter.on(_MessageCenter__WEBPACK_IMPORTED_MODULE_8__["Event"].AfterWordCardsAnimation, this.transformation.bind(this));
+        this.props.eventCenter.on(_MessageCenter__WEBPACK_IMPORTED_MODULE_8__["Event"].AfterLogin, this.zoomIn.bind(this));
+        this.props.eventCenter.on(_MessageCenter__WEBPACK_IMPORTED_MODULE_8__["Event"].AfterSubmitMessage, this.cmdHandler.bind(this));
         window.addEventListener("resize", this.engine.resize.bind(this.engine));
         this.updateMask();
     };
@@ -1115,7 +1093,7 @@ var Scene = /** @class */ (function (_super) {
         var color = this.maskColor;
         var setting = "rgba(" + color.r + "," + color.g + "," + color.b + "," + color.a + ")";
         jquery__WEBPACK_IMPORTED_MODULE_3__('#greenMask').css('background-color', setting);
-        this.props.eventCenter.trigger(_MessageCenter__WEBPACK_IMPORTED_MODULE_6__["Event"].UpdateDevPanelData, { greenMask: setting });
+        this.props.eventCenter.trigger(_MessageCenter__WEBPACK_IMPORTED_MODULE_8__["Event"].UpdateDevPanelData, { greenMask: setting });
     };
     ;
     Scene.prototype.startUpdateBackgroundParticles = function () {
@@ -1177,7 +1155,7 @@ var Scene = /** @class */ (function (_super) {
                 this.viewPort.rotation = this.camera.rotation.clone();
             }
         }
-        else if (Scene.chatRoomIndex !== null) {
+        else if (_common_GlobalData__WEBPACK_IMPORTED_MODULE_7__["GlobalData"].chatRoomIndex !== null && !_common_CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getQueryString('freeCamera')) {
             var positionCorrelationRate = 0.02;
             var positionCorrelation = this.viewPort.position
                 .subtract(this.camera.position)
@@ -1211,9 +1189,9 @@ var Scene = /** @class */ (function (_super) {
     };
     ;
     Scene.prototype.renderAfter = function () {
-        this.props.eventCenter.trigger(_MessageCenter__WEBPACK_IMPORTED_MODULE_6__["Event"].UpdateDevPanelData, {
+        this.props.eventCenter.trigger(_MessageCenter__WEBPACK_IMPORTED_MODULE_8__["Event"].UpdateDevPanelData, {
             fps: this.engine.getFps().toFixed() + ' fps',
-            coordinate: _BabylonUtility__WEBPACK_IMPORTED_MODULE_5__["BabylonUtility"].positionToString(this.camera.position)
+            coordinate: _common_BabylonUtility__WEBPACK_IMPORTED_MODULE_5__["BabylonUtility"].positionToString(this.camera.position)
         });
     };
     ;
@@ -1227,7 +1205,7 @@ var Scene = /** @class */ (function (_super) {
         var bubbleMash = babylonjs__WEBPACK_IMPORTED_MODULE_1__["MeshBuilder"].CreateBox("bubbleMash", { size: 0.5 }, this.scene);
         bubbleSpray.addShape(bubbleMash, shapeCount);
         bubbleMash.dispose();
-        var texture = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Texture"]('assets/bubbles/all.png', this.scene);
+        var texture = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Texture"]('assets/bubbles.png', this.scene);
         texture.hasAlpha = true;
         var bubbles = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["StandardMaterial"]("bubbles", this.scene);
         bubbles.backFaceCulling = false;
@@ -1288,7 +1266,7 @@ var Scene = /** @class */ (function (_super) {
                     var particle = _this.createParticle(center);
                     particlesSetting.particles.push({
                         mesh: particle,
-                        translateVector: _BabylonUtility__WEBPACK_IMPORTED_MODULE_5__["BabylonUtility"].getRandomVector3(),
+                        translateVector: _common_BabylonUtility__WEBPACK_IMPORTED_MODULE_5__["BabylonUtility"].getRandomVector3(),
                         duration: _this.getDurationForParticle()
                     });
                 }
@@ -1309,7 +1287,7 @@ var Scene = /** @class */ (function (_super) {
              center.z + (CommonUtility.getRandomIntInRange(range * -1, range) * 0.1),
             );
         */
-        var colorSetIndex = _CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getRandomIntInRange(0, 2);
+        var colorSetIndex = _common_CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getRandomIntInRange(0, 2);
         // const colorSet = this.colorsSetForParticle[colorSetIndex];
         // const colorInRGB = colorSet.diffuseColor;
         // const color = new BABYLON.Color3(colorInRGB[0], colorInRGB[1], colorInRGB[2]);
@@ -1361,7 +1339,7 @@ var Scene = /** @class */ (function (_super) {
                 if (newCount > 100)
                     updatedNodes.length = newCount;
             }
-            _this.props.eventCenter.trigger(_MessageCenter__WEBPACK_IMPORTED_MODULE_6__["Event"].UpdateDevPanelData, {
+            _this.props.eventCenter.trigger(_MessageCenter__WEBPACK_IMPORTED_MODULE_8__["Event"].UpdateDevPanelData, {
                 linesystemPerformance: linesystemPerformance
             });
             _this.linesystemPerformance = 0;
@@ -1375,7 +1353,7 @@ var Scene = /** @class */ (function (_super) {
                 node.translateVector.z = -1;
             else if (node.position.z < -16)
                 node.translateVector.z = 1;
-            _BabylonUtility__WEBPACK_IMPORTED_MODULE_5__["BabylonUtility"].updatePosition(node.position, node.translateVector, node.scale);
+            _common_BabylonUtility__WEBPACK_IMPORTED_MODULE_5__["BabylonUtility"].updatePosition(node.position, node.translateVector, node.scale);
             return node;
         });
         return nodes;
@@ -1389,8 +1367,8 @@ var Scene = /** @class */ (function (_super) {
             var chatRoomsNode = _this.chatRoomsNodes[i];
             var distance = babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"].Distance(chatRoomsNode, node.position);
             if (distance > maxMove) {
-                var vector = _BabylonUtility__WEBPACK_IMPORTED_MODULE_5__["BabylonUtility"].subtractVector(chatRoomsNode, node.position).normalize();
-                _BabylonUtility__WEBPACK_IMPORTED_MODULE_5__["BabylonUtility"].updatePosition(node.position, vector, maxMove);
+                var vector = _common_BabylonUtility__WEBPACK_IMPORTED_MODULE_5__["BabylonUtility"].subtractVector(chatRoomsNode, node.position).normalize();
+                _common_BabylonUtility__WEBPACK_IMPORTED_MODULE_5__["BabylonUtility"].updatePosition(node.position, vector, maxMove);
             }
             else {
                 node.position = chatRoomsNode;
@@ -1429,7 +1407,7 @@ var Scene = /** @class */ (function (_super) {
         var linesForChatRoomLen = this.linesForChatRooms.length;
         var exchangeCount = 20;
         var maxIndex = Math.min(linesystemLen, linesForChatRoomLen) - 1 - exchangeCount;
-        var startIndex = _CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getRandomIntInRange(0, maxIndex);
+        var startIndex = _common_CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getRandomIntInRange(0, maxIndex);
         for (var i = 0; i < exchangeCount; i++) {
             var index = startIndex + i;
             var toExchange = this.linesForChatRooms[index];
@@ -1451,60 +1429,56 @@ var Scene = /** @class */ (function (_super) {
         var scale = 0.003;
         particles.forEach(function (p) {
             if (p.duration <= 0) {
-                p.translateVector = _BabylonUtility__WEBPACK_IMPORTED_MODULE_5__["BabylonUtility"].getRandomVector3();
+                p.translateVector = _common_BabylonUtility__WEBPACK_IMPORTED_MODULE_5__["BabylonUtility"].getRandomVector3();
                 p.duration = _this.getDurationForParticle();
             }
-            _BabylonUtility__WEBPACK_IMPORTED_MODULE_5__["BabylonUtility"].updatePosition(p.mesh.position, p.translateVector, scale);
+            _common_BabylonUtility__WEBPACK_IMPORTED_MODULE_5__["BabylonUtility"].updatePosition(p.mesh.position, p.translateVector, scale);
             p.duration -= 1;
         });
     };
     ;
     /** unit in frame number */
     Scene.prototype.getDurationForParticle = function () {
-        return _CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getRandomIntInRange(60 * 3, 60 * 6);
+        return _common_CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getRandomIntInRange(60 * 3, 60 * 6);
     };
     ;
     Scene.prototype.getPoints = function () {
         var _this = this;
-        var addNodeCount = Number(_CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getQueryString('addNodeCount'));
-        jquery__WEBPACK_IMPORTED_MODULE_3__["getJSON"]('apis/getPoints').then(function (data) {
-            var take = 120;
-            Object.keys(data).forEach(function (key, i) {
-                var range = { x: { from: 0, to: 0 }, y: { from: 0, to: 0 }, z: { from: 0, to: 0 } };
-                var pointInGroup = data[key].map(function (p) {
-                    ['x', 'y', 'z'].forEach(function (axis) {
-                        var oneAxis = range[axis];
-                        oneAxis.from = Math.min(oneAxis.from, p[axis]);
-                        oneAxis.to = Math.max(oneAxis.to, p[axis]);
-                    });
-                    var position = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"](p.x, p.y, p.z);
-                    var box1 = babylonjs__WEBPACK_IMPORTED_MODULE_1__["MeshBuilder"].CreateBox("box", { size: 0.3 }, _this.scene);
-                    box1.position = position;
-                    return position;
-                });
-                if (key === 'chatroom0') {
-                    for (var c = 0; c < addNodeCount; c++) {
-                        var new1 = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"](_CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getRandomNumberInRange(range.x.from, range.x.to, 5), _CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getRandomNumberInRange(range.y.from, range.y.to, 5), range.z.from);
-                        var new2 = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"](_CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getRandomNumberInRange(range.x.from, range.x.to, 5), _CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getRandomNumberInRange(range.y.from, range.y.to, 5), range.z.to);
-                        pointInGroup.push(new1);
-                        pointInGroup.push(new2);
-                        var box1 = babylonjs__WEBPACK_IMPORTED_MODULE_1__["MeshBuilder"].CreateBox("box", { size: 0.3 }, _this.scene);
-                        box1.position = new1;
-                        var box2 = babylonjs__WEBPACK_IMPORTED_MODULE_1__["MeshBuilder"].CreateBox("box", { size: 0.3 }, _this.scene);
-                        box2.position = new2;
-                    }
-                }
-                _this.chatRoomsNodes = _this.chatRoomsNodes.concat(pointInGroup);
-                var linesInGroup = _BabylonUtility__WEBPACK_IMPORTED_MODULE_5__["BabylonUtility"].getLineToEachOther(pointInGroup);
-                var maxLine = _CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].sort(linesInGroup, function (e) { return e.distance * -1; })[0];
-                var center = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"](0, 0, 0);
+        var addNodeCount = Number(_common_CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getQueryString('addNodeCount'));
+        var handleForRoom = function (roomId, data) {
+            var range = { x: { from: null, to: null }, y: { from: null, to: null }, z: { from: null, to: null } };
+            var pointInGroup = data.map(function (p) {
                 ['x', 'y', 'z'].forEach(function (axis) {
-                    center[axis] = (maxLine.from[axis] + maxLine.to[axis]) / 2;
+                    var oneAxis = range[axis];
+                    oneAxis.from = oneAxis.from ? Math.min(oneAxis.from, p[axis]) : p[axis];
+                    oneAxis.to = oneAxis.to ? Math.max(oneAxis.to, p[axis]) : p[axis];
                 });
-                _this.chatRoomsCenter.push(center);
-                _this.linesForChatRooms = _this.linesForChatRooms.concat(linesInGroup.slice(0, take));
+                var position = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"](p.x, p.y, p.z);
+                var node = babylonjs__WEBPACK_IMPORTED_MODULE_1__["MeshBuilder"].CreateSphere("node", { diameter: 0.2 }, _this.scene);
+                node.position = position;
+                return position;
             });
-            _this.chatRoomsNodes = _CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].shuffle(_this.chatRoomsNodes);
+            for (var c = 0; c < addNodeCount; c++) {
+                var position = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"](_common_CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getRandomNumberInRange(range.x.from, range.x.to, 5), _common_CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getRandomNumberInRange(range.y.from, range.y.to, 5), range.z.from);
+                pointInGroup.push(position);
+                var node = babylonjs__WEBPACK_IMPORTED_MODULE_1__["MeshBuilder"].CreateSphere("node", { diameter: 0.2 }, _this.scene);
+                node.position = position;
+                var nodeMaterial = node.material = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["StandardMaterial"]("nodeMaterial", _this.scene);
+                nodeMaterial.diffuseColor = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Color3"](1, 0, 1);
+            }
+            _this.chatRoomsNodes = _this.chatRoomsNodes.concat(pointInGroup);
+            var linesInGroup = _common_BabylonUtility__WEBPACK_IMPORTED_MODULE_5__["BabylonUtility"].getLineToEachOther(pointInGroup);
+            var maxLine = _common_CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].sort(linesInGroup, function (e) { return e.distance; })[linesInGroup.length - 1];
+            var center = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"](0, 0, 0);
+            ['x', 'y', 'z'].forEach(function (axis) {
+                center[axis] = (maxLine.from[axis] + maxLine.to[axis]) / 2;
+            });
+            _this.chatRoomsCenter.push(center);
+            _this.linesForChatRooms = _this.linesForChatRooms.concat(linesInGroup.slice(0, 120));
+        };
+        jquery__WEBPACK_IMPORTED_MODULE_3__["getJSON"]('apis/getPoints').then(function (data) {
+            _common_CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].loop(9, function (roomId) { return handleForRoom(roomId, data["chatroom" + roomId]); });
+            _this.chatRoomsNodes = _common_CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].shuffle(_this.chatRoomsNodes);
         });
     };
     ;
@@ -1528,7 +1502,7 @@ var Scene = /** @class */ (function (_super) {
         });
         var meshContainer = [[], [], []];
         this.linesForChatRooms.forEach(function (e, i) {
-            var materialIndex = _CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getRandomIntInRange(0, 2);
+            var materialIndex = _common_CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getRandomIntInRange(0, 2);
             var line = babylonjs__WEBPACK_IMPORTED_MODULE_1__["MeshBuilder"].CreateTube("line" + i, {
                 path: [e.from, e.to],
                 radius: 0.03,
@@ -1556,8 +1530,8 @@ var Scene = /** @class */ (function (_super) {
             var context = canvas.getContext('2d');
             context.drawImage(img, 0, 0, width, height);
             // inputs
-            var startX = 64 * _CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getRandomIntInRange(0, 6);
-            var startY = 64 * _CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getRandomIntInRange(0, 6);
+            var startX = 64 * _common_CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getRandomIntInRange(0, 6);
+            var startY = 64 * _common_CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getRandomIntInRange(0, 6);
             var takeWidth = 64;
             var rateOfWoverH = 1 / 1;
             var takeHeight = takeWidth / rateOfWoverH;
@@ -1579,14 +1553,14 @@ var Scene = /** @class */ (function (_super) {
                 });
             }
             var initialZ = -15;
-            var textNodes = _CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].sort(pixels, function (p) { return p.brightness; }).reverse()
+            var textNodes = _common_CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].sort(pixels, function (p) { return p.brightness; }).reverse()
                 .slice(0, 200)
                 .map(function (p, i) {
                 var rate = 0.12;
-                var position = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"]((p.x - 32) * rate, (p.y - 32) * -1 * rate, initialZ + _CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getRandomNumberInRange(-2, 2, 3));
+                var position = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"]((p.x - 32) * rate, (p.y - 32) * -1 * rate, initialZ + _common_CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getRandomNumberInRange(-2, 2, 3));
                 return {
                     position: position,
-                    scale: _CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getRandomNumberInRange(0.005, 0.01, 3),
+                    scale: _common_CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getRandomNumberInRange(0.005, 0.01, 3),
                     translateVector: new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"](0, 0, position.z < initialZ ? 1 : -1) // 初始方向
                 };
             });
@@ -1603,12 +1577,12 @@ var Scene = /** @class */ (function (_super) {
         var alpha = this.maskColor.a * ((100 + chatBotResponse.text2cmd.ledValue) / 100);
         this.maskColor.a = (alpha < 0.3) ? Number(alpha.toFixed(3)) : 0.3;
         this.updateMask();
-        var center = this.chatRoomsCenter[Scene.chatRoomIndex];
+        var center = this.chatRoomsCenter[_common_GlobalData__WEBPACK_IMPORTED_MODULE_7__["GlobalData"].chatRoomIndex];
         // Algae
         var algae = babylonjs__WEBPACK_IMPORTED_MODULE_1__["Mesh"].CreatePlane("algae-" + this.algaes.length, 0.5, this.scene);
-        algae.position.x = center.x + _CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getRandomNumberInRange(-1, 1, 2);
-        algae.position.y = center.y + _CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getRandomNumberInRange(-1, 1, 2);
-        algae.position.z = center.z + _CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getRandomNumberInRange(-1, 1, 2);
+        algae.position.x = center.x + _common_CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getRandomNumberInRange(-1, 1, 2);
+        algae.position.y = center.y + _common_CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getRandomNumberInRange(-1, 1, 2);
+        algae.position.z = center.z + _common_CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getRandomNumberInRange(-1, 1, 2);
         algae.billboardMode = babylonjs__WEBPACK_IMPORTED_MODULE_1__["Mesh"].BILLBOARDMODE_ALL;
         algae.scaling = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"](0.1, 0.1, 0.1);
         var material = algae.material = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["StandardMaterial"]("algaeMaterial", this.scene);
@@ -1617,7 +1591,7 @@ var Scene = /** @class */ (function (_super) {
         this.algaes.push({
             mesh: algae,
             createTime: new Date(),
-            translateVector: _BabylonUtility__WEBPACK_IMPORTED_MODULE_5__["BabylonUtility"].getRandomVector3(),
+            translateVector: _common_BabylonUtility__WEBPACK_IMPORTED_MODULE_5__["BabylonUtility"].getRandomVector3(),
             duration: this.getDurationForParticle()
         });
         // Bubble
@@ -1638,8 +1612,8 @@ var Scene = /** @class */ (function (_super) {
     };
     ;
     Scene.prototype.zoomIn = function () {
-        Scene.chatRoomIndex = Scene.chatRoomIndex || _CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getRandomIntInRange(0, this.chatRoomsCenter.length - 1);
-        var chatRoom = this.chatRoomsCenter[Scene.chatRoomIndex];
+        _common_GlobalData__WEBPACK_IMPORTED_MODULE_7__["GlobalData"].chatRoomIndex = _common_GlobalData__WEBPACK_IMPORTED_MODULE_7__["GlobalData"].chatRoomIndex || _common_CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getRandomIntInRange(0, this.chatRoomsCenter.length - 1);
+        var chatRoom = this.chatRoomsCenter[_common_GlobalData__WEBPACK_IMPORTED_MODULE_7__["GlobalData"].chatRoomIndex];
         var destination = chatRoom ?
             new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"](chatRoom.x * 2.5, chatRoom.y * 2.5, 0) :
             babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"].Zero();
@@ -1648,7 +1622,6 @@ var Scene = /** @class */ (function (_super) {
         this.cameraLocations = points;
     };
     ;
-    Scene.chatRoomIndex = null;
     return Scene;
 }(react__WEBPACK_IMPORTED_MODULE_0__["Component"]));
 
@@ -1660,26 +1633,6 @@ var TranslateType;
     TranslateType[TranslateType["Expand"] = 2] = "Expand";
 })(TranslateType || (TranslateType = {}));
 ;
-;
-var AsyncWorker = /** @class */ (function () {
-    function AsyncWorker(src) {
-        if (!window['Worker'])
-            throw 'Worker not support';
-        this.worker = new Worker(src);
-    }
-    ;
-    AsyncWorker.prototype.asyncExcute = function (input) {
-        var _this = this;
-        return new Promise(function (resolve, reject) {
-            var worker = _this.worker;
-            worker.onmessage = function (message) { return resolve(message.data); };
-            worker.onerror = function (e) { return reject(e.error); };
-            worker.postMessage(input);
-        });
-    };
-    ;
-    return AsyncWorker;
-}());
 ;
 
 
@@ -1715,63 +1668,290 @@ if(false) {}
 
 /***/ }),
 
-/***/ "./app_src/controlPanel.scss":
-/*!***********************************!*\
-  !*** ./app_src/controlPanel.scss ***!
-  \***********************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ "./app_src/common/AsyncWorker.ts":
+/*!***************************************!*\
+  !*** ./app_src/common/AsyncWorker.ts ***!
+  \***************************************/
+/*! exports provided: AsyncWorker */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "AsyncWorker", function() { return AsyncWorker; });
+var AsyncWorker = /** @class */ (function () {
+    function AsyncWorker(src) {
+        if (!window['Worker'])
+            throw 'Worker not support';
+        this.worker = new Worker(src);
+    }
+    ;
+    AsyncWorker.prototype.asyncExcute = function (input) {
+        var _this = this;
+        return new Promise(function (resolve, reject) {
+            var worker = _this.worker;
+            worker.onmessage = function (message) { return resolve(message.data); };
+            worker.onerror = function (e) { return reject(e.error); };
+            worker.postMessage(input);
+        });
+    };
+    ;
+    return AsyncWorker;
+}());
 
-var content = __webpack_require__(/*! !../node_modules/css-loader!../node_modules/sass-loader/lib/loader.js!./controlPanel.scss */ "./node_modules/css-loader/index.js!./node_modules/sass-loader/lib/loader.js!./app_src/controlPanel.scss");
+;
 
-if(typeof content === 'string') content = [[module.i, content, '']];
-
-var transform;
-var insertInto;
-
-
-
-var options = {"hmr":true}
-
-options.transform = transform
-options.insertInto = undefined;
-
-var update = __webpack_require__(/*! ../node_modules/style-loader/lib/addStyles.js */ "./node_modules/style-loader/lib/addStyles.js")(content, options);
-
-if(content.locals) module.exports = content.locals;
-
-if(false) {}
 
 /***/ }),
 
-/***/ "./app_src/devPanel.scss":
-/*!*******************************!*\
-  !*** ./app_src/devPanel.scss ***!
-  \*******************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ "./app_src/common/BabylonUtility.ts":
+/*!******************************************!*\
+  !*** ./app_src/common/BabylonUtility.ts ***!
+  \******************************************/
+/*! exports provided: BabylonUtility */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "BabylonUtility", function() { return BabylonUtility; });
+/* harmony import */ var _CommonUtility__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./CommonUtility */ "./app_src/common/CommonUtility.ts");
+
+var BabylonUtility = /** @class */ (function () {
+    function BabylonUtility() {
+    }
+    BabylonUtility.distance = function (v1, v2) {
+        var dx = v1.x - v2.x;
+        var dy = v1.y - v2.y;
+        var dz = v1.z - v2.z;
+        return Math.sqrt(dx * dx + dy * dy + dz * dz);
+    };
+    ;
+    BabylonUtility.degrees = function (v1, v2) {
+        var rad = Math.acos(BABYLON.Vector3.Dot(v1, v2) / (v1.length() * v2.length()));
+        return BABYLON.Angle.FromRadians(rad).degrees() || 0;
+    };
+    ;
+    BabylonUtility.addVector = function (v1, v2) {
+        return new BABYLON.Vector3(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z);
+    };
+    ;
+    BabylonUtility.subtractVector = function (v1, v2) {
+        return new BABYLON.Vector3(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
+    };
+    ;
+    BabylonUtility.getRandomVector3 = function (randomOnX, randomOnY, randomOnZ) {
+        if (randomOnX === void 0) { randomOnX = true; }
+        if (randomOnY === void 0) { randomOnY = true; }
+        if (randomOnZ === void 0) { randomOnZ = true; }
+        return new BABYLON.Vector3(randomOnX ? _CommonUtility__WEBPACK_IMPORTED_MODULE_0__["CommonUtility"].getRandomInt() : 0, randomOnY ? _CommonUtility__WEBPACK_IMPORTED_MODULE_0__["CommonUtility"].getRandomInt() : 0, randomOnZ ? _CommonUtility__WEBPACK_IMPORTED_MODULE_0__["CommonUtility"].getRandomInt() : 0).normalize();
+    };
+    ;
+    BabylonUtility.updatePosition = function (position, translateVector, scale) {
+        position.x += (translateVector.x * scale);
+        position.y += (translateVector.y * scale);
+        position.z += (translateVector.z * scale);
+        return position;
+    };
+    ;
+    BabylonUtility.positionToString = function (position) {
+        var positions = ['x', 'y', 'z'].map(function (k) {
+            return position[k].toFixed(2);
+        });
+        return positions.join(', ');
+    };
+    ;
+    BabylonUtility.getLineToEachOther = function (points) {
+        var lines = [];
+        points.forEach(function (from, iOfFrom) {
+            points.forEach(function (to, iOfTo) {
+                if (iOfFrom < iOfTo) {
+                    var distance = BabylonUtility.distance(from, to);
+                    var key = iOfFrom + "-" + iOfTo;
+                    lines.push({
+                        key: key,
+                        from: from,
+                        to: to,
+                        distance: distance
+                    });
+                }
+            });
+        });
+        return lines;
+    };
+    ;
+    return BabylonUtility;
+}());
+
+;
+;
 
 
-var content = __webpack_require__(/*! !../node_modules/css-loader!../node_modules/sass-loader/lib/loader.js!./devPanel.scss */ "./node_modules/css-loader/index.js!./node_modules/sass-loader/lib/loader.js!./app_src/devPanel.scss");
+/***/ }),
 
-if(typeof content === 'string') content = [[module.i, content, '']];
+/***/ "./app_src/common/CommonUtility.ts":
+/*!*****************************************!*\
+  !*** ./app_src/common/CommonUtility.ts ***!
+  \*****************************************/
+/*! exports provided: CommonUtility */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-var transform;
-var insertInto;
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CommonUtility", function() { return CommonUtility; });
+var CommonUtility = /** @class */ (function () {
+    function CommonUtility() {
+    }
+    CommonUtility.getRandomBoolean = function () {
+        return Math.random() >= 0.5;
+    };
+    ;
+    CommonUtility.getRandomNumberInRange = function (min, max, digits) {
+        var rate = Math.pow(10, digits);
+        return CommonUtility.getRandomIntInRange(min * rate, max * rate) / rate;
+    };
+    ;
+    CommonUtility.getRandomIntInRange = function (min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    };
+    ;
+    CommonUtility.getRandomInt = function (digits) {
+        var r = CommonUtility.getRandomBoolean() ? 1 : -1;
+        return CommonUtility.getRandomNegativeInt(digits) * r;
+    };
+    ;
+    CommonUtility.getRandomNegativeInt = function (digits) {
+        return CommonUtility.getRandomNegativeNumber(digits);
+    };
+    ;
+    CommonUtility.getRandomNumber = function (digitsOnInt, digitsOnFloat) {
+        var r = CommonUtility.getRandomBoolean() ? 1 : -1;
+        return CommonUtility.getRandomNegativeNumber(digitsOnInt, digitsOnFloat) * r;
+    };
+    ;
+    CommonUtility.getRandomNegativeNumber = function (digitsOnInt, digitsOnFloat) {
+        digitsOnInt = digitsOnInt || 1;
+        digitsOnFloat = digitsOnFloat || 0;
+        var result = Math.round(Math.random() * Math.pow(10, digitsOnInt + digitsOnFloat));
+        if (digitsOnFloat !== 0)
+            result = result / Math.pow(10, digitsOnFloat);
+        return result;
+    };
+    ;
+    CommonUtility.sort = function (array, func) {
+        array.sort(function (a, b) {
+            return func(a) - func(b);
+        });
+        return array;
+    };
+    ;
+    CommonUtility.shuffle = function (array) {
+        var currentIndex = array.length;
+        var temporaryValue;
+        var randomIndex;
+        // While there remain elements to shuffle...
+        while (0 !== currentIndex) {
+            // Pick a remaining element...
+            randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex -= 1;
+            // And swap it with the current element.
+            temporaryValue = array[currentIndex];
+            array[currentIndex] = array[randomIndex];
+            array[randomIndex] = temporaryValue;
+        }
+        return array;
+    };
+    ;
+    CommonUtility.createArray = function (length) {
+        var array = Array.apply(null, { length: length });
+        return array;
+    };
+    ;
+    CommonUtility.getQueryString = function (field, url) {
+        var href = url ? url : window.location.href;
+        var reg = new RegExp('[?&]' + field + '=([^&#]*)', 'i');
+        var string = reg.exec(href);
+        return string ? decodeURIComponent(string[1]) : undefined;
+    };
+    ;
+    CommonUtility.deepMerge = function (from, to, propName) {
+        if (from instanceof Object && !(from instanceof Date)) {
+            if (from instanceof Array)
+                to = to || [];
+            to = to || {};
+            var fromKeys = Object.keys(from);
+            if (fromKeys) {
+                fromKeys.forEach(function (prop) {
+                    to[prop] = CommonUtility.deepMerge(from[prop], to[prop], prop);
+                });
+            }
+        }
+        else
+            to = from;
+        return to;
+    };
+    ;
+    CommonUtility.deepClone = function (obj) {
+        return CommonUtility.deepMerge(obj, {});
+    };
+    ;
+    CommonUtility.asyncPost = function (url, data) {
+        return $.ajax({
+            url: url,
+            type: "post",
+            contentType: "application/json",
+            data: JSON.stringify(data)
+        });
+    };
+    ;
+    CommonUtility.loop = function (count, func) {
+        var finished = 0;
+        while (finished < count) {
+            func(finished);
+            finished++;
+        }
+        ;
+    };
+    ;
+    return CommonUtility;
+}());
+
+;
 
 
+/***/ }),
 
-var options = {"hmr":true}
+/***/ "./app_src/common/GlobalData.ts":
+/*!**************************************!*\
+  !*** ./app_src/common/GlobalData.ts ***!
+  \**************************************/
+/*! exports provided: GlobalData, Roles */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-options.transform = transform
-options.insertInto = undefined;
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "GlobalData", function() { return GlobalData; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Roles", function() { return Roles; });
+/* harmony import */ var _CommonUtility__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./CommonUtility */ "./app_src/common/CommonUtility.ts");
 
-var update = __webpack_require__(/*! ../node_modules/style-loader/lib/addStyles.js */ "./node_modules/style-loader/lib/addStyles.js")(content, options);
+var GlobalData = /** @class */ (function () {
+    function GlobalData() {
+    }
+    ;
+    GlobalData.userName = null;
+    GlobalData.signInTime = null;
+    GlobalData.chatRoomIndex = Number(_CommonUtility__WEBPACK_IMPORTED_MODULE_0__["CommonUtility"].getQueryString('chatRoomIndex'));
+    return GlobalData;
+}());
 
-if(content.locals) module.exports = content.locals;
+;
+var Roles;
+(function (Roles) {
+    Roles[Roles["User"] = 0] = "User";
+    Roles[Roles["ChatBot"] = 1] = "ChatBot";
+    Roles[Roles["Algae"] = 2] = "Algae";
+    Roles[Roles["AI"] = 3] = "AI";
+})(Roles || (Roles = {}));
+;
 
-if(false) {}
 
 /***/ }),
 
@@ -1784,36 +1964,6 @@ if(false) {}
 
 
 var content = __webpack_require__(/*! !../node_modules/css-loader!../node_modules/sass-loader/lib/loader.js!./flexbox.scss */ "./node_modules/css-loader/index.js!./node_modules/sass-loader/lib/loader.js!./app_src/flexbox.scss");
-
-if(typeof content === 'string') content = [[module.i, content, '']];
-
-var transform;
-var insertInto;
-
-
-
-var options = {"hmr":true}
-
-options.transform = transform
-options.insertInto = undefined;
-
-var update = __webpack_require__(/*! ../node_modules/style-loader/lib/addStyles.js */ "./node_modules/style-loader/lib/addStyles.js")(content, options);
-
-if(content.locals) module.exports = content.locals;
-
-if(false) {}
-
-/***/ }),
-
-/***/ "./app_src/loginPanel.scss":
-/*!*********************************!*\
-  !*** ./app_src/loginPanel.scss ***!
-  \*********************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-
-var content = __webpack_require__(/*! !../node_modules/css-loader!../node_modules/sass-loader/lib/loader.js!./loginPanel.scss */ "./node_modules/css-loader/index.js!./node_modules/sass-loader/lib/loader.js!./app_src/loginPanel.scss");
 
 if(typeof content === 'string') content = [[module.i, content, '']];
 
@@ -1848,27 +1998,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _base_scss__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_base_scss__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _flexbox_scss__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./flexbox.scss */ "./app_src/flexbox.scss");
 /* harmony import */ var _flexbox_scss__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_flexbox_scss__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _scene_scss__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./scene.scss */ "./app_src/scene.scss");
-/* harmony import */ var _scene_scss__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_scene_scss__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _controlPanel_scss__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./controlPanel.scss */ "./app_src/controlPanel.scss");
-/* harmony import */ var _controlPanel_scss__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_controlPanel_scss__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _loginPanel_scss__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./loginPanel.scss */ "./app_src/loginPanel.scss");
-/* harmony import */ var _loginPanel_scss__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_loginPanel_scss__WEBPACK_IMPORTED_MODULE_4__);
-/* harmony import */ var _messageBoard_scss__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./messageBoard.scss */ "./app_src/messageBoard.scss");
-/* harmony import */ var _messageBoard_scss__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_messageBoard_scss__WEBPACK_IMPORTED_MODULE_5__);
-/* harmony import */ var _devPanel_scss__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./devPanel.scss */ "./app_src/devPanel.scss");
-/* harmony import */ var _devPanel_scss__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(_devPanel_scss__WEBPACK_IMPORTED_MODULE_6__);
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! react */ "react");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_7__);
-/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! react-dom */ "react-dom");
-/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_8___default = /*#__PURE__*/__webpack_require__.n(react_dom__WEBPACK_IMPORTED_MODULE_8__);
-/* harmony import */ var _MessageCenter__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./MessageCenter */ "./app_src/MessageCenter.ts");
-/* harmony import */ var _Scene__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./Scene */ "./app_src/Scene.tsx");
-/* harmony import */ var _DevPanel__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./DevPanel */ "./app_src/DevPanel.tsx");
-/* harmony import */ var _LoginPanel__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./LoginPanel */ "./app_src/LoginPanel.tsx");
-/* harmony import */ var _ControlPanel__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./ControlPanel */ "./app_src/ControlPanel.tsx");
-/* harmony import */ var _MessageBoard__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./MessageBoard */ "./app_src/MessageBoard.tsx");
-/* harmony import */ var _CommonUtility__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./CommonUtility */ "./app_src/CommonUtility.ts");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react-dom */ "react-dom");
+/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(react_dom__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _MessageCenter__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./MessageCenter */ "./app_src/MessageCenter.ts");
+/* harmony import */ var _Scene__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./Scene */ "./app_src/Scene.tsx");
+/* harmony import */ var _DevPanel__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./DevPanel */ "./app_src/DevPanel.tsx");
+/* harmony import */ var _LoginPanel__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./LoginPanel */ "./app_src/LoginPanel.tsx");
+/* harmony import */ var _ControlPanel__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./ControlPanel */ "./app_src/ControlPanel.tsx");
+/* harmony import */ var _MessageBoard__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./MessageBoard */ "./app_src/MessageBoard.tsx");
+/* harmony import */ var _common_CommonUtility__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./common/CommonUtility */ "./app_src/common/CommonUtility.ts");
 
 
 
@@ -1880,83 +2020,18 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-
-
-
-
-
-var isdev = _CommonUtility__WEBPACK_IMPORTED_MODULE_15__["CommonUtility"].getQueryString('isdev');
+var isdev = _common_CommonUtility__WEBPACK_IMPORTED_MODULE_10__["CommonUtility"].getQueryString('isdev');
 if (!isdev)
     console.info = console.debug = console.log = function () { };
-var eventCenter = new _MessageCenter__WEBPACK_IMPORTED_MODULE_9__["EventCenter"]();
-var messageCenter = new _MessageCenter__WEBPACK_IMPORTED_MODULE_9__["MessageCenter"](eventCenter);
-react_dom__WEBPACK_IMPORTED_MODULE_8__["render"](react__WEBPACK_IMPORTED_MODULE_7__["createElement"]("div", null,
-    react__WEBPACK_IMPORTED_MODULE_7__["createElement"](_Scene__WEBPACK_IMPORTED_MODULE_10__["Scene"], { eventCenter: eventCenter }),
-    react__WEBPACK_IMPORTED_MODULE_7__["createElement"](_DevPanel__WEBPACK_IMPORTED_MODULE_11__["DevPanel"], { eventCenter: eventCenter }),
-    react__WEBPACK_IMPORTED_MODULE_7__["createElement"](_LoginPanel__WEBPACK_IMPORTED_MODULE_12__["LoginPanel"], { eventCenter: eventCenter }),
-    react__WEBPACK_IMPORTED_MODULE_7__["createElement"](_MessageBoard__WEBPACK_IMPORTED_MODULE_14__["MessageBoard"], { messageCenter: messageCenter, eventCenter: eventCenter }),
-    react__WEBPACK_IMPORTED_MODULE_7__["createElement"](_ControlPanel__WEBPACK_IMPORTED_MODULE_13__["ControlPanel"], { messageCenter: messageCenter, eventCenter: eventCenter })), document.getElementById("app"));
+var eventCenter = new _MessageCenter__WEBPACK_IMPORTED_MODULE_4__["EventCenter"]();
+var messageCenter = new _MessageCenter__WEBPACK_IMPORTED_MODULE_4__["MessageCenter"](eventCenter);
+react_dom__WEBPACK_IMPORTED_MODULE_3__["render"](react__WEBPACK_IMPORTED_MODULE_2__["createElement"]("div", null,
+    react__WEBPACK_IMPORTED_MODULE_2__["createElement"](_Scene__WEBPACK_IMPORTED_MODULE_5__["Scene"], { eventCenter: eventCenter }),
+    react__WEBPACK_IMPORTED_MODULE_2__["createElement"](_DevPanel__WEBPACK_IMPORTED_MODULE_6__["DevPanel"], { eventCenter: eventCenter }),
+    react__WEBPACK_IMPORTED_MODULE_2__["createElement"](_LoginPanel__WEBPACK_IMPORTED_MODULE_7__["LoginPanel"], { eventCenter: eventCenter }),
+    react__WEBPACK_IMPORTED_MODULE_2__["createElement"](_MessageBoard__WEBPACK_IMPORTED_MODULE_9__["MessageBoard"], { messageCenter: messageCenter, eventCenter: eventCenter }),
+    react__WEBPACK_IMPORTED_MODULE_2__["createElement"](_ControlPanel__WEBPACK_IMPORTED_MODULE_8__["ControlPanel"], { messageCenter: messageCenter, eventCenter: eventCenter })), document.getElementById("app"));
 
-
-/***/ }),
-
-/***/ "./app_src/messageBoard.scss":
-/*!***********************************!*\
-  !*** ./app_src/messageBoard.scss ***!
-  \***********************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-
-var content = __webpack_require__(/*! !../node_modules/css-loader!../node_modules/sass-loader/lib/loader.js!./messageBoard.scss */ "./node_modules/css-loader/index.js!./node_modules/sass-loader/lib/loader.js!./app_src/messageBoard.scss");
-
-if(typeof content === 'string') content = [[module.i, content, '']];
-
-var transform;
-var insertInto;
-
-
-
-var options = {"hmr":true}
-
-options.transform = transform
-options.insertInto = undefined;
-
-var update = __webpack_require__(/*! ../node_modules/style-loader/lib/addStyles.js */ "./node_modules/style-loader/lib/addStyles.js")(content, options);
-
-if(content.locals) module.exports = content.locals;
-
-if(false) {}
-
-/***/ }),
-
-/***/ "./app_src/scene.scss":
-/*!****************************!*\
-  !*** ./app_src/scene.scss ***!
-  \****************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-
-var content = __webpack_require__(/*! !../node_modules/css-loader!../node_modules/sass-loader/lib/loader.js!./scene.scss */ "./node_modules/css-loader/index.js!./node_modules/sass-loader/lib/loader.js!./app_src/scene.scss");
-
-if(typeof content === 'string') content = [[module.i, content, '']];
-
-var transform;
-var insertInto;
-
-
-
-var options = {"hmr":true}
-
-options.transform = transform
-options.insertInto = undefined;
-
-var update = __webpack_require__(/*! ../node_modules/style-loader/lib/addStyles.js */ "./node_modules/style-loader/lib/addStyles.js")(content, options);
-
-if(content.locals) module.exports = content.locals;
-
-if(false) {}
 
 /***/ }),
 
@@ -4511,6 +4586,101 @@ module.exports = function(a, b){
 
 /***/ }),
 
+/***/ "./node_modules/css-loader/index.js!./node_modules/sass-loader/lib/loader.js!./app_src/ControlPanel.scss":
+/*!******************************************************************************************************!*\
+  !*** ./node_modules/css-loader!./node_modules/sass-loader/lib/loader.js!./app_src/ControlPanel.scss ***!
+  \******************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(false);
+// imports
+
+
+// module
+exports.push([module.i, "html,\nbody {\n  font-family: Microsoft JhengHei;\n  overflow: hidden;\n  width: 100%;\n  height: 100%;\n  margin: 0;\n  padding: 0; }\n\n.full-page {\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  overflow: hidden; }\n\n/* flash */\n.flash {\n  -webkit-animation-name: flash-animation;\n  -webkit-animation-duration: 1s;\n  animation-name: flash-animation;\n  animation-duration: 1s; }\n\n@-webkit-keyframes flash-animation {\n  from {\n    background: rgba(255, 255, 255, 0.8); }\n  to {\n    background: default; } }\n\n@keyframes flash-animation {\n  from {\n    background: rgba(255, 255, 255, 0.8); }\n  to {\n    background: default; } }\n\n.untouchable {\n  pointer-events: none; }\n\ninput[type=text] {\n  background-color: transparent;\n  border: 1px solid #ffffff;\n  border-radius: 3px;\n  height: 24px;\n  color: #ffffff; }\n\n.button {\n  background-color: transparent;\n  cursor: pointer; }\n\n.white-text, .control-panel .textInput button {\n  color: white;\n  text-shadow: 0px 0px 6px #404040; }\n\n.text-center {\n  text-align: center; }\n\n.visible {\n  opacity: 1; }\n\n.invisible {\n  opacity: 0; }\n\n.transition-all, .control-panel, .control-panel .textInput {\n  -webkit-transition: all 0.3s ease;\n  -moz-transition: all 0.3s ease;\n  -o-transition: all 0.3s ease;\n  transition: all 0.3s ease; }\n\n.clearfix::after {\n  content: \"\";\n  clear: both;\n  display: table; }\n\n.flex, .control-panel, .control-panel .textInput {\n  display: flex; }\n\n.flex-row {\n  flex-direction: row; }\n\n.flex-column, .control-panel {\n  flex-direction: column; }\n\n.flex-verticalCenter, .flex-center, .control-panel, .control-panel .textInput {\n  align-items: center; }\n\n.flex-horizontalCenter, .flex-center, .control-panel, .control-panel .textInput {\n  justify-content: center; }\n\n.flex-end {\n  align-items: flex-end; }\n\n.control-panel {\n  position: fixed;\n  bottom: 30px;\n  left: 0;\n  width: 100%;\n  height: 70px; }\n  .control-panel .buttons .button {\n    font-size: 1.8em;\n    border: 0; }\n  .control-panel .textInput {\n    width: 100%;\n    max-width: 35em; }\n  .control-panel .textInput input {\n    background-color: transparent;\n    border: solid 1px white;\n    border-radius: 1px;\n    width: 80%; }\n  .control-panel .textInput button {\n    border: solid 1px white;\n    border-radius: 1px;\n    margin: 0; }\n  .control-panel .userRecord {\n    display: none;\n    position: absolute;\n    top: -10px;\n    left: 50%;\n    transform: translate(-50%, -100%);\n    padding: 10px;\n    background-color: rgba(255, 255, 255, 0.6);\n    border: 1px solid #ccc;\n    border-radius: 3px;\n    -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);\n    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175); }\n    .control-panel .userRecord div {\n      padding: 2px 0; }\n", ""]);
+
+// exports
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/index.js!./node_modules/sass-loader/lib/loader.js!./app_src/DevPanel.scss":
+/*!**************************************************************************************************!*\
+  !*** ./node_modules/css-loader!./node_modules/sass-loader/lib/loader.js!./app_src/DevPanel.scss ***!
+  \**************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(false);
+// imports
+
+
+// module
+exports.push([module.i, "#devPanel {\n  display: none;\n  position: fixed;\n  top: 0;\n  right: 0;\n  background-color: rgba(0, 0, 0, 0.2);\n  width: 200px; }\n  #devPanel table {\n    width: 100%; }\n    #devPanel table ul {\n      padding-left: 15px; }\n\n#devPanel td {\n  width: 50px;\n  padding: 3px;\n  word-break: break-all; }\n", ""]);
+
+// exports
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/index.js!./node_modules/sass-loader/lib/loader.js!./app_src/LoginPanel.scss":
+/*!****************************************************************************************************!*\
+  !*** ./node_modules/css-loader!./node_modules/sass-loader/lib/loader.js!./app_src/LoginPanel.scss ***!
+  \****************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(false);
+// imports
+
+
+// module
+exports.push([module.i, "html,\nbody {\n  font-family: Microsoft JhengHei;\n  overflow: hidden;\n  width: 100%;\n  height: 100%;\n  margin: 0;\n  padding: 0; }\n\n.full-page {\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  overflow: hidden; }\n\n/* flash */\n.flash {\n  -webkit-animation-name: flash-animation;\n  -webkit-animation-duration: 1s;\n  animation-name: flash-animation;\n  animation-duration: 1s; }\n\n@-webkit-keyframes flash-animation {\n  from {\n    background: rgba(255, 255, 255, 0.8); }\n  to {\n    background: default; } }\n\n@keyframes flash-animation {\n  from {\n    background: rgba(255, 255, 255, 0.8); }\n  to {\n    background: default; } }\n\n.untouchable {\n  pointer-events: none; }\n\ninput[type=text] {\n  background-color: transparent;\n  border: 1px solid #ffffff;\n  border-radius: 3px;\n  height: 24px;\n  color: #ffffff; }\n\n.button, #loginPanel .skipAnimation > button {\n  background-color: transparent;\n  cursor: pointer; }\n\n.white-text, #loginPanel .skipAnimation > button {\n  color: white;\n  text-shadow: 0px 0px 6px #404040; }\n\n.text-center {\n  text-align: center; }\n\n.visible {\n  opacity: 1; }\n\n.invisible {\n  opacity: 0; }\n\n.transition-all {\n  -webkit-transition: all 0.3s ease;\n  -moz-transition: all 0.3s ease;\n  -o-transition: all 0.3s ease;\n  transition: all 0.3s ease; }\n\n.clearfix::after {\n  content: \"\";\n  clear: both;\n  display: table; }\n\n#loginPanel {\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  background-color: rgba(0, 0, 0, 0.3);\n  overflow: auto; }\n  #loginPanel > .wordCard {\n    display: none;\n    white-space: nowrap; }\n  #loginPanel .skipAnimation {\n    position: absolute;\n    bottom: 10%;\n    left: 50%;\n    transform: translate(-50%); }\n    #loginPanel .skipAnimation > button {\n      border: 1px solid white;\n      border-radius: 2px;\n      padding: 0 20px; }\n\n#signInWrapper .label {\n  height: 24px;\n  line-height: 24px; }\n\n#signInWrapper .icon {\n  height: 24px;\n  line-height: 24px;\n  background: url(\"https://google-developers.appspot.com/identity/sign-in/g-normal.png\") transparent -7px 50% no-repeat;\n  display: inline-block;\n  vertical-align: middle;\n  width: 25px; }\n\n.signInButton {\n  background: transparent;\n  padding: 0;\n  border: none;\n  color: #ecffec;\n  font-size: 18px;\n  cursor: pointer; }\n", ""]);
+
+// exports
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/index.js!./node_modules/sass-loader/lib/loader.js!./app_src/MessageBoard.scss":
+/*!******************************************************************************************************!*\
+  !*** ./node_modules/css-loader!./node_modules/sass-loader/lib/loader.js!./app_src/MessageBoard.scss ***!
+  \******************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(false);
+// imports
+
+
+// module
+exports.push([module.i, "html,\nbody {\n  font-family: Microsoft JhengHei;\n  overflow: hidden;\n  width: 100%;\n  height: 100%;\n  margin: 0;\n  padding: 0; }\n\n.full-page, #messageBoard {\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  overflow: hidden; }\n\n/* flash */\n.flash {\n  -webkit-animation-name: flash-animation;\n  -webkit-animation-duration: 1s;\n  animation-name: flash-animation;\n  animation-duration: 1s; }\n\n@-webkit-keyframes flash-animation {\n  from {\n    background: rgba(255, 255, 255, 0.8); }\n  to {\n    background: default; } }\n\n@keyframes flash-animation {\n  from {\n    background: rgba(255, 255, 255, 0.8); }\n  to {\n    background: default; } }\n\n.untouchable, #messageBoard {\n  pointer-events: none; }\n\ninput[type=text] {\n  background-color: transparent;\n  border: 1px solid #ffffff;\n  border-radius: 3px;\n  height: 24px;\n  color: #ffffff; }\n\n.button {\n  background-color: transparent;\n  cursor: pointer; }\n\n.white-text, #messageBoard .messageBoardContent .messageBox {\n  color: white;\n  text-shadow: 0px 0px 6px #404040; }\n\n.text-center {\n  text-align: center; }\n\n.visible {\n  opacity: 1; }\n\n.invisible {\n  opacity: 0; }\n\n.transition-all {\n  -webkit-transition: all 0.3s ease;\n  -moz-transition: all 0.3s ease;\n  -o-transition: all 0.3s ease;\n  transition: all 0.3s ease; }\n\n.clearfix::after, #messageBoard .messageBoardContent::after {\n  content: \"\";\n  clear: both;\n  display: table; }\n\n.flex, #messageBoard {\n  display: flex; }\n\n.flex-row {\n  flex-direction: row; }\n\n.flex-column {\n  flex-direction: column; }\n\n.flex-verticalCenter, .flex-center {\n  align-items: center; }\n\n.flex-horizontalCenter, .flex-center, #messageBoard {\n  justify-content: center; }\n\n.flex-end {\n  align-items: flex-end; }\n\n#messageBoard > div {\n  margin-bottom: 100px; }\n\n#messageBoard .messageBoardContent {\n  width: 100%;\n  overflow: hidden; }\n  #messageBoard .messageBoardContent .messageBox {\n    position: relative;\n    background-color: rgba(255, 255, 255, 0.05);\n    padding: 3px;\n    margin: 5px 0;\n    border-radius: 3px;\n    width: 50%;\n    color: white; }\n    #messageBoard .messageBoardContent .messageBox .avatar {\n      position: absolute;\n      width: 30px;\n      transform: translateY(40%); }\n    #messageBoard .messageBoardContent .messageBox .name {\n      position: absolute;\n      top: 0px;\n      left: 7px; }\n    #messageBoard .messageBoardContent .messageBox .content {\n      margin: 20px 0 0 30px; }\n\n#messageBoard .scrollbarContainer {\n  pointer-events: auto;\n  position: relative;\n  top: 0;\n  right: 0;\n  width: 15px;\n  background-color: rgba(0, 0, 0, 0.1); }\n  #messageBoard .scrollbarContainer .scrollbar {\n    position: absolute;\n    top: 0;\n    right: 1px;\n    width: 12px;\n    height: 100px;\n    background-color: rgba(0, 0, 0, 0.3);\n    border-radius: 5px; }\n\n@media only screen and (min-width: 768px) {\n  .messageBoardContent {\n    padding: 0 50px; } }\n\n@media only screen and (min-width: 1224px) {\n  .messageBoardContent {\n    padding: 0 200px; } }\n", ""]);
+
+// exports
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/index.js!./node_modules/sass-loader/lib/loader.js!./app_src/Scene.scss":
+/*!***********************************************************************************************!*\
+  !*** ./node_modules/css-loader!./node_modules/sass-loader/lib/loader.js!./app_src/Scene.scss ***!
+  \***********************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(false);
+// imports
+
+
+// module
+exports.push([module.i, "html,\nbody {\n  font-family: Microsoft JhengHei;\n  overflow: hidden;\n  width: 100%;\n  height: 100%;\n  margin: 0;\n  padding: 0; }\n\n.full-page, #renderCanvas, #greenMask {\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  overflow: hidden; }\n\n/* flash */\n.flash {\n  -webkit-animation-name: flash-animation;\n  -webkit-animation-duration: 1s;\n  animation-name: flash-animation;\n  animation-duration: 1s; }\n\n@-webkit-keyframes flash-animation {\n  from {\n    background: rgba(255, 255, 255, 0.8); }\n  to {\n    background: default; } }\n\n@keyframes flash-animation {\n  from {\n    background: rgba(255, 255, 255, 0.8); }\n  to {\n    background: default; } }\n\n.untouchable, #greenMask {\n  pointer-events: none; }\n\ninput[type=text] {\n  background-color: transparent;\n  border: 1px solid #ffffff;\n  border-radius: 3px;\n  height: 24px;\n  color: #ffffff; }\n\n.button {\n  background-color: transparent;\n  cursor: pointer; }\n\n.white-text {\n  color: white;\n  text-shadow: 0px 0px 6px #404040; }\n\n.text-center {\n  text-align: center; }\n\n.visible {\n  opacity: 1; }\n\n.invisible {\n  opacity: 0; }\n\n.transition-all, #greenMask {\n  -webkit-transition: all 0.3s ease;\n  -moz-transition: all 0.3s ease;\n  -o-transition: all 0.3s ease;\n  transition: all 0.3s ease; }\n\n.clearfix::after {\n  content: \"\";\n  clear: both;\n  display: table; }\n\n#renderCanvas {\n  touch-action: none; }\n", ""]);
+
+// exports
+
+
+/***/ }),
+
 /***/ "./node_modules/css-loader/index.js!./node_modules/sass-loader/lib/loader.js!./app_src/base.scss":
 /*!**********************************************************************************************!*\
   !*** ./node_modules/css-loader!./node_modules/sass-loader/lib/loader.js!./app_src/base.scss ***!
@@ -4530,44 +4700,6 @@ exports.push([module.i, "html,\nbody {\n  font-family: Microsoft JhengHei;\n  ov
 
 /***/ }),
 
-/***/ "./node_modules/css-loader/index.js!./node_modules/sass-loader/lib/loader.js!./app_src/controlPanel.scss":
-/*!******************************************************************************************************!*\
-  !*** ./node_modules/css-loader!./node_modules/sass-loader/lib/loader.js!./app_src/controlPanel.scss ***!
-  \******************************************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(false);
-// imports
-
-
-// module
-exports.push([module.i, "html,\nbody {\n  font-family: Microsoft JhengHei;\n  overflow: hidden;\n  width: 100%;\n  height: 100%;\n  margin: 0;\n  padding: 0; }\n\n.full-page {\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  overflow: hidden; }\n\n/* flash */\n.flash {\n  -webkit-animation-name: flash-animation;\n  -webkit-animation-duration: 1s;\n  animation-name: flash-animation;\n  animation-duration: 1s; }\n\n@-webkit-keyframes flash-animation {\n  from {\n    background: rgba(255, 255, 255, 0.8); }\n  to {\n    background: default; } }\n\n@keyframes flash-animation {\n  from {\n    background: rgba(255, 255, 255, 0.8); }\n  to {\n    background: default; } }\n\n.untouchable {\n  pointer-events: none; }\n\ninput[type=text] {\n  background-color: transparent;\n  border: 1px solid #ffffff;\n  border-radius: 3px;\n  height: 24px;\n  color: #ffffff; }\n\n.button {\n  background-color: transparent;\n  cursor: pointer; }\n\n.white-text, .control-panel .textInput button {\n  color: white;\n  text-shadow: 0px 0px 6px #404040; }\n\n.text-center {\n  text-align: center; }\n\n.visible {\n  opacity: 1; }\n\n.invisible {\n  opacity: 0; }\n\n.transition-all, .control-panel, .control-panel .textInput {\n  -webkit-transition: all 0.3s ease;\n  -moz-transition: all 0.3s ease;\n  -o-transition: all 0.3s ease;\n  transition: all 0.3s ease; }\n\n.clearfix::after {\n  content: \"\";\n  clear: both;\n  display: table; }\n\n.flex, .control-panel, .control-panel .textInput {\n  display: flex; }\n\n.flex-row {\n  flex-direction: row; }\n\n.flex-column, .control-panel {\n  flex-direction: column; }\n\n.flex-verticalCenter, .flex-center, .control-panel, .control-panel .textInput {\n  align-items: center; }\n\n.flex-horizontalCenter, .flex-center, .control-panel, .control-panel .textInput {\n  justify-content: center; }\n\n.flex-end {\n  align-items: flex-end; }\n\n.control-panel {\n  position: fixed;\n  bottom: 30px;\n  left: 0;\n  width: 100%;\n  height: 70px; }\n  .control-panel .buttons .button {\n    font-size: 1.8em;\n    border: 0; }\n  .control-panel .textInput {\n    width: 100%;\n    max-width: 35em; }\n  .control-panel .textInput input {\n    background-color: transparent;\n    border: solid 1px white;\n    border-radius: 1px;\n    width: 80%; }\n  .control-panel .textInput button {\n    border: solid 1px white;\n    border-radius: 1px;\n    margin: 0; }\n", ""]);
-
-// exports
-
-
-/***/ }),
-
-/***/ "./node_modules/css-loader/index.js!./node_modules/sass-loader/lib/loader.js!./app_src/devPanel.scss":
-/*!**************************************************************************************************!*\
-  !*** ./node_modules/css-loader!./node_modules/sass-loader/lib/loader.js!./app_src/devPanel.scss ***!
-  \**************************************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(false);
-// imports
-
-
-// module
-exports.push([module.i, "#devPanel {\n  display: none;\n  position: fixed;\n  top: 0;\n  right: 0;\n  background-color: rgba(0, 0, 0, 0.2);\n  width: 200px; }\n  #devPanel table {\n    width: 100%; }\n    #devPanel table ul {\n      padding-left: 15px; }\n\n#devPanel td {\n  width: 50px;\n  padding: 3px;\n  word-break: break-all; }\n", ""]);
-
-// exports
-
-
-/***/ }),
-
 /***/ "./node_modules/css-loader/index.js!./node_modules/sass-loader/lib/loader.js!./app_src/flexbox.scss":
 /*!*************************************************************************************************!*\
   !*** ./node_modules/css-loader!./node_modules/sass-loader/lib/loader.js!./app_src/flexbox.scss ***!
@@ -4581,63 +4713,6 @@ exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/li
 
 // module
 exports.push([module.i, ".flex {\n  display: flex; }\n\n.flex-row {\n  flex-direction: row; }\n\n.flex-column {\n  flex-direction: column; }\n\n.flex-verticalCenter, .flex-center {\n  align-items: center; }\n\n.flex-horizontalCenter, .flex-center {\n  justify-content: center; }\n\n.flex-end {\n  align-items: flex-end; }\n", ""]);
-
-// exports
-
-
-/***/ }),
-
-/***/ "./node_modules/css-loader/index.js!./node_modules/sass-loader/lib/loader.js!./app_src/loginPanel.scss":
-/*!****************************************************************************************************!*\
-  !*** ./node_modules/css-loader!./node_modules/sass-loader/lib/loader.js!./app_src/loginPanel.scss ***!
-  \****************************************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(false);
-// imports
-
-
-// module
-exports.push([module.i, "html,\nbody {\n  font-family: Microsoft JhengHei;\n  overflow: hidden;\n  width: 100%;\n  height: 100%;\n  margin: 0;\n  padding: 0; }\n\n.full-page {\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  overflow: hidden; }\n\n/* flash */\n.flash {\n  -webkit-animation-name: flash-animation;\n  -webkit-animation-duration: 1s;\n  animation-name: flash-animation;\n  animation-duration: 1s; }\n\n@-webkit-keyframes flash-animation {\n  from {\n    background: rgba(255, 255, 255, 0.8); }\n  to {\n    background: default; } }\n\n@keyframes flash-animation {\n  from {\n    background: rgba(255, 255, 255, 0.8); }\n  to {\n    background: default; } }\n\n.untouchable {\n  pointer-events: none; }\n\ninput[type=text] {\n  background-color: transparent;\n  border: 1px solid #ffffff;\n  border-radius: 3px;\n  height: 24px;\n  color: #ffffff; }\n\n.button, #loginPanel .skipAnimation > button {\n  background-color: transparent;\n  cursor: pointer; }\n\n.white-text, #loginPanel .skipAnimation > button {\n  color: white;\n  text-shadow: 0px 0px 6px #404040; }\n\n.text-center {\n  text-align: center; }\n\n.visible {\n  opacity: 1; }\n\n.invisible {\n  opacity: 0; }\n\n.transition-all {\n  -webkit-transition: all 0.3s ease;\n  -moz-transition: all 0.3s ease;\n  -o-transition: all 0.3s ease;\n  transition: all 0.3s ease; }\n\n.clearfix::after {\n  content: \"\";\n  clear: both;\n  display: table; }\n\n#loginPanel {\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  background-color: rgba(0, 0, 0, 0.3);\n  overflow: auto; }\n  #loginPanel > .wordCard {\n    display: none;\n    white-space: nowrap; }\n  #loginPanel .skipAnimation {\n    position: absolute;\n    bottom: 10%;\n    left: 50%;\n    transform: translate(-50%); }\n    #loginPanel .skipAnimation > button {\n      border: 1px solid white;\n      border-radius: 2px;\n      padding: 0 20px; }\n\n#signInWrapper .label {\n  height: 24px;\n  line-height: 24px; }\n\n#signInWrapper .icon {\n  height: 24px;\n  line-height: 24px;\n  background: url(\"https://google-developers.appspot.com/identity/sign-in/g-normal.png\") transparent -7px 50% no-repeat;\n  display: inline-block;\n  vertical-align: middle;\n  width: 25px; }\n\n.signInButton {\n  background: transparent;\n  padding: 0;\n  border: none;\n  color: #ecffec;\n  font-size: 18px;\n  cursor: pointer; }\n", ""]);
-
-// exports
-
-
-/***/ }),
-
-/***/ "./node_modules/css-loader/index.js!./node_modules/sass-loader/lib/loader.js!./app_src/messageBoard.scss":
-/*!******************************************************************************************************!*\
-  !*** ./node_modules/css-loader!./node_modules/sass-loader/lib/loader.js!./app_src/messageBoard.scss ***!
-  \******************************************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(false);
-// imports
-
-
-// module
-exports.push([module.i, "html,\nbody {\n  font-family: Microsoft JhengHei;\n  overflow: hidden;\n  width: 100%;\n  height: 100%;\n  margin: 0;\n  padding: 0; }\n\n.full-page, #messageBoard {\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  overflow: hidden; }\n\n/* flash */\n.flash {\n  -webkit-animation-name: flash-animation;\n  -webkit-animation-duration: 1s;\n  animation-name: flash-animation;\n  animation-duration: 1s; }\n\n@-webkit-keyframes flash-animation {\n  from {\n    background: rgba(255, 255, 255, 0.8); }\n  to {\n    background: default; } }\n\n@keyframes flash-animation {\n  from {\n    background: rgba(255, 255, 255, 0.8); }\n  to {\n    background: default; } }\n\n.untouchable, #messageBoard {\n  pointer-events: none; }\n\ninput[type=text] {\n  background-color: transparent;\n  border: 1px solid #ffffff;\n  border-radius: 3px;\n  height: 24px;\n  color: #ffffff; }\n\n.button {\n  background-color: transparent;\n  cursor: pointer; }\n\n.white-text, #messageBoard .messageBoardContent .messageBox {\n  color: white;\n  text-shadow: 0px 0px 6px #404040; }\n\n.text-center {\n  text-align: center; }\n\n.visible {\n  opacity: 1; }\n\n.invisible {\n  opacity: 0; }\n\n.transition-all {\n  -webkit-transition: all 0.3s ease;\n  -moz-transition: all 0.3s ease;\n  -o-transition: all 0.3s ease;\n  transition: all 0.3s ease; }\n\n.clearfix::after, #messageBoard .messageBoardContent::after {\n  content: \"\";\n  clear: both;\n  display: table; }\n\n.flex, #messageBoard {\n  display: flex; }\n\n.flex-row {\n  flex-direction: row; }\n\n.flex-column {\n  flex-direction: column; }\n\n.flex-verticalCenter, .flex-center {\n  align-items: center; }\n\n.flex-horizontalCenter, .flex-center, #messageBoard {\n  justify-content: center; }\n\n.flex-end {\n  align-items: flex-end; }\n\n#messageBoard > div {\n  margin-bottom: 100px; }\n\n#messageBoard .messageBoardContent {\n  width: 100%;\n  overflow: hidden; }\n  #messageBoard .messageBoardContent .messageBox {\n    position: relative;\n    background-color: rgba(255, 255, 255, 0.05);\n    padding: 3px;\n    margin: 5px 0;\n    border-radius: 3px;\n    width: 50%;\n    color: white; }\n    #messageBoard .messageBoardContent .messageBox .avatar {\n      position: absolute;\n      width: 30px;\n      transform: translateY(40%); }\n    #messageBoard .messageBoardContent .messageBox .name {\n      position: absolute;\n      top: 0px;\n      left: 7px; }\n    #messageBoard .messageBoardContent .messageBox .content {\n      margin: 20px 0 0 30px; }\n\n#messageBoard .scrollbarContainer {\n  pointer-events: auto;\n  position: relative;\n  top: 0;\n  right: 0;\n  width: 15px;\n  background-color: rgba(0, 0, 0, 0.1); }\n  #messageBoard .scrollbarContainer .scrollbar {\n    position: absolute;\n    top: 0;\n    right: 1px;\n    width: 12px;\n    height: 100px;\n    background-color: rgba(0, 0, 0, 0.3);\n    border-radius: 5px; }\n\n@media only screen and (min-width: 768px) {\n  .messageBoardContent {\n    padding: 0 50px; } }\n\n@media only screen and (min-width: 1224px) {\n  .messageBoardContent {\n    padding: 0 200px; } }\n", ""]);
-
-// exports
-
-
-/***/ }),
-
-/***/ "./node_modules/css-loader/index.js!./node_modules/sass-loader/lib/loader.js!./app_src/scene.scss":
-/*!***********************************************************************************************!*\
-  !*** ./node_modules/css-loader!./node_modules/sass-loader/lib/loader.js!./app_src/scene.scss ***!
-  \***********************************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(false);
-// imports
-
-
-// module
-exports.push([module.i, "html,\nbody {\n  font-family: Microsoft JhengHei;\n  overflow: hidden;\n  width: 100%;\n  height: 100%;\n  margin: 0;\n  padding: 0; }\n\n.full-page, #renderCanvas, #greenMask {\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  overflow: hidden; }\n\n/* flash */\n.flash {\n  -webkit-animation-name: flash-animation;\n  -webkit-animation-duration: 1s;\n  animation-name: flash-animation;\n  animation-duration: 1s; }\n\n@-webkit-keyframes flash-animation {\n  from {\n    background: rgba(255, 255, 255, 0.8); }\n  to {\n    background: default; } }\n\n@keyframes flash-animation {\n  from {\n    background: rgba(255, 255, 255, 0.8); }\n  to {\n    background: default; } }\n\n.untouchable, #greenMask {\n  pointer-events: none; }\n\ninput[type=text] {\n  background-color: transparent;\n  border: 1px solid #ffffff;\n  border-radius: 3px;\n  height: 24px;\n  color: #ffffff; }\n\n.button {\n  background-color: transparent;\n  cursor: pointer; }\n\n.white-text {\n  color: white;\n  text-shadow: 0px 0px 6px #404040; }\n\n.text-center {\n  text-align: center; }\n\n.visible {\n  opacity: 1; }\n\n.invisible {\n  opacity: 0; }\n\n.transition-all, #greenMask {\n  -webkit-transition: all 0.3s ease;\n  -moz-transition: all 0.3s ease;\n  -o-transition: all 0.3s ease;\n  transition: all 0.3s ease; }\n\n.clearfix::after {\n  content: \"\";\n  clear: both;\n  display: table; }\n\n#renderCanvas {\n  touch-action: none; }\n", ""]);
 
 // exports
 
@@ -11670,4 +11745,4 @@ module.exports = ReactDOM;
 /***/ })
 
 /******/ });
-//# sourceMappingURL=bundle.main.js.map
+//# sourceMappingURL=bundle.main.6cda2af4b240094936a5.js.map
