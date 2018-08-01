@@ -1,5 +1,5 @@
 import * as React from "react";
-import { EventCenter, Event } from './MessageCenter';
+import { EventCenter, Event } from './common/MessageCenter';
 import { GlobalData } from './common/GlobalData';
 
 import "./LoginPanel.scss";
@@ -8,27 +8,27 @@ export class LoginPanel
     extends React.Component<{ eventCenter: EventCenter }> {
 
     render() {
-        return <div id="loginPanel" className="flex flex-center"
+        return <div id="loginPanel"
             onClick={this.focus.bind(this)}>
 
-            <div className="white-text text-center wordCard">
+            <div className="text-center wordCard">
                 概念有名而成數據，
                     <br /> 物體無形而成概念，
                     <br /> 彼自成空間；
                 </div>
-            <div className="white-text text-center wordCard">
+            <div className="text-center wordCard">
                 萬物竄流宇宙，
                     <br /> 在邊隙處落下，
                     <br /> 於彼端再現；
                 </div>
-            <div className="white-text text-center wordCard startBackgroundTransform">
+            <div className="text-center wordCard startBackgroundTransform">
                 千萬形貌，
                     <br /> 終歸涅槃，
                     <br /> 生生不息，
                     <br /> 周而復始。
                 </div>
             <div id="signInWrapper" className="wordCard">
-                <span className="label white-text">Sign in with:&nbsp;</span>
+                <span className="label">Sign in with:&nbsp;</span>
                 <input type="text" id="signInName"
                     onKeyPress={this.keyPress.bind(this)} />
                 <button type="button" className="signInButton"

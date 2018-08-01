@@ -1,11 +1,11 @@
-@import 'base';
+@import 'common/mixin';
 #renderCanvas {
-    @extend .full-page;
+    @include full-page;
     touch-action: none;
 }
 
 #greenMask {
-    @extend .full-page;
-    @extend .untouchable;
-    @extend .transition-all;
+    @include full-page;
+    @include untouchable;
+    @include transition-all;
 }

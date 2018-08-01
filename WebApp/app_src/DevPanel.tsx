@@ -1,5 +1,5 @@
 import * as React from "react";
-import { EventCenter, Event } from './MessageCenter';
+import { EventCenter, Event } from './common/MessageCenter';
 import { CommonUtility } from './common/CommonUtility';
 
 export const AddLogEvent = 'AddLogEvent';

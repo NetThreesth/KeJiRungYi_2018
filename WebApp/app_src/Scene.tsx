@@ -7,7 +7,7 @@ import { BabylonUtility, Line } from './common/BabylonUtility';
 import { AsyncWorker } from './common/AsyncWorker';
 import { GlobalData } from './common/GlobalData';
 
-import { EventCenter, Event, ChatBotResponse } from './MessageCenter';
+import { EventCenter, Event, ChatBotResponse } from './common/MessageCenter';
 
 import "./Scene.scss";
 
@@ -698,7 +698,8 @@ export class Scene extends React.Component<
     };
 
     private zoomIn() {
-        GlobalData.chatRoomIndex = GlobalData.chatRoomIndex || CommonUtility.getRandomIntInRange(0, this.chatRoomsCenter.length - 1);
+        GlobalData.chatRoomIndex = Number(CommonUtility.getQueryString('chatRoomIndex')) ||
+            CommonUtility.getRandomIntInRange(0, this.chatRoomsCenter.length - 1);
         const chatRoom = this.chatRoomsCenter[GlobalData.chatRoomIndex];
         const destination = chatRoom ?
             new BABYLON.Vector3(chatRoom.x * 2.5, chatRoom.y * 2.5, 0) :

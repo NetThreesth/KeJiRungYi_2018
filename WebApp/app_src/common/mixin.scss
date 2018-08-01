@@ -1,0 +1,70 @@
+@mixin flex {
+    display: flex;
+}
+
+@mixin flex-row {
+    flex-direction: row;
+}
+
+@mixin flex-column {
+    flex-direction: column;
+}
+
+@mixin flex-verticalCenter {
+    align-items: center;
+}
+
+@mixin flex-horizontalCenter {
+    justify-content: center;
+}
+
+@mixin flex-center {
+    @include flex-verticalCenter;
+    @include flex-horizontalCenter;
+}
+
+@mixin flex-end {
+    align-items: flex-end;
+}
+
+@mixin transition-all {
+    -webkit-transition: all 0.3s ease;
+    -moz-transition: all 0.3s ease;
+    -o-transition: all 0.3s ease;
+    transition: all 0.3s ease;
+}
+
+@mixin shadow-text {
+    text-shadow: 0px 0px 6px #404040;
+}
+
+@mixin white-text {
+    @include shadow-text;
+    color: white;
+}
+
+@mixin button {
+    background-color: transparent;
+    cursor: pointer;
+}
+
+@mixin untouchable {
+    pointer-events: none;
+}
+
+@mixin full-page {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+@mixin clearfix {
+    &:after {
+        content: "";
+        clear: both;
+        display: table;
+    }
+}

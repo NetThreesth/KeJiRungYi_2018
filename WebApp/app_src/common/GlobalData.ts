@@ -3,7 +3,7 @@ import { CommonUtility } from './CommonUtility';
 export class GlobalData {
     static userName: string = null;
     static signInTime: Date = null;
-    static chatRoomIndex: number = Number(CommonUtility.getQueryString('chatRoomIndex'));;
+    static chatRoomIndex: number = null;
 };
 
 export enum Roles {

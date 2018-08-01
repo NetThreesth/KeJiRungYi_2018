@@ -1,10 +1,9 @@
-import "./base.scss";
-import "./flexbox.scss";
+import "./common/site.scss";
 
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 
-import { MessageCenter, EventCenter, Event } from './MessageCenter';
+import { MessageCenter, EventCenter, Event } from './common/MessageCenter';
 import { Scene } from './Scene';
 import { DevPanel } from './DevPanel';
 import { LoginPanel } from './LoginPanel';

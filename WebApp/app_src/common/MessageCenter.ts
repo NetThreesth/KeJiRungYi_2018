@@ -1,7 +1,7 @@
-import { Roles,GlobalData } from './common/GlobalData';
-import { Scene } from './Scene';
-import { CommonUtility } from './common/CommonUtility';
-import { AddLogEvent } from './DevPanel';
+import { Roles, GlobalData } from './GlobalData';
+import { Scene } from '../Scene';
+import { CommonUtility } from './CommonUtility';
+import { AddLogEvent } from '../DevPanel';
 
 export enum ContentType {
     Text, Image
@@ -26,33 +26,37 @@ export class MessageCenter {
 
 
     addText(role: Roles, text: string) {
-        this.contents.push({ role: role, type: ContentType.Text, content: text });
-        this.eventCenter.trigger(MessageCenter.eventName);
+        this.addMessage({ role: role, type: ContentType.Text, content: text });
 
         if (role !== Roles.User) return;
-        CommonUtility.asyncPost('apis/uploadText', { rid: GlobalData.chatRoomIndex, text: text })
-            .done((resp: ChatBotResponse) => {
-                this.eventCenter.trigger(AddLogEvent, resp);
-                this.addText(Roles.Algae, resp.algaeResponse);
-                this.addText(Roles.ChatBot, resp.chatbotResponse);
-                this.eventCenter.trigger(Event.AfterSubmitMessage, resp);
-            });
+        CommonUtility.asyncPost(
+            'apis/uploadText',
+            { rid: GlobalData.chatRoomIndex, text: text }
+        ).done(this.responseHandler.bind(this));
     };
 
 
     addImage(role: Roles, b64String: string) {
-        this.contents.push({ role: role, type: ContentType.Image, content: b64String });
-        this.eventCenter.trigger(MessageCenter.eventName);
+        this.addMessage({ role: role, type: ContentType.Image, content: b64String });
 
-        CommonUtility.asyncPost('apis/uploadImage', { rid: GlobalData.chatRoomIndex, base64Image: b64String })
-            .done((resp: ChatBotResponse) => {
-                this.eventCenter.trigger(AddLogEvent, resp);
-                this.addText(Roles.ChatBot, resp.chatbotResponse);
-                this.addText(Roles.Algae, resp.algaeResponse);
-                this.addText(Roles.ChatBot, resp.chatbot2algaeResponse);
-                this.addText(Roles.Algae, JSON.stringify(resp));
-                this.eventCenter.trigger(Event.AfterSubmitMessage, resp);
-            });
+        CommonUtility.asyncPost(
+            'apis/uploadImage',
+            { rid: GlobalData.chatRoomIndex, base64Image: b64String }
+        ).done(this.responseHandler.bind(this));
+    };
+
+    private addMessage(content: Content) {
+        this.contents.push(content);
+        this.eventCenter.trigger(MessageCenter.eventName);
+    };
+
+    private responseHandler(resp: ChatBotResponse) {
+        this.eventCenter.trigger(Event.AfterSubmitMessage, resp);
+        this.eventCenter.trigger(AddLogEvent, resp);
+
+        this.addText(Roles.ChatBot, resp.chatbotResponse);
+        setTimeout(() => this.addText(Roles.Algae, resp.algaeResponse), 1000);
+        setTimeout(() => this.addText(Roles.ChatBot, resp.chatbot2algaeResponse), 2000);
     };
 };
 

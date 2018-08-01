@@ -128,7 +128,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ControlPanel", function() { return ControlPanel; });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _MessageCenter__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./MessageCenter */ "./app_src/MessageCenter.ts");
+/* harmony import */ var _common_MessageCenter__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./common/MessageCenter */ "./app_src/common/MessageCenter.ts");
 /* harmony import */ var _common_GlobalData__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./common/GlobalData */ "./app_src/common/GlobalData.ts");
 /* harmony import */ var _ControlPanel_scss__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./ControlPanel.scss */ "./app_src/ControlPanel.scss");
 /* harmony import */ var _ControlPanel_scss__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_ControlPanel_scss__WEBPACK_IMPORTED_MODULE_3__);
@@ -165,12 +165,12 @@ var ControlPanel = /** @class */ (function (_super) {
                 react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("button", { className: "button", onClick: this.handleText.bind(this) },
                     react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("i", { className: "fas fa-share" }))),
             react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "buttons" },
-                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("button", { className: "button white-text", onClick: this.switchTextInput.bind(this) },
+                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("button", { className: "button", onClick: this.switchTextInput.bind(this) },
                     react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("i", { className: "far fa-comment-dots" })),
-                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("label", { htmlFor: "fileUpload", className: "button white-text" },
+                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("label", { htmlFor: "fileUpload", className: "button" },
                     react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("i", { className: "fas fa-camera-retro" })),
                 react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("input", { id: "fileUpload", type: "file", accept: "image/*", style: { display: 'none' }, onChange: this.handleFiles.bind(this) }),
-                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("button", { className: "button white-text", onClick: this.switchUserRecord.bind(this) },
+                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("button", { className: "button", onClick: this.switchUserRecord.bind(this) },
                     react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("i", { className: "fas fa-ellipsis-h" }))),
             react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "userRecord" },
                 react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", null,
@@ -191,7 +191,7 @@ var ControlPanel = /** @class */ (function (_super) {
     ;
     ControlPanel.prototype.componentDidMount = function () {
         var _this = this;
-        this.props.eventCenter.on(_MessageCenter__WEBPACK_IMPORTED_MODULE_1__["Event"].AfterLogin, function () {
+        this.props.eventCenter.on(_common_MessageCenter__WEBPACK_IMPORTED_MODULE_1__["Event"].AfterLogin, function () {
             $('.control-panel').removeClass(['invisible', 'untouchable']).addClass('visible');
             _this.setState({
                 time: new Date().getTime() - _common_GlobalData__WEBPACK_IMPORTED_MODULE_2__["GlobalData"].signInTime.getTime(),
@@ -235,7 +235,7 @@ var ControlPanel = /** @class */ (function (_super) {
     };
     ;
     ControlPanel.prototype.keyPress = function (e) {
-        if (e.which == 13 || e.keyCode == 13)
+        if (e.which === 13 || e.keyCode === 13)
             this.handleText();
     };
     ;
@@ -246,7 +246,6 @@ var ControlPanel = /** @class */ (function (_super) {
             return;
         $input.val('');
         this.onTextAdd(String(text));
-        this.switchTextInput();
     };
     ;
     ControlPanel.prototype.handleFiles = function ($ele) {
@@ -313,7 +312,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DevPanel", function() { return DevPanel; });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _MessageCenter__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./MessageCenter */ "./app_src/MessageCenter.ts");
+/* harmony import */ var _common_MessageCenter__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./common/MessageCenter */ "./app_src/common/MessageCenter.ts");
 /* harmony import */ var _common_CommonUtility__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./common/CommonUtility */ "./app_src/common/CommonUtility.ts");
 /* harmony import */ var _DevPanel_scss__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./DevPanel.scss */ "./app_src/DevPanel.scss");
 /* harmony import */ var _DevPanel_scss__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_DevPanel_scss__WEBPACK_IMPORTED_MODULE_3__);
@@ -341,7 +340,7 @@ var DevPanel = /** @class */ (function (_super) {
         if (!_this.isdev)
             return _this;
         var eventCenter = _this.props.eventCenter;
-        eventCenter.on(_MessageCenter__WEBPACK_IMPORTED_MODULE_1__["Event"].UpdateDevPanelData, function (data) {
+        eventCenter.on(_common_MessageCenter__WEBPACK_IMPORTED_MODULE_1__["Event"].UpdateDevPanelData, function (data) {
             if (Object.keys(data).some(function (key) { return _this.state[key] !== data[key]; }))
                 _this.setState(Object.assign({}, _this.state, data));
         });
@@ -436,7 +435,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "LoginPanel", function() { return LoginPanel; });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _MessageCenter__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./MessageCenter */ "./app_src/MessageCenter.ts");
+/* harmony import */ var _common_MessageCenter__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./common/MessageCenter */ "./app_src/common/MessageCenter.ts");
 /* harmony import */ var _common_GlobalData__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./common/GlobalData */ "./app_src/common/GlobalData.ts");
 /* harmony import */ var _LoginPanel_scss__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./LoginPanel.scss */ "./app_src/LoginPanel.scss");
 /* harmony import */ var _LoginPanel_scss__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_LoginPanel_scss__WEBPACK_IMPORTED_MODULE_3__);
@@ -460,20 +459,20 @@ var LoginPanel = /** @class */ (function (_super) {
         return _super !== null && _super.apply(this, arguments) || this;
     }
     LoginPanel.prototype.render = function () {
-        return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { id: "loginPanel", className: "flex flex-center", onClick: this.focus.bind(this) },
-            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "white-text text-center wordCard" },
+        return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { id: "loginPanel", onClick: this.focus.bind(this) },
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "text-center wordCard" },
                 "\u6982\u5FF5\u6709\u540D\u800C\u6210\u6578\u64DA\uFF0C",
                 react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("br", null),
                 " \u7269\u9AD4\u7121\u5F62\u800C\u6210\u6982\u5FF5\uFF0C",
                 react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("br", null),
                 " \u5F7C\u81EA\u6210\u7A7A\u9593\uFF1B"),
-            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "white-text text-center wordCard" },
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "text-center wordCard" },
                 "\u842C\u7269\u7AC4\u6D41\u5B87\u5B99\uFF0C",
                 react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("br", null),
                 " \u5728\u908A\u9699\u8655\u843D\u4E0B\uFF0C",
                 react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("br", null),
                 " \u65BC\u5F7C\u7AEF\u518D\u73FE\uFF1B"),
-            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "white-text text-center wordCard startBackgroundTransform" },
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "text-center wordCard startBackgroundTransform" },
                 "\u5343\u842C\u5F62\u8C8C\uFF0C",
                 react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("br", null),
                 " \u7D42\u6B78\u6D85\u69C3\uFF0C",
@@ -482,7 +481,7 @@ var LoginPanel = /** @class */ (function (_super) {
                 react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("br", null),
                 " \u5468\u800C\u5FA9\u59CB\u3002"),
             react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { id: "signInWrapper", className: "wordCard" },
-                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("span", { className: "label white-text" }, "Sign in with:\u00A0"),
+                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("span", { className: "label" }, "Sign in with:\u00A0"),
                 react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("input", { type: "text", id: "signInName", onKeyPress: this.keyPress.bind(this) }),
                 react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("button", { type: "button", className: "signInButton", onClick: this.signInButtonClickHandler.bind(this) },
                     react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("i", { className: "fas fa-arrow-circle-right" }))),
@@ -543,7 +542,7 @@ var LoginPanel = /** @class */ (function (_super) {
     ;
     LoginPanel.prototype.afterWordCardsAnimation = function () {
         $('.skipAnimation').hide();
-        this.props.eventCenter.trigger(_MessageCenter__WEBPACK_IMPORTED_MODULE_1__["Event"].AfterWordCardsAnimation);
+        this.props.eventCenter.trigger(_common_MessageCenter__WEBPACK_IMPORTED_MODULE_1__["Event"].AfterWordCardsAnimation);
     };
     ;
     LoginPanel.prototype.focus = function () {
@@ -567,7 +566,7 @@ var LoginPanel = /** @class */ (function (_super) {
     LoginPanel.prototype.login = function () {
         var $loginPanel = $('#loginPanel');
         $loginPanel.animate({ opacity: 0 }, 2000, function () { return $loginPanel.hide(); });
-        this.props.eventCenter.trigger(_MessageCenter__WEBPACK_IMPORTED_MODULE_1__["Event"].AfterLogin);
+        this.props.eventCenter.trigger(_common_MessageCenter__WEBPACK_IMPORTED_MODULE_1__["Event"].AfterLogin);
     };
     ;
     return LoginPanel;
@@ -612,17 +611,16 @@ if(false) {}
 /*!**********************************!*\
   !*** ./app_src/MessageBoard.tsx ***!
   \**********************************/
-/*! exports provided: MessageBoard, Scrollbar */
+/*! exports provided: MessageBoard */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MessageBoard", function() { return MessageBoard; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Scrollbar", function() { return Scrollbar; });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _MessageCenter__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./MessageCenter */ "./app_src/MessageCenter.ts");
-/* harmony import */ var _DevPanel__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./DevPanel */ "./app_src/DevPanel.tsx");
+/* harmony import */ var _common_MessageCenter__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./common/MessageCenter */ "./app_src/common/MessageCenter.ts");
+/* harmony import */ var _common_Scrollbar__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./common/Scrollbar */ "./app_src/common/Scrollbar.tsx");
 /* harmony import */ var _common_GlobalData__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./common/GlobalData */ "./app_src/common/GlobalData.ts");
 /* harmony import */ var _MessageBoard_scss__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./MessageBoard.scss */ "./app_src/MessageBoard.scss");
 /* harmony import */ var _MessageBoard_scss__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_MessageBoard_scss__WEBPACK_IMPORTED_MODULE_4__);
@@ -647,7 +645,7 @@ var MessageBoard = /** @class */ (function (_super) {
         var _this = _super.call(this, props) || this;
         var messageCenter = _this.props.messageCenter;
         _this.state = { contents: messageCenter.contents.slice() };
-        _this.props.messageCenter.eventCenter.on(_MessageCenter__WEBPACK_IMPORTED_MODULE_1__["MessageCenter"].eventName, _this.refresh.bind(_this));
+        _this.props.messageCenter.eventCenter.on(_common_MessageCenter__WEBPACK_IMPORTED_MODULE_1__["MessageCenter"].eventName, _this.refresh.bind(_this));
         return _this;
     }
     ;
@@ -656,12 +654,12 @@ var MessageBoard = /** @class */ (function (_super) {
         var contentElements = contents.map(this.createContent.bind(this));
         return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { id: "messageBoard", className: "invisible" },
             react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "messageBoardContent" }, contentElements),
-            react__WEBPACK_IMPORTED_MODULE_0__["createElement"](Scrollbar, { syncTarget: ".messageBoardContent", eventCenter: this.props.eventCenter }));
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"](_common_Scrollbar__WEBPACK_IMPORTED_MODULE_2__["Scrollbar"], { syncTarget: ".messageBoardContent", eventCenter: this.props.eventCenter }));
     };
     ;
     MessageBoard.prototype.componentDidMount = function () {
         var _this = this;
-        this.props.eventCenter.on(Scrollbar.ScrollEvent, function (rate) {
+        this.props.eventCenter.on(_common_Scrollbar__WEBPACK_IMPORTED_MODULE_2__["Scrollbar"].ScrollEvent, function (rate) {
             _this.scrollTo(rate);
         });
     };
@@ -669,14 +667,14 @@ var MessageBoard = /** @class */ (function (_super) {
     MessageBoard.prototype.componentDidUpdate = function () {
         var _this = this;
         this.scrollTo(1, false, function () {
-            _this.props.eventCenter.trigger(Scrollbar.UpdateEvent);
+            _this.props.eventCenter.trigger(_common_Scrollbar__WEBPACK_IMPORTED_MODULE_2__["Scrollbar"].UpdateEvent);
         });
     };
     ;
     MessageBoard.prototype.createContent = function (content) {
-        if (content.type === _MessageCenter__WEBPACK_IMPORTED_MODULE_1__["ContentType"].Text)
+        if (content.type === _common_MessageCenter__WEBPACK_IMPORTED_MODULE_1__["ContentType"].Text)
             return this.createTextMessage(content);
-        else if (content.type === _MessageCenter__WEBPACK_IMPORTED_MODULE_1__["ContentType"].Image)
+        else if (content.type === _common_MessageCenter__WEBPACK_IMPORTED_MODULE_1__["ContentType"].Image)
             return this.createImageMessage(content);
     };
     ;
@@ -737,201 +735,6 @@ var MessageBoard = /** @class */ (function (_super) {
 }(react__WEBPACK_IMPORTED_MODULE_0__["Component"]));
 
 ;
-var Scrollbar = /** @class */ (function (_super) {
-    __extends(Scrollbar, _super);
-    function Scrollbar() {
-        var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.$syncTarget = null;
-        return _this;
-    }
-    Scrollbar.prototype.render = function () {
-        return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "scrollbarContainer" },
-            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "scrollbar" }));
-    };
-    ;
-    Scrollbar.prototype.componentDidMount = function () {
-        this.$syncTarget = $(this.props.syncTarget);
-        this.initScrollbar();
-    };
-    ;
-    Scrollbar.prototype.initScrollbar = function () {
-        var _this = this;
-        var eventCenter = this.props.eventCenter;
-        var isDragging = false;
-        var origin = { pageY: 0, scrollbarOffset: 0 };
-        var $scrollbarContainer = $('.scrollbarContainer');
-        var $scrollbar = $scrollbarContainer.find('.scrollbar');
-        $(document)
-            .on('mousedown touchstart', '.scrollbarContainer', function (e) {
-            e.preventDefault();
-            var pageY = (e.type === 'touchstart') ? e.originalEvent.touches[0].pageY : e.pageY;
-            eventCenter.trigger(_DevPanel__WEBPACK_IMPORTED_MODULE_2__["AddLogEvent"], e.type + ": pageY- " + pageY);
-            isDragging = true;
-            origin.pageY = pageY;
-            var scrollbarOffset = Number($scrollbar.css('top').replace('px', ''));
-            origin.scrollbarOffset = scrollbarOffset;
-        })
-            .on('mousemove touchmove', '.scrollbarContainer', function (e) {
-            e.preventDefault();
-            if (!isDragging)
-                return;
-            var offsetY = ((e.type === 'touchmove') ? e.originalEvent.touches[0].pageY : e.pageY) - origin.pageY;
-            eventCenter.trigger(_DevPanel__WEBPACK_IMPORTED_MODULE_2__["AddLogEvent"], e.type + ": offsetY- " + offsetY);
-            var maxOffset = $scrollbarContainer.height() - $scrollbar.height();
-            var scrollbarOffset = origin.scrollbarOffset + offsetY;
-            if (scrollbarOffset > maxOffset)
-                scrollbarOffset = maxOffset;
-            else if (scrollbarOffset < 0)
-                scrollbarOffset = 0;
-            $scrollbar.css('top', scrollbarOffset);
-            eventCenter.trigger(Scrollbar.ScrollEvent, scrollbarOffset / maxOffset);
-        }).on('mouseup touchend', function (e) {
-            if (!isDragging)
-                return;
-            isDragging = false;
-            eventCenter.trigger(_DevPanel__WEBPACK_IMPORTED_MODULE_2__["AddLogEvent"], "" + e.type);
-        });
-        eventCenter.on(Scrollbar.UpdateEvent, function () {
-            _this.adjustScrollbarH();
-            _this.adjustScrollbarOffset();
-        });
-    };
-    ;
-    Scrollbar.prototype.adjustScrollbarH = function () {
-        var $scrollTarget = this.$syncTarget;
-        var targetTotalH = $scrollTarget.prop('scrollHeight');
-        var targetViewH = $scrollTarget.height();
-        var $scrollbarContainer = $('.scrollbarContainer');
-        var scrollbarContainerH = $scrollbarContainer.height();
-        var scrollbarH = scrollbarContainerH * (targetViewH / targetTotalH);
-        $scrollbarContainer.find('.scrollbar').height(scrollbarH);
-    };
-    ;
-    Scrollbar.prototype.adjustScrollbarOffset = function () {
-        var $scrollTarget = this.$syncTarget;
-        var targetTotalH = $scrollTarget.prop('scrollHeight');
-        var targetScrollTop = $scrollTarget.scrollTop();
-        var $scrollbarContainer = $('.scrollbarContainer');
-        var scrollbarContainerH = $scrollbarContainer.height();
-        var offset = scrollbarContainerH * targetScrollTop / targetTotalH;
-        $scrollbarContainer.find('.scrollbar').css('top', offset);
-    };
-    ;
-    Scrollbar.ScrollEvent = 'scroll';
-    Scrollbar.UpdateEvent = 'update';
-    return Scrollbar;
-}(react__WEBPACK_IMPORTED_MODULE_0__["Component"]));
-
-;
-
-
-/***/ }),
-
-/***/ "./app_src/MessageCenter.ts":
-/*!**********************************!*\
-  !*** ./app_src/MessageCenter.ts ***!
-  \**********************************/
-/*! exports provided: ContentType, MessageCenter, EventCenter, Event */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ContentType", function() { return ContentType; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MessageCenter", function() { return MessageCenter; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "EventCenter", function() { return EventCenter; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Event", function() { return Event; });
-/* harmony import */ var _common_GlobalData__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./common/GlobalData */ "./app_src/common/GlobalData.ts");
-/* harmony import */ var _common_CommonUtility__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./common/CommonUtility */ "./app_src/common/CommonUtility.ts");
-/* harmony import */ var _DevPanel__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./DevPanel */ "./app_src/DevPanel.tsx");
-
-
-
-var ContentType;
-(function (ContentType) {
-    ContentType[ContentType["Text"] = 0] = "Text";
-    ContentType[ContentType["Image"] = 1] = "Image";
-})(ContentType || (ContentType = {}));
-;
-;
-var MessageCenter = /** @class */ (function () {
-    function MessageCenter(eventCenter) {
-        this.contents = [];
-        this.eventCenter = null;
-        this.eventCenter = eventCenter;
-    }
-    ;
-    MessageCenter.prototype.addText = function (role, text) {
-        var _this = this;
-        this.contents.push({ role: role, type: ContentType.Text, content: text });
-        this.eventCenter.trigger(MessageCenter.eventName);
-        if (role !== _common_GlobalData__WEBPACK_IMPORTED_MODULE_0__["Roles"].User)
-            return;
-        _common_CommonUtility__WEBPACK_IMPORTED_MODULE_1__["CommonUtility"].asyncPost('apis/uploadText', { rid: _common_GlobalData__WEBPACK_IMPORTED_MODULE_0__["GlobalData"].chatRoomIndex, text: text })
-            .done(function (resp) {
-            _this.eventCenter.trigger(_DevPanel__WEBPACK_IMPORTED_MODULE_2__["AddLogEvent"], resp);
-            _this.addText(_common_GlobalData__WEBPACK_IMPORTED_MODULE_0__["Roles"].Algae, resp.algaeResponse);
-            _this.addText(_common_GlobalData__WEBPACK_IMPORTED_MODULE_0__["Roles"].ChatBot, resp.chatbotResponse);
-            _this.eventCenter.trigger(Event.AfterSubmitMessage, resp);
-        });
-    };
-    ;
-    MessageCenter.prototype.addImage = function (role, b64String) {
-        var _this = this;
-        this.contents.push({ role: role, type: ContentType.Image, content: b64String });
-        this.eventCenter.trigger(MessageCenter.eventName);
-        _common_CommonUtility__WEBPACK_IMPORTED_MODULE_1__["CommonUtility"].asyncPost('apis/uploadImage', { rid: _common_GlobalData__WEBPACK_IMPORTED_MODULE_0__["GlobalData"].chatRoomIndex, base64Image: b64String })
-            .done(function (resp) {
-            _this.eventCenter.trigger(_DevPanel__WEBPACK_IMPORTED_MODULE_2__["AddLogEvent"], resp);
-            _this.addText(_common_GlobalData__WEBPACK_IMPORTED_MODULE_0__["Roles"].ChatBot, resp.chatbotResponse);
-            _this.addText(_common_GlobalData__WEBPACK_IMPORTED_MODULE_0__["Roles"].Algae, resp.algaeResponse);
-            _this.addText(_common_GlobalData__WEBPACK_IMPORTED_MODULE_0__["Roles"].ChatBot, resp.chatbot2algaeResponse);
-            _this.addText(_common_GlobalData__WEBPACK_IMPORTED_MODULE_0__["Roles"].Algae, JSON.stringify(resp));
-            _this.eventCenter.trigger(Event.AfterSubmitMessage, resp);
-        });
-    };
-    ;
-    MessageCenter.eventName = 'addMessage';
-    return MessageCenter;
-}());
-
-;
-;
-;
-var EventCenter = /** @class */ (function () {
-    function EventCenter() {
-        this.eventCenter = $({});
-        this.registeredEventMap = {};
-    }
-    EventCenter.prototype.on = function (event, handler) {
-        this.registeredEventMap[event] = true;
-        console.log("Event registered: " + event);
-        this.eventCenter.on(event, function (event, data) { return handler(data); });
-    };
-    ;
-    EventCenter.prototype.trigger = function (event, data) {
-        if (!this.registeredEventMap[event]) {
-            console.log("Event not registered: " + event);
-            return;
-        }
-        this.eventCenter.trigger(event, data);
-    };
-    ;
-    return EventCenter;
-}());
-
-;
-var Event = /** @class */ (function () {
-    function Event() {
-    }
-    Event.AfterLogin = 'AfterLogin';
-    Event.UpdateDevPanelData = 'UpdateDevPanelData';
-    Event.AfterWordCardsAnimation = 'AfterWordCardsAnimation';
-    Event.AfterSubmitMessage = 'AfterSubmitMessage';
-    Event.None = 'None';
-    return Event;
-}());
-
-;
 
 
 /***/ }),
@@ -988,7 +791,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _common_BabylonUtility__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./common/BabylonUtility */ "./app_src/common/BabylonUtility.ts");
 /* harmony import */ var _common_AsyncWorker__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./common/AsyncWorker */ "./app_src/common/AsyncWorker.ts");
 /* harmony import */ var _common_GlobalData__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./common/GlobalData */ "./app_src/common/GlobalData.ts");
-/* harmony import */ var _MessageCenter__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./MessageCenter */ "./app_src/MessageCenter.ts");
+/* harmony import */ var _common_MessageCenter__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./common/MessageCenter */ "./app_src/common/MessageCenter.ts");
 /* harmony import */ var _Scene_scss__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./Scene.scss */ "./app_src/Scene.scss");
 /* harmony import */ var _Scene_scss__WEBPACK_IMPORTED_MODULE_9___default = /*#__PURE__*/__webpack_require__.n(_Scene_scss__WEBPACK_IMPORTED_MODULE_9__);
 var __extends = (undefined && undefined.__extends) || (function () {
@@ -1082,9 +885,9 @@ var Scene = /** @class */ (function (_super) {
             _this.scene.render();
             _this.renderAfter();
         });
-        this.props.eventCenter.on(_MessageCenter__WEBPACK_IMPORTED_MODULE_8__["Event"].AfterWordCardsAnimation, this.transformation.bind(this));
-        this.props.eventCenter.on(_MessageCenter__WEBPACK_IMPORTED_MODULE_8__["Event"].AfterLogin, this.zoomIn.bind(this));
-        this.props.eventCenter.on(_MessageCenter__WEBPACK_IMPORTED_MODULE_8__["Event"].AfterSubmitMessage, this.cmdHandler.bind(this));
+        this.props.eventCenter.on(_common_MessageCenter__WEBPACK_IMPORTED_MODULE_8__["Event"].AfterWordCardsAnimation, this.transformation.bind(this));
+        this.props.eventCenter.on(_common_MessageCenter__WEBPACK_IMPORTED_MODULE_8__["Event"].AfterLogin, this.zoomIn.bind(this));
+        this.props.eventCenter.on(_common_MessageCenter__WEBPACK_IMPORTED_MODULE_8__["Event"].AfterSubmitMessage, this.cmdHandler.bind(this));
         window.addEventListener("resize", this.engine.resize.bind(this.engine));
         this.updateMask();
     };
@@ -1093,7 +896,7 @@ var Scene = /** @class */ (function (_super) {
         var color = this.maskColor;
         var setting = "rgba(" + color.r + "," + color.g + "," + color.b + "," + color.a + ")";
         jquery__WEBPACK_IMPORTED_MODULE_3__('#greenMask').css('background-color', setting);
-        this.props.eventCenter.trigger(_MessageCenter__WEBPACK_IMPORTED_MODULE_8__["Event"].UpdateDevPanelData, { greenMask: setting });
+        this.props.eventCenter.trigger(_common_MessageCenter__WEBPACK_IMPORTED_MODULE_8__["Event"].UpdateDevPanelData, { greenMask: setting });
     };
     ;
     Scene.prototype.startUpdateBackgroundParticles = function () {
@@ -1189,7 +992,7 @@ var Scene = /** @class */ (function (_super) {
     };
     ;
     Scene.prototype.renderAfter = function () {
-        this.props.eventCenter.trigger(_MessageCenter__WEBPACK_IMPORTED_MODULE_8__["Event"].UpdateDevPanelData, {
+        this.props.eventCenter.trigger(_common_MessageCenter__WEBPACK_IMPORTED_MODULE_8__["Event"].UpdateDevPanelData, {
             fps: this.engine.getFps().toFixed() + ' fps',
             coordinate: _common_BabylonUtility__WEBPACK_IMPORTED_MODULE_5__["BabylonUtility"].positionToString(this.camera.position)
         });
@@ -1339,7 +1142,7 @@ var Scene = /** @class */ (function (_super) {
                 if (newCount > 100)
                     updatedNodes.length = newCount;
             }
-            _this.props.eventCenter.trigger(_MessageCenter__WEBPACK_IMPORTED_MODULE_8__["Event"].UpdateDevPanelData, {
+            _this.props.eventCenter.trigger(_common_MessageCenter__WEBPACK_IMPORTED_MODULE_8__["Event"].UpdateDevPanelData, {
                 linesystemPerformance: linesystemPerformance
             });
             _this.linesystemPerformance = 0;
@@ -1612,7 +1415,8 @@ var Scene = /** @class */ (function (_super) {
     };
     ;
     Scene.prototype.zoomIn = function () {
-        _common_GlobalData__WEBPACK_IMPORTED_MODULE_7__["GlobalData"].chatRoomIndex = _common_GlobalData__WEBPACK_IMPORTED_MODULE_7__["GlobalData"].chatRoomIndex || _common_CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getRandomIntInRange(0, this.chatRoomsCenter.length - 1);
+        _common_GlobalData__WEBPACK_IMPORTED_MODULE_7__["GlobalData"].chatRoomIndex = Number(_common_CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getQueryString('chatRoomIndex')) ||
+            _common_CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getRandomIntInRange(0, this.chatRoomsCenter.length - 1);
         var chatRoom = this.chatRoomsCenter[_common_GlobalData__WEBPACK_IMPORTED_MODULE_7__["GlobalData"].chatRoomIndex];
         var destination = chatRoom ?
             new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"](chatRoom.x * 2.5, chatRoom.y * 2.5, 0) :
@@ -1635,36 +1439,6 @@ var TranslateType;
 ;
 ;
 
-
-/***/ }),
-
-/***/ "./app_src/base.scss":
-/*!***************************!*\
-  !*** ./app_src/base.scss ***!
-  \***************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-
-var content = __webpack_require__(/*! !../node_modules/css-loader!../node_modules/sass-loader/lib/loader.js!./base.scss */ "./node_modules/css-loader/index.js!./node_modules/sass-loader/lib/loader.js!./app_src/base.scss");
-
-if(typeof content === 'string') content = [[module.i, content, '']];
-
-var transform;
-var insertInto;
-
-
-
-var options = {"hmr":true}
-
-options.transform = transform
-options.insertInto = undefined;
-
-var update = __webpack_require__(/*! ../node_modules/style-loader/lib/addStyles.js */ "./node_modules/style-loader/lib/addStyles.js")(content, options);
-
-if(content.locals) module.exports = content.locals;
-
-if(false) {}
 
 /***/ }),
 
@@ -1930,15 +1704,12 @@ var CommonUtility = /** @class */ (function () {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "GlobalData", function() { return GlobalData; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Roles", function() { return Roles; });
-/* harmony import */ var _CommonUtility__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./CommonUtility */ "./app_src/common/CommonUtility.ts");
-
 var GlobalData = /** @class */ (function () {
     function GlobalData() {
     }
-    ;
     GlobalData.userName = null;
     GlobalData.signInTime = null;
-    GlobalData.chatRoomIndex = Number(_CommonUtility__WEBPACK_IMPORTED_MODULE_0__["CommonUtility"].getQueryString('chatRoomIndex'));
+    GlobalData.chatRoomIndex = null;
     return GlobalData;
 }());
 
@@ -1955,15 +1726,235 @@ var Roles;
 
 /***/ }),
 
-/***/ "./app_src/flexbox.scss":
-/*!******************************!*\
-  !*** ./app_src/flexbox.scss ***!
-  \******************************/
+/***/ "./app_src/common/MessageCenter.ts":
+/*!*****************************************!*\
+  !*** ./app_src/common/MessageCenter.ts ***!
+  \*****************************************/
+/*! exports provided: ContentType, MessageCenter, EventCenter, Event */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ContentType", function() { return ContentType; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MessageCenter", function() { return MessageCenter; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "EventCenter", function() { return EventCenter; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Event", function() { return Event; });
+/* harmony import */ var _GlobalData__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./GlobalData */ "./app_src/common/GlobalData.ts");
+/* harmony import */ var _CommonUtility__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./CommonUtility */ "./app_src/common/CommonUtility.ts");
+/* harmony import */ var _DevPanel__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../DevPanel */ "./app_src/DevPanel.tsx");
+
+
+
+var ContentType;
+(function (ContentType) {
+    ContentType[ContentType["Text"] = 0] = "Text";
+    ContentType[ContentType["Image"] = 1] = "Image";
+})(ContentType || (ContentType = {}));
+;
+;
+var MessageCenter = /** @class */ (function () {
+    function MessageCenter(eventCenter) {
+        this.contents = [];
+        this.eventCenter = null;
+        this.eventCenter = eventCenter;
+    }
+    ;
+    MessageCenter.prototype.addText = function (role, text) {
+        this.addMessage({ role: role, type: ContentType.Text, content: text });
+        if (role !== _GlobalData__WEBPACK_IMPORTED_MODULE_0__["Roles"].User)
+            return;
+        _CommonUtility__WEBPACK_IMPORTED_MODULE_1__["CommonUtility"].asyncPost('apis/uploadText', { rid: _GlobalData__WEBPACK_IMPORTED_MODULE_0__["GlobalData"].chatRoomIndex, text: text }).done(this.responseHandler.bind(this));
+    };
+    ;
+    MessageCenter.prototype.addImage = function (role, b64String) {
+        this.addMessage({ role: role, type: ContentType.Image, content: b64String });
+        _CommonUtility__WEBPACK_IMPORTED_MODULE_1__["CommonUtility"].asyncPost('apis/uploadImage', { rid: _GlobalData__WEBPACK_IMPORTED_MODULE_0__["GlobalData"].chatRoomIndex, base64Image: b64String }).done(this.responseHandler.bind(this));
+    };
+    ;
+    MessageCenter.prototype.addMessage = function (content) {
+        this.contents.push(content);
+        this.eventCenter.trigger(MessageCenter.eventName);
+    };
+    ;
+    MessageCenter.prototype.responseHandler = function (resp) {
+        var _this = this;
+        this.eventCenter.trigger(Event.AfterSubmitMessage, resp);
+        this.eventCenter.trigger(_DevPanel__WEBPACK_IMPORTED_MODULE_2__["AddLogEvent"], resp);
+        this.addText(_GlobalData__WEBPACK_IMPORTED_MODULE_0__["Roles"].ChatBot, resp.chatbotResponse);
+        setTimeout(function () { return _this.addText(_GlobalData__WEBPACK_IMPORTED_MODULE_0__["Roles"].Algae, resp.algaeResponse); }, 1000);
+        setTimeout(function () { return _this.addText(_GlobalData__WEBPACK_IMPORTED_MODULE_0__["Roles"].ChatBot, resp.chatbot2algaeResponse); }, 2000);
+    };
+    ;
+    MessageCenter.eventName = 'addMessage';
+    return MessageCenter;
+}());
+
+;
+;
+;
+var EventCenter = /** @class */ (function () {
+    function EventCenter() {
+        this.eventCenter = $({});
+        this.registeredEventMap = {};
+    }
+    EventCenter.prototype.on = function (event, handler) {
+        this.registeredEventMap[event] = true;
+        console.log("Event registered: " + event);
+        this.eventCenter.on(event, function (event, data) { return handler(data); });
+    };
+    ;
+    EventCenter.prototype.trigger = function (event, data) {
+        if (!this.registeredEventMap[event]) {
+            console.log("Event not registered: " + event);
+            return;
+        }
+        this.eventCenter.trigger(event, data);
+    };
+    ;
+    return EventCenter;
+}());
+
+;
+var Event = /** @class */ (function () {
+    function Event() {
+    }
+    Event.AfterLogin = 'AfterLogin';
+    Event.UpdateDevPanelData = 'UpdateDevPanelData';
+    Event.AfterWordCardsAnimation = 'AfterWordCardsAnimation';
+    Event.AfterSubmitMessage = 'AfterSubmitMessage';
+    Event.None = 'None';
+    return Event;
+}());
+
+;
+
+
+/***/ }),
+
+/***/ "./app_src/common/Scrollbar.tsx":
+/*!**************************************!*\
+  !*** ./app_src/common/Scrollbar.tsx ***!
+  \**************************************/
+/*! exports provided: Scrollbar */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Scrollbar", function() { return Scrollbar; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _DevPanel__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../DevPanel */ "./app_src/DevPanel.tsx");
+var __extends = (undefined && undefined.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+
+
+var Scrollbar = /** @class */ (function (_super) {
+    __extends(Scrollbar, _super);
+    function Scrollbar() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.$syncTarget = null;
+        return _this;
+    }
+    Scrollbar.prototype.render = function () {
+        return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "scrollbarContainer" },
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "scrollbar" }));
+    };
+    ;
+    Scrollbar.prototype.componentDidMount = function () {
+        this.$syncTarget = $(this.props.syncTarget);
+        this.initScrollbar();
+    };
+    ;
+    Scrollbar.prototype.initScrollbar = function () {
+        var _this = this;
+        var eventCenter = this.props.eventCenter;
+        var isDragging = false;
+        var origin = { pageY: 0, scrollbarOffset: 0 };
+        var $scrollbarContainer = $('.scrollbarContainer');
+        var $scrollbar = $scrollbarContainer.find('.scrollbar');
+        $(document)
+            .on('mousedown touchstart', '.scrollbarContainer', function (e) {
+            e.preventDefault();
+            var pageY = (e.type === 'touchstart') ? e.originalEvent.touches[0].pageY : e.pageY;
+            eventCenter.trigger(_DevPanel__WEBPACK_IMPORTED_MODULE_1__["AddLogEvent"], e.type + ": pageY- " + pageY);
+            isDragging = true;
+            origin.pageY = pageY;
+            var scrollbarOffset = Number($scrollbar.css('top').replace('px', ''));
+            origin.scrollbarOffset = scrollbarOffset;
+        })
+            .on('mousemove touchmove', '.scrollbarContainer', function (e) {
+            e.preventDefault();
+            if (!isDragging)
+                return;
+            var offsetY = ((e.type === 'touchmove') ? e.originalEvent.touches[0].pageY : e.pageY) - origin.pageY;
+            eventCenter.trigger(_DevPanel__WEBPACK_IMPORTED_MODULE_1__["AddLogEvent"], e.type + ": offsetY- " + offsetY);
+            var maxOffset = $scrollbarContainer.height() - $scrollbar.height();
+            var scrollbarOffset = origin.scrollbarOffset + offsetY;
+            if (scrollbarOffset > maxOffset)
+                scrollbarOffset = maxOffset;
+            else if (scrollbarOffset < 0)
+                scrollbarOffset = 0;
+            $scrollbar.css('top', scrollbarOffset);
+            eventCenter.trigger(Scrollbar.ScrollEvent, scrollbarOffset / maxOffset);
+        }).on('mouseup touchend', function (e) {
+            if (!isDragging)
+                return;
+            isDragging = false;
+            eventCenter.trigger(_DevPanel__WEBPACK_IMPORTED_MODULE_1__["AddLogEvent"], "" + e.type);
+        });
+        eventCenter.on(Scrollbar.UpdateEvent, function () {
+            _this.adjustScrollbarH();
+            _this.adjustScrollbarOffset();
+        });
+    };
+    ;
+    Scrollbar.prototype.adjustScrollbarH = function () {
+        var $scrollTarget = this.$syncTarget;
+        var targetTotalH = $scrollTarget.prop('scrollHeight');
+        var targetViewH = $scrollTarget.height();
+        var $scrollbarContainer = $('.scrollbarContainer');
+        var scrollbarContainerH = $scrollbarContainer.height();
+        var scrollbarH = scrollbarContainerH * (targetViewH / targetTotalH);
+        $scrollbarContainer.find('.scrollbar').height(scrollbarH);
+    };
+    ;
+    Scrollbar.prototype.adjustScrollbarOffset = function () {
+        var $scrollTarget = this.$syncTarget;
+        var targetTotalH = $scrollTarget.prop('scrollHeight');
+        var targetScrollTop = $scrollTarget.scrollTop();
+        var $scrollbarContainer = $('.scrollbarContainer');
+        var scrollbarContainerH = $scrollbarContainer.height();
+        var offset = scrollbarContainerH * targetScrollTop / targetTotalH;
+        $scrollbarContainer.find('.scrollbar').css('top', offset);
+    };
+    ;
+    Scrollbar.ScrollEvent = 'scroll';
+    Scrollbar.UpdateEvent = 'update';
+    return Scrollbar;
+}(react__WEBPACK_IMPORTED_MODULE_0__["Component"]));
+
+;
+
+
+/***/ }),
+
+/***/ "./app_src/common/site.scss":
+/*!**********************************!*\
+  !*** ./app_src/common/site.scss ***!
+  \**********************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 
-var content = __webpack_require__(/*! !../node_modules/css-loader!../node_modules/sass-loader/lib/loader.js!./flexbox.scss */ "./node_modules/css-loader/index.js!./node_modules/sass-loader/lib/loader.js!./app_src/flexbox.scss");
+var content = __webpack_require__(/*! !../../node_modules/css-loader!../../node_modules/sass-loader/lib/loader.js!./site.scss */ "./node_modules/css-loader/index.js!./node_modules/sass-loader/lib/loader.js!./app_src/common/site.scss");
 
 if(typeof content === 'string') content = [[module.i, content, '']];
 
@@ -1977,7 +1968,7 @@ var options = {"hmr":true}
 options.transform = transform
 options.insertInto = undefined;
 
-var update = __webpack_require__(/*! ../node_modules/style-loader/lib/addStyles.js */ "./node_modules/style-loader/lib/addStyles.js")(content, options);
+var update = __webpack_require__(/*! ../../node_modules/style-loader/lib/addStyles.js */ "./node_modules/style-loader/lib/addStyles.js")(content, options);
 
 if(content.locals) module.exports = content.locals;
 
@@ -1994,21 +1985,19 @@ if(false) {}
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _base_scss__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./base.scss */ "./app_src/base.scss");
-/* harmony import */ var _base_scss__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_base_scss__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _flexbox_scss__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./flexbox.scss */ "./app_src/flexbox.scss");
-/* harmony import */ var _flexbox_scss__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_flexbox_scss__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react */ "react");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react-dom */ "react-dom");
-/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(react_dom__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _MessageCenter__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./MessageCenter */ "./app_src/MessageCenter.ts");
-/* harmony import */ var _Scene__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./Scene */ "./app_src/Scene.tsx");
-/* harmony import */ var _DevPanel__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./DevPanel */ "./app_src/DevPanel.tsx");
-/* harmony import */ var _LoginPanel__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./LoginPanel */ "./app_src/LoginPanel.tsx");
-/* harmony import */ var _ControlPanel__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./ControlPanel */ "./app_src/ControlPanel.tsx");
-/* harmony import */ var _MessageBoard__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./MessageBoard */ "./app_src/MessageBoard.tsx");
-/* harmony import */ var _common_CommonUtility__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./common/CommonUtility */ "./app_src/common/CommonUtility.ts");
+/* harmony import */ var _common_site_scss__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./common/site.scss */ "./app_src/common/site.scss");
+/* harmony import */ var _common_site_scss__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_common_site_scss__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react-dom */ "react-dom");
+/* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(react_dom__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _common_MessageCenter__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./common/MessageCenter */ "./app_src/common/MessageCenter.ts");
+/* harmony import */ var _Scene__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./Scene */ "./app_src/Scene.tsx");
+/* harmony import */ var _DevPanel__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./DevPanel */ "./app_src/DevPanel.tsx");
+/* harmony import */ var _LoginPanel__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./LoginPanel */ "./app_src/LoginPanel.tsx");
+/* harmony import */ var _ControlPanel__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./ControlPanel */ "./app_src/ControlPanel.tsx");
+/* harmony import */ var _MessageBoard__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./MessageBoard */ "./app_src/MessageBoard.tsx");
+/* harmony import */ var _common_CommonUtility__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./common/CommonUtility */ "./app_src/common/CommonUtility.ts");
 
 
 
@@ -2019,18 +2008,17 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-
-var isdev = _common_CommonUtility__WEBPACK_IMPORTED_MODULE_10__["CommonUtility"].getQueryString('isdev');
+var isdev = _common_CommonUtility__WEBPACK_IMPORTED_MODULE_9__["CommonUtility"].getQueryString('isdev');
 if (!isdev)
     console.info = console.debug = console.log = function () { };
-var eventCenter = new _MessageCenter__WEBPACK_IMPORTED_MODULE_4__["EventCenter"]();
-var messageCenter = new _MessageCenter__WEBPACK_IMPORTED_MODULE_4__["MessageCenter"](eventCenter);
-react_dom__WEBPACK_IMPORTED_MODULE_3__["render"](react__WEBPACK_IMPORTED_MODULE_2__["createElement"]("div", null,
-    react__WEBPACK_IMPORTED_MODULE_2__["createElement"](_Scene__WEBPACK_IMPORTED_MODULE_5__["Scene"], { eventCenter: eventCenter }),
-    react__WEBPACK_IMPORTED_MODULE_2__["createElement"](_DevPanel__WEBPACK_IMPORTED_MODULE_6__["DevPanel"], { eventCenter: eventCenter }),
-    react__WEBPACK_IMPORTED_MODULE_2__["createElement"](_LoginPanel__WEBPACK_IMPORTED_MODULE_7__["LoginPanel"], { eventCenter: eventCenter }),
-    react__WEBPACK_IMPORTED_MODULE_2__["createElement"](_MessageBoard__WEBPACK_IMPORTED_MODULE_9__["MessageBoard"], { messageCenter: messageCenter, eventCenter: eventCenter }),
-    react__WEBPACK_IMPORTED_MODULE_2__["createElement"](_ControlPanel__WEBPACK_IMPORTED_MODULE_8__["ControlPanel"], { messageCenter: messageCenter, eventCenter: eventCenter })), document.getElementById("app"));
+var eventCenter = new _common_MessageCenter__WEBPACK_IMPORTED_MODULE_3__["EventCenter"]();
+var messageCenter = new _common_MessageCenter__WEBPACK_IMPORTED_MODULE_3__["MessageCenter"](eventCenter);
+react_dom__WEBPACK_IMPORTED_MODULE_2__["render"](react__WEBPACK_IMPORTED_MODULE_1__["createElement"]("div", null,
+    react__WEBPACK_IMPORTED_MODULE_1__["createElement"](_Scene__WEBPACK_IMPORTED_MODULE_4__["Scene"], { eventCenter: eventCenter }),
+    react__WEBPACK_IMPORTED_MODULE_1__["createElement"](_DevPanel__WEBPACK_IMPORTED_MODULE_5__["DevPanel"], { eventCenter: eventCenter }),
+    react__WEBPACK_IMPORTED_MODULE_1__["createElement"](_LoginPanel__WEBPACK_IMPORTED_MODULE_6__["LoginPanel"], { eventCenter: eventCenter }),
+    react__WEBPACK_IMPORTED_MODULE_1__["createElement"](_MessageBoard__WEBPACK_IMPORTED_MODULE_8__["MessageBoard"], { messageCenter: messageCenter, eventCenter: eventCenter }),
+    react__WEBPACK_IMPORTED_MODULE_1__["createElement"](_ControlPanel__WEBPACK_IMPORTED_MODULE_7__["ControlPanel"], { messageCenter: messageCenter, eventCenter: eventCenter })), document.getElementById("app"));
 
 
 /***/ }),
@@ -4598,7 +4586,7 @@ exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/li
 
 
 // module
-exports.push([module.i, "html,\nbody {\n  font-family: Microsoft JhengHei;\n  overflow: hidden;\n  width: 100%;\n  height: 100%;\n  margin: 0;\n  padding: 0; }\n\n.full-page {\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  overflow: hidden; }\n\n/* flash */\n.flash {\n  -webkit-animation-name: flash-animation;\n  -webkit-animation-duration: 1s;\n  animation-name: flash-animation;\n  animation-duration: 1s; }\n\n@-webkit-keyframes flash-animation {\n  from {\n    background: rgba(255, 255, 255, 0.8); }\n  to {\n    background: default; } }\n\n@keyframes flash-animation {\n  from {\n    background: rgba(255, 255, 255, 0.8); }\n  to {\n    background: default; } }\n\n.untouchable {\n  pointer-events: none; }\n\ninput[type=text] {\n  background-color: transparent;\n  border: 1px solid #ffffff;\n  border-radius: 3px;\n  height: 24px;\n  color: #ffffff; }\n\n.button {\n  background-color: transparent;\n  cursor: pointer; }\n\n.white-text, .control-panel .textInput button {\n  color: white;\n  text-shadow: 0px 0px 6px #404040; }\n\n.text-center {\n  text-align: center; }\n\n.visible {\n  opacity: 1; }\n\n.invisible {\n  opacity: 0; }\n\n.transition-all, .control-panel, .control-panel .textInput {\n  -webkit-transition: all 0.3s ease;\n  -moz-transition: all 0.3s ease;\n  -o-transition: all 0.3s ease;\n  transition: all 0.3s ease; }\n\n.clearfix::after {\n  content: \"\";\n  clear: both;\n  display: table; }\n\n.flex, .control-panel, .control-panel .textInput {\n  display: flex; }\n\n.flex-row {\n  flex-direction: row; }\n\n.flex-column, .control-panel {\n  flex-direction: column; }\n\n.flex-verticalCenter, .flex-center, .control-panel, .control-panel .textInput {\n  align-items: center; }\n\n.flex-horizontalCenter, .flex-center, .control-panel, .control-panel .textInput {\n  justify-content: center; }\n\n.flex-end {\n  align-items: flex-end; }\n\n.control-panel {\n  position: fixed;\n  bottom: 30px;\n  left: 0;\n  width: 100%;\n  height: 70px; }\n  .control-panel .buttons .button {\n    font-size: 1.8em;\n    border: 0; }\n  .control-panel .textInput {\n    width: 100%;\n    max-width: 35em; }\n  .control-panel .textInput input {\n    background-color: transparent;\n    border: solid 1px white;\n    border-radius: 1px;\n    width: 80%; }\n  .control-panel .textInput button {\n    border: solid 1px white;\n    border-radius: 1px;\n    margin: 0; }\n  .control-panel .userRecord {\n    display: none;\n    position: absolute;\n    top: -10px;\n    left: 50%;\n    transform: translate(-50%, -100%);\n    padding: 10px;\n    background-color: rgba(255, 255, 255, 0.6);\n    border: 1px solid #ccc;\n    border-radius: 3px;\n    -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);\n    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175); }\n    .control-panel .userRecord div {\n      padding: 2px 0; }\n", ""]);
+exports.push([module.i, ".control-panel {\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  justify-content: center;\n  -webkit-transition: all 0.3s ease;\n  -moz-transition: all 0.3s ease;\n  -o-transition: all 0.3s ease;\n  transition: all 0.3s ease;\n  position: fixed;\n  bottom: 30px;\n  left: 0;\n  width: 100%;\n  height: 70px; }\n  .control-panel .buttons > * {\n    margin: 0 3px; }\n  .control-panel .button {\n    background-color: transparent;\n    cursor: pointer;\n    text-shadow: 0px 0px 6px #404040;\n    color: white;\n    font-size: 28px;\n    border: 0; }\n  .control-panel .textInput {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    -webkit-transition: all 0.3s ease;\n    -moz-transition: all 0.3s ease;\n    -o-transition: all 0.3s ease;\n    transition: all 0.3s ease;\n    width: 100%;\n    max-width: 35em; }\n  .control-panel .textInput input {\n    background-color: transparent;\n    border: solid 1px white;\n    border-radius: 1px;\n    width: 80%; }\n  .control-panel .textInput button {\n    border: solid 1px white;\n    font-size: 14px;\n    border-radius: 1px;\n    margin-left: 3px;\n    padding: 2px; }\n  .control-panel .userRecord {\n    display: none;\n    position: absolute;\n    top: -10px;\n    left: 50%;\n    transform: translate(-50%, -100%);\n    padding: 10px;\n    background-color: rgba(255, 255, 255, 0.6);\n    border: 1px solid #ccc;\n    border-radius: 3px;\n    -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);\n    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175); }\n    .control-panel .userRecord div {\n      padding: 2px 0; }\n", ""]);
 
 // exports
 
@@ -4617,7 +4605,7 @@ exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/li
 
 
 // module
-exports.push([module.i, "#devPanel {\n  display: none;\n  position: fixed;\n  top: 0;\n  right: 0;\n  background-color: rgba(0, 0, 0, 0.2);\n  width: 200px; }\n  #devPanel table {\n    width: 100%; }\n    #devPanel table ul {\n      padding-left: 15px; }\n\n#devPanel td {\n  width: 50px;\n  padding: 3px;\n  word-break: break-all; }\n", ""]);
+exports.push([module.i, "#devPanel {\n  display: none;\n  position: fixed;\n  top: 0;\n  right: 0;\n  background-color: rgba(0, 0, 0, 0.2);\n  width: 280px; }\n  #devPanel table {\n    width: 100%; }\n    #devPanel table ul {\n      padding-left: 15px; }\n\n#devPanel td {\n  width: 50px;\n  padding: 3px;\n  word-break: break-all; }\n", ""]);
 
 // exports
 
@@ -4636,7 +4624,7 @@ exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/li
 
 
 // module
-exports.push([module.i, "html,\nbody {\n  font-family: Microsoft JhengHei;\n  overflow: hidden;\n  width: 100%;\n  height: 100%;\n  margin: 0;\n  padding: 0; }\n\n.full-page {\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  overflow: hidden; }\n\n/* flash */\n.flash {\n  -webkit-animation-name: flash-animation;\n  -webkit-animation-duration: 1s;\n  animation-name: flash-animation;\n  animation-duration: 1s; }\n\n@-webkit-keyframes flash-animation {\n  from {\n    background: rgba(255, 255, 255, 0.8); }\n  to {\n    background: default; } }\n\n@keyframes flash-animation {\n  from {\n    background: rgba(255, 255, 255, 0.8); }\n  to {\n    background: default; } }\n\n.untouchable {\n  pointer-events: none; }\n\ninput[type=text] {\n  background-color: transparent;\n  border: 1px solid #ffffff;\n  border-radius: 3px;\n  height: 24px;\n  color: #ffffff; }\n\n.button, #loginPanel .skipAnimation > button {\n  background-color: transparent;\n  cursor: pointer; }\n\n.white-text, #loginPanel .skipAnimation > button {\n  color: white;\n  text-shadow: 0px 0px 6px #404040; }\n\n.text-center {\n  text-align: center; }\n\n.visible {\n  opacity: 1; }\n\n.invisible {\n  opacity: 0; }\n\n.transition-all {\n  -webkit-transition: all 0.3s ease;\n  -moz-transition: all 0.3s ease;\n  -o-transition: all 0.3s ease;\n  transition: all 0.3s ease; }\n\n.clearfix::after {\n  content: \"\";\n  clear: both;\n  display: table; }\n\n#loginPanel {\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  background-color: rgba(0, 0, 0, 0.3);\n  overflow: auto; }\n  #loginPanel > .wordCard {\n    display: none;\n    white-space: nowrap; }\n  #loginPanel .skipAnimation {\n    position: absolute;\n    bottom: 10%;\n    left: 50%;\n    transform: translate(-50%); }\n    #loginPanel .skipAnimation > button {\n      border: 1px solid white;\n      border-radius: 2px;\n      padding: 0 20px; }\n\n#signInWrapper .label {\n  height: 24px;\n  line-height: 24px; }\n\n#signInWrapper .icon {\n  height: 24px;\n  line-height: 24px;\n  background: url(\"https://google-developers.appspot.com/identity/sign-in/g-normal.png\") transparent -7px 50% no-repeat;\n  display: inline-block;\n  vertical-align: middle;\n  width: 25px; }\n\n.signInButton {\n  background: transparent;\n  padding: 0;\n  border: none;\n  color: #ecffec;\n  font-size: 18px;\n  cursor: pointer; }\n", ""]);
+exports.push([module.i, "#loginPanel {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  background-color: rgba(0, 0, 0, 0.3);\n  overflow: auto; }\n  #loginPanel > .wordCard {\n    text-shadow: 0px 0px 6px #404040;\n    color: white;\n    display: none;\n    white-space: nowrap; }\n  #loginPanel .skipAnimation {\n    position: absolute;\n    bottom: 10%;\n    left: 50%;\n    transform: translate(-50%); }\n    #loginPanel .skipAnimation > button {\n      background-color: transparent;\n      cursor: pointer;\n      text-shadow: 0px 0px 6px #404040;\n      color: white;\n      border: 1px solid white;\n      border-radius: 2px;\n      padding: 0 20px; }\n\n#signInWrapper .label {\n  text-shadow: 0px 0px 6px #404040;\n  color: white;\n  height: 24px;\n  line-height: 24px; }\n\n#signInWrapper .icon {\n  height: 24px;\n  line-height: 24px;\n  background: url(\"https://google-developers.appspot.com/identity/sign-in/g-normal.png\") transparent -7px 50% no-repeat;\n  display: inline-block;\n  vertical-align: middle;\n  width: 25px; }\n\n.signInButton {\n  background: transparent;\n  padding: 0;\n  border: none;\n  color: #ecffec;\n  font-size: 18px;\n  cursor: pointer; }\n", ""]);
 
 // exports
 
@@ -4655,7 +4643,7 @@ exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/li
 
 
 // module
-exports.push([module.i, "html,\nbody {\n  font-family: Microsoft JhengHei;\n  overflow: hidden;\n  width: 100%;\n  height: 100%;\n  margin: 0;\n  padding: 0; }\n\n.full-page, #messageBoard {\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  overflow: hidden; }\n\n/* flash */\n.flash {\n  -webkit-animation-name: flash-animation;\n  -webkit-animation-duration: 1s;\n  animation-name: flash-animation;\n  animation-duration: 1s; }\n\n@-webkit-keyframes flash-animation {\n  from {\n    background: rgba(255, 255, 255, 0.8); }\n  to {\n    background: default; } }\n\n@keyframes flash-animation {\n  from {\n    background: rgba(255, 255, 255, 0.8); }\n  to {\n    background: default; } }\n\n.untouchable, #messageBoard {\n  pointer-events: none; }\n\ninput[type=text] {\n  background-color: transparent;\n  border: 1px solid #ffffff;\n  border-radius: 3px;\n  height: 24px;\n  color: #ffffff; }\n\n.button {\n  background-color: transparent;\n  cursor: pointer; }\n\n.white-text, #messageBoard .messageBoardContent .messageBox {\n  color: white;\n  text-shadow: 0px 0px 6px #404040; }\n\n.text-center {\n  text-align: center; }\n\n.visible {\n  opacity: 1; }\n\n.invisible {\n  opacity: 0; }\n\n.transition-all {\n  -webkit-transition: all 0.3s ease;\n  -moz-transition: all 0.3s ease;\n  -o-transition: all 0.3s ease;\n  transition: all 0.3s ease; }\n\n.clearfix::after, #messageBoard .messageBoardContent::after {\n  content: \"\";\n  clear: both;\n  display: table; }\n\n.flex, #messageBoard {\n  display: flex; }\n\n.flex-row {\n  flex-direction: row; }\n\n.flex-column {\n  flex-direction: column; }\n\n.flex-verticalCenter, .flex-center {\n  align-items: center; }\n\n.flex-horizontalCenter, .flex-center, #messageBoard {\n  justify-content: center; }\n\n.flex-end {\n  align-items: flex-end; }\n\n#messageBoard > div {\n  margin-bottom: 100px; }\n\n#messageBoard .messageBoardContent {\n  width: 100%;\n  overflow: hidden; }\n  #messageBoard .messageBoardContent .messageBox {\n    position: relative;\n    background-color: rgba(255, 255, 255, 0.05);\n    padding: 3px;\n    margin: 5px 0;\n    border-radius: 3px;\n    width: 50%;\n    color: white; }\n    #messageBoard .messageBoardContent .messageBox .avatar {\n      position: absolute;\n      width: 30px;\n      transform: translateY(40%); }\n    #messageBoard .messageBoardContent .messageBox .name {\n      position: absolute;\n      top: 0px;\n      left: 7px; }\n    #messageBoard .messageBoardContent .messageBox .content {\n      margin: 20px 0 0 30px; }\n\n#messageBoard .scrollbarContainer {\n  pointer-events: auto;\n  position: relative;\n  top: 0;\n  right: 0;\n  width: 15px;\n  background-color: rgba(0, 0, 0, 0.1); }\n  #messageBoard .scrollbarContainer .scrollbar {\n    position: absolute;\n    top: 0;\n    right: 1px;\n    width: 12px;\n    height: 100px;\n    background-color: rgba(0, 0, 0, 0.3);\n    border-radius: 5px; }\n\n@media only screen and (min-width: 768px) {\n  .messageBoardContent {\n    padding: 0 50px; } }\n\n@media only screen and (min-width: 1224px) {\n  .messageBoardContent {\n    padding: 0 200px; } }\n", ""]);
+exports.push([module.i, "#messageBoard {\n  pointer-events: none;\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  overflow: hidden;\n  display: flex;\n  justify-content: center; }\n  #messageBoard > div {\n    margin-bottom: 100px; }\n  #messageBoard .messageBoardContent {\n    width: 100%;\n    overflow: hidden; }\n    #messageBoard .messageBoardContent:after {\n      content: \"\";\n      clear: both;\n      display: table; }\n    #messageBoard .messageBoardContent .messageBox {\n      text-shadow: 0px 0px 6px #404040;\n      color: white;\n      position: relative;\n      background-color: rgba(255, 255, 255, 0.05);\n      padding: 3px;\n      margin: 5px 0;\n      border-radius: 3px;\n      width: 50%;\n      color: white; }\n      #messageBoard .messageBoardContent .messageBox .avatar {\n        position: absolute;\n        width: 30px;\n        transform: translateY(40%); }\n      #messageBoard .messageBoardContent .messageBox .name {\n        position: absolute;\n        top: 0px;\n        left: 7px; }\n      #messageBoard .messageBoardContent .messageBox .content {\n        margin: 20px 0 0 30px; }\n  #messageBoard .scrollbarContainer {\n    pointer-events: auto;\n    position: relative;\n    top: 0;\n    right: 0;\n    width: 15px;\n    background-color: rgba(0, 0, 0, 0.1); }\n    #messageBoard .scrollbarContainer .scrollbar {\n      position: absolute;\n      top: 0;\n      right: 1px;\n      width: 12px;\n      height: 100px;\n      background-color: rgba(0, 0, 0, 0.3);\n      border-radius: 5px; }\n\n@media only screen and (min-width: 768px) {\n  .messageBoardContent {\n    padding: 0 50px; } }\n\n@media only screen and (min-width: 1224px) {\n  .messageBoardContent {\n    padding: 0 200px; } }\n", ""]);
 
 // exports
 
@@ -4674,45 +4662,26 @@ exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/li
 
 
 // module
-exports.push([module.i, "html,\nbody {\n  font-family: Microsoft JhengHei;\n  overflow: hidden;\n  width: 100%;\n  height: 100%;\n  margin: 0;\n  padding: 0; }\n\n.full-page, #renderCanvas, #greenMask {\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  overflow: hidden; }\n\n/* flash */\n.flash {\n  -webkit-animation-name: flash-animation;\n  -webkit-animation-duration: 1s;\n  animation-name: flash-animation;\n  animation-duration: 1s; }\n\n@-webkit-keyframes flash-animation {\n  from {\n    background: rgba(255, 255, 255, 0.8); }\n  to {\n    background: default; } }\n\n@keyframes flash-animation {\n  from {\n    background: rgba(255, 255, 255, 0.8); }\n  to {\n    background: default; } }\n\n.untouchable, #greenMask {\n  pointer-events: none; }\n\ninput[type=text] {\n  background-color: transparent;\n  border: 1px solid #ffffff;\n  border-radius: 3px;\n  height: 24px;\n  color: #ffffff; }\n\n.button {\n  background-color: transparent;\n  cursor: pointer; }\n\n.white-text {\n  color: white;\n  text-shadow: 0px 0px 6px #404040; }\n\n.text-center {\n  text-align: center; }\n\n.visible {\n  opacity: 1; }\n\n.invisible {\n  opacity: 0; }\n\n.transition-all, #greenMask {\n  -webkit-transition: all 0.3s ease;\n  -moz-transition: all 0.3s ease;\n  -o-transition: all 0.3s ease;\n  transition: all 0.3s ease; }\n\n.clearfix::after {\n  content: \"\";\n  clear: both;\n  display: table; }\n\n#renderCanvas {\n  touch-action: none; }\n", ""]);
+exports.push([module.i, "#renderCanvas {\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  overflow: hidden;\n  touch-action: none; }\n\n#greenMask {\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  overflow: hidden;\n  pointer-events: none;\n  -webkit-transition: all 0.3s ease;\n  -moz-transition: all 0.3s ease;\n  -o-transition: all 0.3s ease;\n  transition: all 0.3s ease; }\n", ""]);
 
 // exports
 
 
 /***/ }),
 
-/***/ "./node_modules/css-loader/index.js!./node_modules/sass-loader/lib/loader.js!./app_src/base.scss":
-/*!**********************************************************************************************!*\
-  !*** ./node_modules/css-loader!./node_modules/sass-loader/lib/loader.js!./app_src/base.scss ***!
-  \**********************************************************************************************/
+/***/ "./node_modules/css-loader/index.js!./node_modules/sass-loader/lib/loader.js!./app_src/common/site.scss":
+/*!*****************************************************************************************************!*\
+  !*** ./node_modules/css-loader!./node_modules/sass-loader/lib/loader.js!./app_src/common/site.scss ***!
+  \*****************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(false);
+exports = module.exports = __webpack_require__(/*! ../../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(false);
 // imports
 
 
 // module
-exports.push([module.i, "html,\nbody {\n  font-family: Microsoft JhengHei;\n  overflow: hidden;\n  width: 100%;\n  height: 100%;\n  margin: 0;\n  padding: 0; }\n\n.full-page {\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  overflow: hidden; }\n\n/* flash */\n.flash {\n  -webkit-animation-name: flash-animation;\n  -webkit-animation-duration: 1s;\n  animation-name: flash-animation;\n  animation-duration: 1s; }\n\n@-webkit-keyframes flash-animation {\n  from {\n    background: rgba(255, 255, 255, 0.8); }\n  to {\n    background: default; } }\n\n@keyframes flash-animation {\n  from {\n    background: rgba(255, 255, 255, 0.8); }\n  to {\n    background: default; } }\n\n.untouchable {\n  pointer-events: none; }\n\ninput[type=text] {\n  background-color: transparent;\n  border: 1px solid #ffffff;\n  border-radius: 3px;\n  height: 24px;\n  color: #ffffff; }\n\n.button {\n  background-color: transparent;\n  cursor: pointer; }\n\n.white-text {\n  color: white;\n  text-shadow: 0px 0px 6px #404040; }\n\n.text-center {\n  text-align: center; }\n\n.visible {\n  opacity: 1; }\n\n.invisible {\n  opacity: 0; }\n\n.transition-all {\n  -webkit-transition: all 0.3s ease;\n  -moz-transition: all 0.3s ease;\n  -o-transition: all 0.3s ease;\n  transition: all 0.3s ease; }\n\n.clearfix::after {\n  content: \"\";\n  clear: both;\n  display: table; }\n", ""]);
-
-// exports
-
-
-/***/ }),
-
-/***/ "./node_modules/css-loader/index.js!./node_modules/sass-loader/lib/loader.js!./app_src/flexbox.scss":
-/*!*************************************************************************************************!*\
-  !*** ./node_modules/css-loader!./node_modules/sass-loader/lib/loader.js!./app_src/flexbox.scss ***!
-  \*************************************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(false);
-// imports
-
-
-// module
-exports.push([module.i, ".flex {\n  display: flex; }\n\n.flex-row {\n  flex-direction: row; }\n\n.flex-column {\n  flex-direction: column; }\n\n.flex-verticalCenter, .flex-center {\n  align-items: center; }\n\n.flex-horizontalCenter, .flex-center {\n  justify-content: center; }\n\n.flex-end {\n  align-items: flex-end; }\n", ""]);
+exports.push([module.i, "html,\nbody {\n  font-family: Microsoft JhengHei;\n  overflow: hidden;\n  width: 100%;\n  height: 100%;\n  margin: 0;\n  padding: 0; }\n\n.flash {\n  -webkit-animation-name: flash-animation;\n  -webkit-animation-duration: 1s;\n  animation-name: flash-animation;\n  animation-duration: 1s; }\n\n@-webkit-keyframes flash-animation {\n  from {\n    background: rgba(255, 255, 255, 0.8); }\n  to {\n    background: default; } }\n\n@keyframes flash-animation {\n  from {\n    background: rgba(255, 255, 255, 0.8); }\n  to {\n    background: default; } }\n\ninput[type=text] {\n  background-color: transparent;\n  border: 1px solid #ffffff;\n  border-radius: 3px;\n  height: 24px;\n  color: #ffffff; }\n\n.text-center {\n  text-align: center; }\n\n.visible {\n  opacity: 1; }\n\n.invisible {\n  opacity: 0; }\n\n.untouchable {\n  pointer-events: none; }\n", ""]);
 
 // exports
 
@@ -11745,4 +11714,4 @@ module.exports = ReactDOM;
 /***/ })
 
 /******/ });
-//# sourceMappingURL=bundle.main.6cda2af4b240094936a5.js.map
+//# sourceMappingURL=bundle.main.js.map

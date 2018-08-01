@@ -1,5 +1,7 @@
-@import 'base';
+@import 'common/mixin';
 #loginPanel {
+    @include flex;
+    @include flex-center;
     position: fixed;
     top: 0;
     left: 0;
@@ -8,6 +10,7 @@
     background-color: rgba(0, 0, 0, 0.3);
     overflow: auto;
     >.wordCard {
+        @include white-text;
         display: none;
         white-space: nowrap;
     }
@@ -17,8 +20,8 @@
         left: 50%;
         transform: translate(-50%);
         >button {
-            @extend .button;
-            @extend .white-text;
+            @include button;
+            @include white-text;
             border: 1px solid white;
             border-radius: 2px;
             padding: 0 20px;
@@ -28,6 +31,7 @@
 
 #signInWrapper {
     .label {
+        @include white-text;
         height: 24px;
         line-height: 24px;
     }

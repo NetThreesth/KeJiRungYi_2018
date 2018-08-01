@@ -1,19 +1,18 @@
-@import 'base';
-@import 'flexbox';
+@import 'common/mixin';
 #messageBoard {
-    @extend .untouchable;
-    @extend .full-page;
-    @extend .flex;
-    @extend .flex-horizontalCenter;
+    @include untouchable;
+    @include full-page;
+    @include flex;
+    @include flex-horizontalCenter;
     >div {
         margin-bottom: 100px;
     }
     .messageBoardContent {
-        @extend .clearfix;
+        @include clearfix;
         width: 100%;
         overflow: hidden;
         .messageBox {
-            @extend .white-text;
+            @include white-text;
             position: relative;
             background-color: rgba(255, 255, 255, 0.05);
             padding: 3px;

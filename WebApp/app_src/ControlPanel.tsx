@@ -1,5 +1,5 @@
 import * as React from "react";
-import { MessageCenter, EventCenter, Event } from './MessageCenter';
+import { MessageCenter, EventCenter, Event } from './common/MessageCenter';
 import { Roles, GlobalData } from './common/GlobalData';
 
 import "./ControlPanel.scss";
@@ -33,15 +33,15 @@ export class ControlPanel extends React.Component<
                 </button>
             </span>
             <div className="buttons">
-                <button className="button white-text" onClick={this.switchTextInput.bind(this)}>
+                <button className="button" onClick={this.switchTextInput.bind(this)}>
                     <i className="far fa-comment-dots"></i>
                 </button>
-                <label htmlFor="fileUpload" className="button white-text">
+                <label htmlFor="fileUpload" className="button">
                     <i className="fas fa-camera-retro"></i>
                 </label>
                 <input id="fileUpload" type="file" accept="image/*" style={{ display: 'none' }}
                     onChange={this.handleFiles.bind(this)} />
-                <button className="button white-text" onClick={this.switchUserRecord.bind(this)}>
+                <button className="button" onClick={this.switchUserRecord.bind(this)}>
                     <i className="fas fa-ellipsis-h"></i>
                 </button>
             </div>
@@ -100,7 +100,7 @@ export class ControlPanel extends React.Component<
     };
 
     private keyPress(e) {
-        if (e.which == 13 || e.keyCode == 13)
+        if (e.which === 13 || e.keyCode === 13)
             this.handleText();
     };
 
@@ -111,7 +111,6 @@ export class ControlPanel extends React.Component<
 
         $input.val('');
         this.onTextAdd(String(text));
-        this.switchTextInput();
     };
 
 
