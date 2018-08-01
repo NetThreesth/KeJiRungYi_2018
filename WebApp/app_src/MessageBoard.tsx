@@ -18,7 +18,7 @@ export class MessageBoard
         super(props);
         const messageCenter = this.props.messageCenter;
         this.state = { contents: messageCenter.contents.slice() };
-        this.props.messageCenter.eventCenter.on(MessageCenter.eventName, this.refresh.bind(this));
+        this.props.eventCenter.on(MessageCenter.eventName, this.refresh.bind(this));
     };
 
     render() {
@@ -61,17 +61,13 @@ export class MessageBoard
     };
 
     private createImageMessage(content: Content) {
-        const style = {
-            width: '100%',
-            maxWidth: '600px'
-        };
         const isUser = content.role === Roles.User;
         const name = isUser ? GlobalData.userName : '';
         const float = isUser ? 'right' : 'left';
         return <div className="messageBox" style={{ float: float }}>
             <img src={this.getAvatar(content.role)} className="avatar" />
             <div className="name">{name}</div>
-            <div className="content"><img src={content.content} style={style} /></div>
+            <div className="content"><img src={content.content} style={{ width: '100%', maxWidth: '600px' }} /></div>
         </div>;
     };
 

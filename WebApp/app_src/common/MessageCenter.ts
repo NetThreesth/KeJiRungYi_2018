@@ -1,11 +1,9 @@
+import { socketClient } from './SocketClient';
 import { Roles, GlobalData } from './GlobalData';
-import { Scene } from '../Scene';
 import { CommonUtility } from './CommonUtility';
 import { AddLogEvent } from '../DevPanel';
 
-export enum ContentType {
-    Text, Image
-};
+export enum ContentType { Text, Image };
 
 export interface Content {
     role: Roles;
@@ -18,10 +16,18 @@ export class MessageCenter {
     static readonly eventName = 'addMessage';
 
     contents: Content[] = [];
-    eventCenter: EventCenter = null;
 
-    constructor(eventCenter: EventCenter) {
-        this.eventCenter = eventCenter;
+    constructor(
+        private eventCenter: EventCenter
+    ) {
+        socketClient.on('uploadAlgaeImage', data => {
+            this.eventCenter.trigger(AddLogEvent, data);
+            this.addMessage({ role: Roles.Algae, type: ContentType.Image, content: data.base64Image });
+        });
+        socketClient.on('uploadDeepAlMessage', data => {
+            this.eventCenter.trigger(AddLogEvent, data);
+            this.addMessage({ role: Roles.AI, type: ContentType.Text, content: data.message });
+        });
     };
 
 
@@ -36,12 +42,11 @@ export class MessageCenter {
     };
 
 
-    addImage(role: Roles, b64String: string) {
-        this.addMessage({ role: role, type: ContentType.Image, content: b64String });
-
+    addImage(role: Roles, base64Image: string) {
+        this.addMessage({ role: role, type: ContentType.Image, content: base64Image });
         CommonUtility.asyncPost(
             'apis/uploadImage',
-            { rid: GlobalData.chatRoomIndex, base64Image: b64String }
+            { rid: GlobalData.chatRoomIndex, base64Image: base64Image }
         ).done(this.responseHandler.bind(this));
     };
 
@@ -51,8 +56,8 @@ export class MessageCenter {
     };
 
     private responseHandler(resp: ChatBotResponse) {
-        this.eventCenter.trigger(Event.AfterSubmitMessage, resp);
         this.eventCenter.trigger(AddLogEvent, resp);
+        this.eventCenter.trigger(Event.AfterSubmitMessage, resp);
 
         this.addText(Roles.ChatBot, resp.chatbotResponse);
         setTimeout(() => this.addText(Roles.Algae, resp.algaeResponse), 1000);

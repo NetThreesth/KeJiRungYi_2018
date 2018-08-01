@@ -645,7 +645,7 @@ var MessageBoard = /** @class */ (function (_super) {
         var _this = _super.call(this, props) || this;
         var messageCenter = _this.props.messageCenter;
         _this.state = { contents: messageCenter.contents.slice() };
-        _this.props.messageCenter.eventCenter.on(_common_MessageCenter__WEBPACK_IMPORTED_MODULE_1__["MessageCenter"].eventName, _this.refresh.bind(_this));
+        _this.props.eventCenter.on(_common_MessageCenter__WEBPACK_IMPORTED_MODULE_1__["MessageCenter"].eventName, _this.refresh.bind(_this));
         return _this;
     }
     ;
@@ -689,10 +689,6 @@ var MessageBoard = /** @class */ (function (_super) {
     };
     ;
     MessageBoard.prototype.createImageMessage = function (content) {
-        var style = {
-            width: '100%',
-            maxWidth: '600px'
-        };
         var isUser = content.role === _common_GlobalData__WEBPACK_IMPORTED_MODULE_3__["Roles"].User;
         var name = isUser ? _common_GlobalData__WEBPACK_IMPORTED_MODULE_3__["GlobalData"].userName : '';
         var float = isUser ? 'right' : 'left';
@@ -700,7 +696,7 @@ var MessageBoard = /** @class */ (function (_super) {
             react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("img", { src: this.getAvatar(content.role), className: "avatar" }),
             react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "name" }, name),
             react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "content" },
-                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("img", { src: content.content, style: style })));
+                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("img", { src: content.content, style: { width: '100%', maxWidth: '600px' } })));
     };
     ;
     MessageBoard.prototype.refresh = function () {
@@ -783,8 +779,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var babylonjs__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! babylonjs */ "babylonjs");
 /* harmony import */ var babylonjs__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(babylonjs__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var socket_io_client__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! socket.io-client */ "./node_modules/socket.io-client/lib/index.js");
-/* harmony import */ var socket_io_client__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(socket_io_client__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _common_SocketClient__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./common/SocketClient */ "./app_src/common/SocketClient.ts");
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! jquery */ "jquery");
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_3__);
 /* harmony import */ var _common_CommonUtility__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./common/CommonUtility */ "./app_src/common/CommonUtility.ts");
@@ -901,7 +896,7 @@ var Scene = /** @class */ (function (_super) {
     ;
     Scene.prototype.startUpdateBackgroundParticles = function () {
         var _this = this;
-        socket_io_client__WEBPACK_IMPORTED_MODULE_2__().on('updateBackgroundParticles', function (data) {
+        _common_SocketClient__WEBPACK_IMPORTED_MODULE_2__["socketClient"].on('updateBackgroundParticles', function (data) {
             Object.keys(data).forEach(function (i) {
                 _this.backgroundParticles[i] = _this.backgroundParticles[i] || {};
                 _this.backgroundParticles[i].targetCount = data[i];
@@ -1739,9 +1734,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MessageCenter", function() { return MessageCenter; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "EventCenter", function() { return EventCenter; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Event", function() { return Event; });
-/* harmony import */ var _GlobalData__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./GlobalData */ "./app_src/common/GlobalData.ts");
-/* harmony import */ var _CommonUtility__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./CommonUtility */ "./app_src/common/CommonUtility.ts");
-/* harmony import */ var _DevPanel__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../DevPanel */ "./app_src/DevPanel.tsx");
+/* harmony import */ var _SocketClient__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./SocketClient */ "./app_src/common/SocketClient.ts");
+/* harmony import */ var _GlobalData__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./GlobalData */ "./app_src/common/GlobalData.ts");
+/* harmony import */ var _CommonUtility__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./CommonUtility */ "./app_src/common/CommonUtility.ts");
+/* harmony import */ var _DevPanel__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../DevPanel */ "./app_src/DevPanel.tsx");
+
 
 
 
@@ -1754,21 +1751,29 @@ var ContentType;
 ;
 var MessageCenter = /** @class */ (function () {
     function MessageCenter(eventCenter) {
-        this.contents = [];
-        this.eventCenter = null;
+        var _this = this;
         this.eventCenter = eventCenter;
+        this.contents = [];
+        _SocketClient__WEBPACK_IMPORTED_MODULE_0__["socketClient"].on('uploadAlgaeImage', function (data) {
+            _this.eventCenter.trigger(_DevPanel__WEBPACK_IMPORTED_MODULE_3__["AddLogEvent"], data);
+            _this.addMessage({ role: _GlobalData__WEBPACK_IMPORTED_MODULE_1__["Roles"].Algae, type: ContentType.Image, content: data.base64Image });
+        });
+        _SocketClient__WEBPACK_IMPORTED_MODULE_0__["socketClient"].on('uploadDeepAlMessage', function (data) {
+            _this.eventCenter.trigger(_DevPanel__WEBPACK_IMPORTED_MODULE_3__["AddLogEvent"], data);
+            _this.addMessage({ role: _GlobalData__WEBPACK_IMPORTED_MODULE_1__["Roles"].AI, type: ContentType.Text, content: data.message });
+        });
     }
     ;
     MessageCenter.prototype.addText = function (role, text) {
         this.addMessage({ role: role, type: ContentType.Text, content: text });
-        if (role !== _GlobalData__WEBPACK_IMPORTED_MODULE_0__["Roles"].User)
+        if (role !== _GlobalData__WEBPACK_IMPORTED_MODULE_1__["Roles"].User)
             return;
-        _CommonUtility__WEBPACK_IMPORTED_MODULE_1__["CommonUtility"].asyncPost('apis/uploadText', { rid: _GlobalData__WEBPACK_IMPORTED_MODULE_0__["GlobalData"].chatRoomIndex, text: text }).done(this.responseHandler.bind(this));
+        _CommonUtility__WEBPACK_IMPORTED_MODULE_2__["CommonUtility"].asyncPost('apis/uploadText', { rid: _GlobalData__WEBPACK_IMPORTED_MODULE_1__["GlobalData"].chatRoomIndex, text: text }).done(this.responseHandler.bind(this));
     };
     ;
-    MessageCenter.prototype.addImage = function (role, b64String) {
-        this.addMessage({ role: role, type: ContentType.Image, content: b64String });
-        _CommonUtility__WEBPACK_IMPORTED_MODULE_1__["CommonUtility"].asyncPost('apis/uploadImage', { rid: _GlobalData__WEBPACK_IMPORTED_MODULE_0__["GlobalData"].chatRoomIndex, base64Image: b64String }).done(this.responseHandler.bind(this));
+    MessageCenter.prototype.addImage = function (role, base64Image) {
+        this.addMessage({ role: role, type: ContentType.Image, content: base64Image });
+        _CommonUtility__WEBPACK_IMPORTED_MODULE_2__["CommonUtility"].asyncPost('apis/uploadImage', { rid: _GlobalData__WEBPACK_IMPORTED_MODULE_1__["GlobalData"].chatRoomIndex, base64Image: base64Image }).done(this.responseHandler.bind(this));
     };
     ;
     MessageCenter.prototype.addMessage = function (content) {
@@ -1778,11 +1783,11 @@ var MessageCenter = /** @class */ (function () {
     ;
     MessageCenter.prototype.responseHandler = function (resp) {
         var _this = this;
+        this.eventCenter.trigger(_DevPanel__WEBPACK_IMPORTED_MODULE_3__["AddLogEvent"], resp);
         this.eventCenter.trigger(Event.AfterSubmitMessage, resp);
-        this.eventCenter.trigger(_DevPanel__WEBPACK_IMPORTED_MODULE_2__["AddLogEvent"], resp);
-        this.addText(_GlobalData__WEBPACK_IMPORTED_MODULE_0__["Roles"].ChatBot, resp.chatbotResponse);
-        setTimeout(function () { return _this.addText(_GlobalData__WEBPACK_IMPORTED_MODULE_0__["Roles"].Algae, resp.algaeResponse); }, 1000);
-        setTimeout(function () { return _this.addText(_GlobalData__WEBPACK_IMPORTED_MODULE_0__["Roles"].ChatBot, resp.chatbot2algaeResponse); }, 2000);
+        this.addText(_GlobalData__WEBPACK_IMPORTED_MODULE_1__["Roles"].ChatBot, resp.chatbotResponse);
+        setTimeout(function () { return _this.addText(_GlobalData__WEBPACK_IMPORTED_MODULE_1__["Roles"].Algae, resp.algaeResponse); }, 1000);
+        setTimeout(function () { return _this.addText(_GlobalData__WEBPACK_IMPORTED_MODULE_1__["Roles"].ChatBot, resp.chatbot2algaeResponse); }, 2000);
     };
     ;
     MessageCenter.eventName = 'addMessage';
@@ -1942,6 +1947,24 @@ var Scrollbar = /** @class */ (function (_super) {
 }(react__WEBPACK_IMPORTED_MODULE_0__["Component"]));
 
 ;
+
+
+/***/ }),
+
+/***/ "./app_src/common/SocketClient.ts":
+/*!****************************************!*\
+  !*** ./app_src/common/SocketClient.ts ***!
+  \****************************************/
+/*! exports provided: socketClient */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "socketClient", function() { return socketClient; });
+/* harmony import */ var socket_io_client__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! socket.io-client */ "./node_modules/socket.io-client/lib/index.js");
+/* harmony import */ var socket_io_client__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(socket_io_client__WEBPACK_IMPORTED_MODULE_0__);
+
+var socketClient = socket_io_client__WEBPACK_IMPORTED_MODULE_0__();
 
 
 /***/ }),
@@ -11714,4 +11737,4 @@ module.exports = ReactDOM;
 /***/ })
 
 /******/ });
-//# sourceMappingURL=bundle.main.js.map
+//# sourceMappingURL=bundle.main.5787d6f82cdc9b28ea2f.js.map

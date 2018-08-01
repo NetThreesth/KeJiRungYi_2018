@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as BABYLON from 'babylonjs';
-import * as io from 'socket.io-client';
+import { socketClient } from './common/SocketClient';
 import * as $ from 'jquery';
 import { CommonUtility } from './common/CommonUtility';
 import { BabylonUtility, Line } from './common/BabylonUtility';
@@ -98,7 +98,7 @@ export class Scene extends React.Component<
     };
 
     private startUpdateBackgroundParticles() {
-        io().on('updateBackgroundParticles', data => {
+        socketClient.on('updateBackgroundParticles', data => {
             Object.keys(data).forEach(i => {
                 this.backgroundParticles[i] = this.backgroundParticles[i] || {} as any;
                 this.backgroundParticles[i].targetCount = data[i];
