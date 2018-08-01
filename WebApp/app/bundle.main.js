@@ -844,9 +844,9 @@ var Scene = /** @class */ (function (_super) {
             return function () {
                 if (!textures) {
                     textures = {
-                        0: new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Texture"]('assets/background_particles/pink_particle.png', _this.scene),
-                        1: new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Texture"]('assets/background_particles/white_particle.png', _this.scene),
-                        2: new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Texture"]('assets/background_particles/yellow_particle.png', _this.scene)
+                        0: new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Texture"]('https://s3.amazonaws.com/3sth/particles/pink_particle.png', _this.scene),
+                        1: new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Texture"]('https://s3.amazonaws.com/3sth/particles/white_particle.png', _this.scene),
+                        2: new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Texture"]('https://s3.amazonaws.com/3sth/particles/yellow_particle.png', _this.scene)
                     };
                     Object.keys(textures).forEach(function (key) { return textures[key].hasAlpha = true; });
                 }
@@ -920,7 +920,7 @@ var Scene = /** @class */ (function (_super) {
         this.lightOfCamera.intensity = 0.3;
         var skyboxMaterial = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["StandardMaterial"]("skyBox", scene);
         skyboxMaterial.backFaceCulling = false;
-        skyboxMaterial.reflectionTexture = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["CubeTexture"]("assets/skybox/sb", scene);
+        skyboxMaterial.reflectionTexture = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["CubeTexture"]("https://s3.amazonaws.com/3sth/skybox/sb", scene);
         skyboxMaterial.reflectionTexture.coordinatesMode = babylonjs__WEBPACK_IMPORTED_MODULE_1__["Texture"].SKYBOX_MODE;
         skyboxMaterial.diffuseColor = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Color3"](0, 0, 0);
         skyboxMaterial.specularColor = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Color3"](0, 0, 0);
@@ -1003,7 +1003,7 @@ var Scene = /** @class */ (function (_super) {
         var bubbleMash = babylonjs__WEBPACK_IMPORTED_MODULE_1__["MeshBuilder"].CreateBox("bubbleMash", { size: 0.5 }, this.scene);
         bubbleSpray.addShape(bubbleMash, shapeCount);
         bubbleMash.dispose();
-        var texture = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Texture"]('assets/bubbles.png', this.scene);
+        var texture = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Texture"]('https://s3.amazonaws.com/3sth/bubble/bubbles_combined.png', this.scene);
         texture.hasAlpha = true;
         var bubbles = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["StandardMaterial"]("bubbles", this.scene);
         bubbles.backFaceCulling = false;
@@ -1384,7 +1384,7 @@ var Scene = /** @class */ (function (_super) {
         algae.billboardMode = babylonjs__WEBPACK_IMPORTED_MODULE_1__["Mesh"].BILLBOARDMODE_ALL;
         algae.scaling = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"](0.1, 0.1, 0.1);
         var material = algae.material = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["StandardMaterial"]("algaeMaterial", this.scene);
-        material.diffuseTexture = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Texture"]('assets/algae_particles.png', this.scene);
+        material.diffuseTexture = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Texture"]('https://s3.amazonaws.com/3sth/algae/algae_particle.png', this.scene);
         material.diffuseTexture.hasAlpha = true;
         this.algaes.push({
             mesh: algae,
@@ -11737,4 +11737,4 @@ module.exports = ReactDOM;
 /***/ })
 
 /******/ });
-//# sourceMappingURL=bundle.main.5787d6f82cdc9b28ea2f.js.map
+//# sourceMappingURL=bundle.main.js.map

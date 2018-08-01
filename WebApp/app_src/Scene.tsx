@@ -126,7 +126,7 @@ export class Scene extends React.Component<
 
         const skyboxMaterial = new BABYLON.StandardMaterial("skyBox", scene);
         skyboxMaterial.backFaceCulling = false;
-        skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture("assets/skybox/sb", scene);
+        skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture("https://s3.amazonaws.com/3sth/skybox/sb", scene);
         skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
         skyboxMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
         skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
@@ -214,7 +214,7 @@ export class Scene extends React.Component<
         bubbleSpray.addShape(bubbleMash, shapeCount);
         bubbleMash.dispose();
 
-        const texture = new BABYLON.Texture('assets/bubbles.png', this.scene);
+        const texture = new BABYLON.Texture('https://s3.amazonaws.com/3sth/bubble/bubbles_combined.png', this.scene);
         texture.hasAlpha = true;
 
         const bubbles = new BABYLON.StandardMaterial("bubbles", this.scene);
@@ -315,9 +315,9 @@ export class Scene extends React.Component<
         return () => {
             if (!textures) {
                 textures = {
-                    0: new BABYLON.Texture('assets/background_particles/pink_particle.png', this.scene),
-                    1: new BABYLON.Texture('assets/background_particles/white_particle.png', this.scene),
-                    2: new BABYLON.Texture('assets/background_particles/yellow_particle.png', this.scene)
+                    0: new BABYLON.Texture('https://s3.amazonaws.com/3sth/particles/pink_particle.png', this.scene),
+                    1: new BABYLON.Texture('https://s3.amazonaws.com/3sth/particles/white_particle.png', this.scene),
+                    2: new BABYLON.Texture('https://s3.amazonaws.com/3sth/particles/yellow_particle.png', this.scene)
                 };
                 Object.keys(textures).forEach(key => textures[key].hasAlpha = true);
             }
@@ -671,7 +671,7 @@ export class Scene extends React.Component<
         algae.scaling = new BABYLON.Vector3(0.1, 0.1, 0.1);
 
         const material = algae.material = new BABYLON.StandardMaterial(`algaeMaterial`, this.scene);
-        material.diffuseTexture = new BABYLON.Texture('assets/algae_particles.png', this.scene);
+        material.diffuseTexture = new BABYLON.Texture('https://s3.amazonaws.com/3sth/algae/algae_particle.png', this.scene);
         material.diffuseTexture.hasAlpha = true;
         this.algaes.push({
             mesh: algae,
