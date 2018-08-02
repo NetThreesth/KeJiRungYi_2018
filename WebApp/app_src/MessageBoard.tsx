@@ -81,11 +81,11 @@ export class MessageBoard
 
     private getAvatar(role: Roles) {
         if (role === Roles.User)
-            return 'assets/avatar_white.png';
+            return '3sth/avatar/avatar_white.png';
         if (role === Roles.Algae)
-            return 'assets/avatar_yellow.png';
+            return '3sth/avatar/avatar_yellow.png';
         if (role === Roles.ChatBot)
-            return 'assets/avatar_pink.png';
+            return '3sth/avatar/avatar_pink.png';
     };
 
     private scrollTo(rate: number, immediate = true, afterFunc = () => { }) {

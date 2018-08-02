@@ -30,6 +30,17 @@ const server = app.listen(PORT, () => {
 // [END Setup]
 
 
+// [Reverse Proxy (For Assets)]
+var proxy = require('http-proxy').createProxyServer();
+proxy.on('error', err => logger.error(err));
+var assetsServer = 'https://s3.amazonaws.com';
+app.all("/3sth/*", (req, res) => {
+    logger.info('redirecting to assets server: ' + req.originalUrl);
+    return proxy.web(req, res, { changeOrigin: true, target: assetsServer });
+});
+// [END Reverse Proxy]
+
+
 const backgroundParticles = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0 };
 
 
@@ -154,7 +165,7 @@ function sentToChatbots(text, rid) {
     backgroundParticles[rid] += 1;
     io.sockets.emit('updateBackgroundParticles', backgroundParticles);
 
-    setTimeout(function() {
+    setTimeout(function () {
         backgroundParticles[rid] -= 1;
         io.sockets.emit('updateBackgroundParticles', backgroundParticles);
     }, 30 * 60 * 1000);
