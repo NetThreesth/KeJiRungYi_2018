@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as BABYLON from 'babylonjs';
-import { socketClient } from './common/SocketClient';
 import * as $ from 'jquery';
+import { socketClient } from './common/SocketClient';
 import { CommonUtility } from './common/CommonUtility';
 import { BabylonUtility, Line } from './common/BabylonUtility';
 import { AsyncWorker } from './common/AsyncWorker';

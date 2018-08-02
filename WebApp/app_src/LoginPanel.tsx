@@ -1,4 +1,5 @@
 import * as React from "react";
+import { socketClient } from './common/SocketClient';
 import { EventCenter, Event } from './common/MessageCenter';
 import { GlobalData } from './common/GlobalData';
 
@@ -137,10 +138,8 @@ export class LoginPanel
 
         GlobalData.userName = signInName;
         GlobalData.signInTime = new Date();
-        this.login();
-    };
+        setTimeout(() => socketClient.emit('signIn', GlobalData), 10);
 
-    private login() {
         const $loginPanel = $('#loginPanel');
         $loginPanel.animate({ opacity: 0 }, 2000, () => $loginPanel.hide());
         this.props.eventCenter.trigger(Event.AfterLogin);

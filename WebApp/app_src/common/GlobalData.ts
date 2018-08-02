@@ -1,9 +1,14 @@
 import { CommonUtility } from './CommonUtility';
 
-export class GlobalData {
-    static userName: string = null;
-    static signInTime: Date = null;
-    static chatRoomIndex: number = null;
+export const GlobalData: {
+    userName: string;
+    signInTime: Date;
+    chatRoomIndex: number;
+
+} = {
+    userName: null,
+    signInTime: null,
+    chatRoomIndex: null
 };
 
 export enum Roles {

@@ -31,9 +31,9 @@ const server = app.listen(PORT, () => {
 
 
 // [Reverse Proxy (For Assets)]
-var proxy = require('http-proxy').createProxyServer();
+const proxy = require('http-proxy').createProxyServer();
 proxy.on('error', err => logger.error(err));
-var assetsServer = 'https://s3.amazonaws.com';
+const assetsServer = 'https://s3.amazonaws.com';
 app.all("/3sth/*", (req, res) => {
     logger.info('redirecting to assets server: ' + req.originalUrl);
     return proxy.web(req, res, { changeOrigin: true, target: assetsServer });
@@ -47,14 +47,30 @@ const backgroundParticles = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8:
 // [socket.io]
 const io = require('socket.io')(server);
 io.on('connection', socket => {
-    socket.emit('updateBackgroundParticles', backgroundParticles);
+    const push = setInterval(() => {
+        socket.emit('updateBackgroundParticles', backgroundParticles)
+    }, 100);
+
+    socket.on('signIn', info => {
+        try {
+            info = JSON.stringify(info);
+            logger.info('sign in: ' + info);
+        }
+        catch (err) { logger.info('sign in info parsing error'); }
+
+    });
+
+    socket.on('disconnect', () => {
+        clearInterval(push);
+    });
 });
 // [END socket.io]
 
 
 
+/* 
 // [GraphQL]
-/* const express_graphql = require('express-graphql');
+const express_graphql = require('express-graphql');
 const graphql = require('graphql');
 const repo = require('./repository.js');
 
@@ -82,8 +98,9 @@ const rootQuery = new graphql.GraphQLObjectType({
 app.use('/graphql', express_graphql({
   schema: new graphql.GraphQLSchema({ query: rootQuery }),
   graphiql: true
-})); */
+})); 
 // [END GraphQL]
+*/
 
 
 
@@ -163,12 +180,8 @@ app.route('/apis/uploadText').post((req, res, next) => {
 function sentToChatbots(text, rid) {
     const axios = require('axios');
     backgroundParticles[rid] += 1;
-    io.sockets.emit('updateBackgroundParticles', backgroundParticles);
 
-    setTimeout(function () {
-        backgroundParticles[rid] -= 1;
-        io.sockets.emit('updateBackgroundParticles', backgroundParticles);
-    }, 30 * 60 * 1000);
+    setTimeout(() => backgroundParticles[rid] -= 1, 30 * 60 * 1000);
 
     return axios.post('http://35.236.167.99:5000/3sth/api/v1.0/chatbots/', {
         msg: text,
