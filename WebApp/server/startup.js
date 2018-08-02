@@ -51,56 +51,76 @@ io.on('connection', socket => {
         socket.emit('updateBackgroundParticles', backgroundParticles)
     }, 100);
 
-    socket.on('signIn', info => {
-        try {
-            info = JSON.stringify(info);
-            logger.info('sign in: ' + info);
-        }
-        catch (err) { logger.info('sign in info parsing error'); }
+    let userInfo = null;
 
+    socket.on('updateUserInfo', info => {
+        try { JSON.stringify(info); }
+        catch (err) {
+            logger.error('user info parsing error');
+            throw err;
+        }
+        userInfo = info;
     });
 
     socket.on('disconnect', () => {
         clearInterval(push);
+        if (userInfo) logger.info('sign out: ' + JSON.stringify(userInfo));
     });
 });
 // [END socket.io]
 
 
 
-/* 
+
 // [GraphQL]
 const express_graphql = require('express-graphql');
 const graphql = require('graphql');
 const repo = require('./repository.js');
 
-const MessageType = new graphql.GraphQLObjectType({
-  name: 'Message',
-  fields: {
-    id: { type: graphql.GraphQLString },
-    time: { type: graphql.GraphQLString },
-    message: { type: graphql.GraphQLString },
-    name: { type: graphql.GraphQLString },
-    chatroomId: { type: graphql.GraphQLString },
-  }
-});
-
 const rootQuery = new graphql.GraphQLObjectType({
-  name: 'Query',
-  fields: {
-    messages: {
-      type: new graphql.GraphQLList(MessageType),
-      resolve: () => repo.Message.findAll()
+    name: 'Query',
+    fields: {
+        messages: {
+            type: new graphql.GraphQLList(
+                new graphql.GraphQLObjectType({
+                    name: 'Message',
+                    fields: {
+                        id: { type: graphql.GraphQLInt },
+                        time: { type: graphql.GraphQLString },
+                        message: { type: graphql.GraphQLString },
+                        name: { type: graphql.GraphQLString },
+                        chatroomId: { type: graphql.GraphQLString },
+                    }
+                })
+            ),
+            resolve: () => repo.Message.findAll()
+        },
+
+        userLog: {
+            type: new graphql.GraphQLList(
+                new graphql.GraphQLObjectType({
+                    name: 'UserLog',
+                    fields: {
+                        id: { type: graphql.GraphQLInt },
+                        userName: { type: graphql.GraphQLString },
+                        chatRoomIndex: { type: graphql.GraphQLString },
+                        touchEventCount: { type: graphql.GraphQLInt },
+                        signInTime: { type: graphql.GraphQLString },
+                        stayTime: { type: graphql.GraphQLInt }
+                    }
+                })
+            ),
+            resolve: () => repo.UserLog.findAll()
+        }
     }
-  }
 });
 
 app.use('/graphql', express_graphql({
-  schema: new graphql.GraphQLSchema({ query: rootQuery }),
-  graphiql: true
-})); 
+    schema: new graphql.GraphQLSchema({ query: rootQuery }),
+    graphiql: true
+}));
 // [END GraphQL]
-*/
+
 
 
 

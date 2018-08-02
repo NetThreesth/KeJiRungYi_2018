@@ -11,7 +11,7 @@ const repo = module.exports = {};
 repo.Message = sequelize.define(
     'message',
     {
-        id: { type: Sequelize.STRING, primaryKey: true },
+        id: { type: Sequelize.INTEGER, primaryKey: true },
         time: { type: Sequelize.TIME },
         message: { type: Sequelize.STRING },
         name: { type: Sequelize.STRING },
@@ -23,3 +23,20 @@ repo.Message = sequelize.define(
         tableName: 'messagelog',
     }
 );
+
+repo.UserLog = sequelize.define(
+    'userLog',
+    {
+        id: { type: Sequelize.INTEGER, primaryKey: true },
+        userName: { type: Sequelize.STRING },
+        chatRoomIndex: { type: Sequelize.STRING },
+        touchEventCount: { type: Sequelize.INTEGER },
+        signInTime: { type: Sequelize.TIME },
+        stayTime: { type: Sequelize.INTEGER },
+    },
+    {
+        timestamps: false,
+        freezeTableName: true,
+        tableName: 'userlog',
+    }
+); 

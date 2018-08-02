@@ -138,7 +138,7 @@ export class LoginPanel
 
         GlobalData.userName = signInName;
         GlobalData.signInTime = new Date();
-        setTimeout(() => socketClient.emit('signIn', GlobalData), 10);
+        setTimeout(() => socketClient.emit('updateUserInfo', GlobalData), 0);
 
         const $loginPanel = $('#loginPanel');
         $loginPanel.animate({ opacity: 0 }, 2000, () => $loginPanel.hide());

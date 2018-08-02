@@ -128,10 +128,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ControlPanel", function() { return ControlPanel; });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _common_MessageCenter__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./common/MessageCenter */ "./app_src/common/MessageCenter.ts");
-/* harmony import */ var _common_GlobalData__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./common/GlobalData */ "./app_src/common/GlobalData.ts");
-/* harmony import */ var _ControlPanel_scss__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./ControlPanel.scss */ "./app_src/ControlPanel.scss");
-/* harmony import */ var _ControlPanel_scss__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_ControlPanel_scss__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _common_SocketClient__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./common/SocketClient */ "./app_src/common/SocketClient.ts");
+/* harmony import */ var _common_MessageCenter__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./common/MessageCenter */ "./app_src/common/MessageCenter.ts");
+/* harmony import */ var _common_GlobalData__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./common/GlobalData */ "./app_src/common/GlobalData.ts");
+/* harmony import */ var _ControlPanel_scss__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./ControlPanel.scss */ "./app_src/ControlPanel.scss");
+/* harmony import */ var _ControlPanel_scss__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_ControlPanel_scss__WEBPACK_IMPORTED_MODULE_4__);
 var __extends = (undefined && undefined.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -142,6 +143,7 @@ var __extends = (undefined && undefined.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+
 
 
 
@@ -175,10 +177,10 @@ var ControlPanel = /** @class */ (function (_super) {
             react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "userRecord" },
                 react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", null,
                     "\u7528\u6236: ",
-                    _common_GlobalData__WEBPACK_IMPORTED_MODULE_2__["GlobalData"].userName),
+                    _common_GlobalData__WEBPACK_IMPORTED_MODULE_3__["GlobalData"].userName),
                 react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", null,
                     "\u804A\u5929\u5BA4\u7DE8\u865F: ",
-                    _common_GlobalData__WEBPACK_IMPORTED_MODULE_2__["GlobalData"].chatRoomIndex),
+                    _common_GlobalData__WEBPACK_IMPORTED_MODULE_3__["GlobalData"].chatRoomIndex),
                 react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", null,
                     "\u4F7F\u7528\u6642\u9593: ",
                     this.state.time,
@@ -191,10 +193,10 @@ var ControlPanel = /** @class */ (function (_super) {
     ;
     ControlPanel.prototype.componentDidMount = function () {
         var _this = this;
-        this.props.eventCenter.on(_common_MessageCenter__WEBPACK_IMPORTED_MODULE_1__["Event"].AfterLogin, function () {
+        this.props.eventCenter.on(_common_MessageCenter__WEBPACK_IMPORTED_MODULE_2__["Event"].AfterLogin, function () {
             $('.control-panel').removeClass(['invisible', 'untouchable']).addClass('visible');
             _this.setState({
-                time: new Date().getTime() - _common_GlobalData__WEBPACK_IMPORTED_MODULE_2__["GlobalData"].signInTime.getTime(),
+                time: new Date().getTime() - _common_GlobalData__WEBPACK_IMPORTED_MODULE_3__["GlobalData"].signInTime.getTime(),
                 touchEventCount: 0
             });
         });
@@ -203,12 +205,15 @@ var ControlPanel = /** @class */ (function (_super) {
                 touchEventCount: _this.state.touchEventCount + 1
             });
             _this.setState(newState);
+            setTimeout(function () {
+                _common_SocketClient__WEBPACK_IMPORTED_MODULE_1__["socketClient"].emit('updateUserInfo', Object.assign({ touchEventCount: newState.touchEventCount }, _common_GlobalData__WEBPACK_IMPORTED_MODULE_3__["GlobalData"]));
+            }, 0);
         });
         setInterval(function () {
-            if (!_common_GlobalData__WEBPACK_IMPORTED_MODULE_2__["GlobalData"].signInTime)
+            if (!_common_GlobalData__WEBPACK_IMPORTED_MODULE_3__["GlobalData"].signInTime)
                 return;
             var newState = Object.assign({}, _this.state, {
-                time: new Date().getTime() - _common_GlobalData__WEBPACK_IMPORTED_MODULE_2__["GlobalData"].signInTime.getTime(),
+                time: new Date().getTime() - _common_GlobalData__WEBPACK_IMPORTED_MODULE_3__["GlobalData"].signInTime.getTime(),
             });
             _this.setState(newState);
         }, 200);
@@ -220,11 +225,11 @@ var ControlPanel = /** @class */ (function (_super) {
     };
     ;
     ControlPanel.prototype.onTextAdd = function (text) {
-        this.props.messageCenter.addText(_common_GlobalData__WEBPACK_IMPORTED_MODULE_2__["Roles"].User, text);
+        this.props.messageCenter.addText(_common_GlobalData__WEBPACK_IMPORTED_MODULE_3__["Roles"].User, text);
     };
     ;
     ControlPanel.prototype.onImageAdd = function (image) {
-        this.props.messageCenter.addImage(_common_GlobalData__WEBPACK_IMPORTED_MODULE_2__["Roles"].User, image);
+        this.props.messageCenter.addImage(_common_GlobalData__WEBPACK_IMPORTED_MODULE_3__["Roles"].User, image);
     };
     ;
     ControlPanel.prototype.switchTextInput = function () {
@@ -562,7 +567,7 @@ var LoginPanel = /** @class */ (function (_super) {
             return;
         _common_GlobalData__WEBPACK_IMPORTED_MODULE_3__["GlobalData"].userName = signInName;
         _common_GlobalData__WEBPACK_IMPORTED_MODULE_3__["GlobalData"].signInTime = new Date();
-        setTimeout(function () { return _common_SocketClient__WEBPACK_IMPORTED_MODULE_1__["socketClient"].emit('signIn', _common_GlobalData__WEBPACK_IMPORTED_MODULE_3__["GlobalData"]); }, 10);
+        setTimeout(function () { return _common_SocketClient__WEBPACK_IMPORTED_MODULE_1__["socketClient"].emit('updateUserInfo', _common_GlobalData__WEBPACK_IMPORTED_MODULE_3__["GlobalData"]); }, 0);
         var $loginPanel = $('#loginPanel');
         $loginPanel.animate({ opacity: 0 }, 2000, function () { return $loginPanel.hide(); });
         this.props.eventCenter.trigger(_common_MessageCenter__WEBPACK_IMPORTED_MODULE_2__["Event"].AfterLogin);
@@ -11731,4 +11736,4 @@ module.exports = ReactDOM;
 /***/ })
 
 /******/ });
-//# sourceMappingURL=bundle.main.01b18e8acfe98868df35.js.map
+//# sourceMappingURL=bundle.main.1aad74d5f6bf66246a32.js.map

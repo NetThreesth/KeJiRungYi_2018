@@ -1,4 +1,5 @@
 import * as React from "react";
+import { socketClient } from './common/SocketClient';
 import { MessageCenter, EventCenter, Event } from './common/MessageCenter';
 import { Roles, GlobalData } from './common/GlobalData';
 
@@ -68,6 +69,12 @@ export class ControlPanel extends React.Component<
                 touchEventCount: this.state.touchEventCount + 1
             });
             this.setState(newState);
+            setTimeout(() => {
+                socketClient.emit(
+                    'updateUserInfo',
+                    Object.assign({ touchEventCount: newState.touchEventCount }, GlobalData)
+                );
+            }, 0);
         });
         setInterval(() => {
             if (!GlobalData.signInTime) return;
