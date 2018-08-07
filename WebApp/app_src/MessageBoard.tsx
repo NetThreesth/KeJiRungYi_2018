@@ -41,7 +41,7 @@ export class MessageBoard
             this.scrollTo(1, false, () => {
                 this.props.eventCenter.trigger(Scrollbar.UpdateEvent);
             });
-        }, 0);
+        });
     };
 
     private createContent(content: Content) {

@@ -37,7 +37,11 @@ export class MessageCenter {
         if (role !== Roles.User) return;
         CommonUtility.asyncPost(
             'apis/uploadText',
-            { rid: GlobalData.chatRoomIndex, text: text }
+            {
+                userName: GlobalData.userName,
+                rid: GlobalData.chatRoomIndex,
+                text: text
+            }
         ).done(this.responseHandler.bind(this));
     };
 
@@ -46,7 +50,11 @@ export class MessageCenter {
         this.addMessage({ role: role, type: ContentType.Image, content: base64Image });
         CommonUtility.asyncPost(
             'apis/uploadImage',
-            { rid: GlobalData.chatRoomIndex, base64Image: base64Image }
+            {
+                userName: GlobalData.userName,
+                rid: GlobalData.chatRoomIndex,
+                base64Image: base64Image
+            }
         ).done(this.responseHandler.bind(this));
     };
 

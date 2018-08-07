@@ -174,7 +174,7 @@ app.route('/apis/uploadImage').post((req, res, next) => {
             const translationResult = translations.join('');
             logger.info('Translations: ' + translationResult);
 
-            return sentToChatbots(translationResult, body.rid);
+            return sentToChatbots(translationResult, body.rid, body.userName);
         })
         .then(result => {
             logger.info(result.data);
@@ -185,10 +185,9 @@ app.route('/apis/uploadImage').post((req, res, next) => {
 });
 
 app.route('/apis/uploadText').post((req, res, next) => {
-    const text = req.body.text;
-    const rid = req.body.rid;
+    const body = req.body;
 
-    sentToChatbots(text, rid)
+    sentToChatbots(body.text, body.rid, body.userName)
         .then(result => {
             logger.info(result.data);
             res.json(result.data);
@@ -197,12 +196,23 @@ app.route('/apis/uploadText').post((req, res, next) => {
         .catch(err => errorHandler(err, next));
 });
 
-function sentToChatbots(text, rid) {
-    const axios = require('axios');
+function sentToChatbots(text, rid, userName) {
     backgroundParticles[rid] += 1;
-
     setTimeout(() => backgroundParticles[rid] -= 1, 30 * 60 * 1000);
 
+    repo.Message.create({
+        // id: { type: Sequelize.INTEGER, primaryKey: true },
+        // time: { type: Sequelize.TIME },
+        time: new Date(),
+        // message: { type: Sequelize.STRING },
+        message: text,
+        // name: { type: Sequelize.STRING },
+        name: userName,
+        // chatroomId: { type: Sequelize.STRING },
+        chatroomId: rid,
+    });
+
+    const axios = require('axios');
     return axios.post('http://35.236.167.99:5000/3sth/api/v1.0/chatbots/', {
         msg: text,
         rid: rid

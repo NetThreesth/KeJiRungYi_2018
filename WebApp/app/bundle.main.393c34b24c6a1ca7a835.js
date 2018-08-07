@@ -674,7 +674,7 @@ var MessageBoard = /** @class */ (function (_super) {
             _this.scrollTo(1, false, function () {
                 _this.props.eventCenter.trigger(_common_Scrollbar__WEBPACK_IMPORTED_MODULE_2__["Scrollbar"].UpdateEvent);
             });
-        }, 0);
+        });
     };
     ;
     MessageBoard.prototype.createContent = function (content) {
@@ -1765,12 +1765,20 @@ var MessageCenter = /** @class */ (function () {
         this.addMessage({ role: role, type: ContentType.Text, content: text });
         if (role !== _GlobalData__WEBPACK_IMPORTED_MODULE_1__["Roles"].User)
             return;
-        _CommonUtility__WEBPACK_IMPORTED_MODULE_2__["CommonUtility"].asyncPost('apis/uploadText', { rid: _GlobalData__WEBPACK_IMPORTED_MODULE_1__["GlobalData"].chatRoomIndex, text: text }).done(this.responseHandler.bind(this));
+        _CommonUtility__WEBPACK_IMPORTED_MODULE_2__["CommonUtility"].asyncPost('apis/uploadText', {
+            userName: _GlobalData__WEBPACK_IMPORTED_MODULE_1__["GlobalData"].userName,
+            rid: _GlobalData__WEBPACK_IMPORTED_MODULE_1__["GlobalData"].chatRoomIndex,
+            text: text
+        }).done(this.responseHandler.bind(this));
     };
     ;
     MessageCenter.prototype.addImage = function (role, base64Image) {
         this.addMessage({ role: role, type: ContentType.Image, content: base64Image });
-        _CommonUtility__WEBPACK_IMPORTED_MODULE_2__["CommonUtility"].asyncPost('apis/uploadImage', { rid: _GlobalData__WEBPACK_IMPORTED_MODULE_1__["GlobalData"].chatRoomIndex, base64Image: base64Image }).done(this.responseHandler.bind(this));
+        _CommonUtility__WEBPACK_IMPORTED_MODULE_2__["CommonUtility"].asyncPost('apis/uploadImage', {
+            userName: _GlobalData__WEBPACK_IMPORTED_MODULE_1__["GlobalData"].userName,
+            rid: _GlobalData__WEBPACK_IMPORTED_MODULE_1__["GlobalData"].chatRoomIndex,
+            base64Image: base64Image
+        }).done(this.responseHandler.bind(this));
     };
     ;
     MessageCenter.prototype.addMessage = function (content) {
@@ -11734,4 +11742,4 @@ module.exports = ReactDOM;
 /***/ })
 
 /******/ });
-//# sourceMappingURL=bundle.main.98926d9ad4c8f40b00ae.js.map
+//# sourceMappingURL=bundle.main.393c34b24c6a1ca7a835.js.map
