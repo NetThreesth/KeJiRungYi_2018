@@ -71,6 +71,7 @@ export class CommonUtility {
     };
 
     static getQueryString(field: string, url?: string) {
+        console.log(`try get Query String: ${field}`)
         const href = url ? url : window.location.href;
         const reg = new RegExp('[?&]' + field + '=([^&#]*)', 'i');
         const string = reg.exec(href);

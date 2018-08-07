@@ -512,16 +512,18 @@ export class Scene extends React.Component<
                     oneAxis.from = oneAxis.from ? Math.min(oneAxis.from, p[axis]) : p[axis];
                     oneAxis.to = oneAxis.to ? Math.max(oneAxis.to, p[axis]) : p[axis];
                 });
-                const position = new BABYLON.Vector3(p.x, p.y, p.z)
-                const node = BABYLON.MeshBuilder.CreateSphere("node", { diameter: 0.2 }, this.scene);
-                node.position = position;
+                const position = new BABYLON.Vector3(p.x, p.y, p.z);
+                if (addNodeCount) {
+                    const node = BABYLON.MeshBuilder.CreateSphere("node", { diameter: 0.2 }, this.scene);
+                    node.position = position;
+                }
                 return position;
             });
             for (let c = 0; c < addNodeCount; c++) {
                 const position = new BABYLON.Vector3(
                     CommonUtility.getRandomNumberInRange(range.x.from, range.x.to, 5),
                     CommonUtility.getRandomNumberInRange(range.y.from, range.y.to, 5),
-                    range.z.from
+                    CommonUtility.getRandomNumberInRange(range.z.from, range.z.to, 5)
                 );
                 pointInGroup.push(position);
                 const node = BABYLON.MeshBuilder.CreateSphere("node", { diameter: 0.2 }, this.scene);

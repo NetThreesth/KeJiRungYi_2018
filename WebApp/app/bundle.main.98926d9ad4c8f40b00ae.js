@@ -670,37 +670,32 @@ var MessageBoard = /** @class */ (function (_super) {
     ;
     MessageBoard.prototype.componentDidUpdate = function () {
         var _this = this;
-        this.scrollTo(1, false, function () {
-            _this.props.eventCenter.trigger(_common_Scrollbar__WEBPACK_IMPORTED_MODULE_2__["Scrollbar"].UpdateEvent);
-        });
+        setTimeout(function () {
+            _this.scrollTo(1, false, function () {
+                _this.props.eventCenter.trigger(_common_Scrollbar__WEBPACK_IMPORTED_MODULE_2__["Scrollbar"].UpdateEvent);
+            });
+        }, 0);
     };
     ;
     MessageBoard.prototype.createContent = function (content) {
-        if (content.type === _common_MessageCenter__WEBPACK_IMPORTED_MODULE_1__["ContentType"].Text)
-            return this.createTextMessage(content);
-        else if (content.type === _common_MessageCenter__WEBPACK_IMPORTED_MODULE_1__["ContentType"].Image)
-            return this.createImageMessage(content);
-    };
-    ;
-    MessageBoard.prototype.createTextMessage = function (content) {
         var isUser = content.role === _common_GlobalData__WEBPACK_IMPORTED_MODULE_3__["Roles"].User;
         var name = isUser ? _common_GlobalData__WEBPACK_IMPORTED_MODULE_3__["GlobalData"].userName : '';
         var float = isUser ? 'right' : 'left';
-        return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "messageBox", style: { float: float } },
-            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("img", { src: this.getAvatar(content.role), className: "avatar" }),
-            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "name" }, name),
-            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "content" }, content.content));
-    };
-    ;
-    MessageBoard.prototype.createImageMessage = function (content) {
-        var isUser = content.role === _common_GlobalData__WEBPACK_IMPORTED_MODULE_3__["Roles"].User;
-        var name = isUser ? _common_GlobalData__WEBPACK_IMPORTED_MODULE_3__["GlobalData"].userName : '';
-        var float = isUser ? 'right' : 'left';
-        return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "messageBox", style: { float: float } },
-            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("img", { src: this.getAvatar(content.role), className: "avatar" }),
-            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "name" }, name),
+        var colors = {};
+        colors[_common_GlobalData__WEBPACK_IMPORTED_MODULE_3__["Roles"].User] = 'white';
+        colors[_common_GlobalData__WEBPACK_IMPORTED_MODULE_3__["Roles"].Algae] = '#ffffe0';
+        colors[_common_GlobalData__WEBPACK_IMPORTED_MODULE_3__["Roles"].ChatBot] = '#fff0f2';
+        colors[_common_GlobalData__WEBPACK_IMPORTED_MODULE_3__["Roles"].AI] = '#e0ffff';
+        var $content = (content.type === _common_MessageCenter__WEBPACK_IMPORTED_MODULE_1__["ContentType"].Text) ?
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "content", style: { color: colors[content.role] } },
+                " ",
+                content.content) :
             react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "content" },
-                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("img", { src: content.content, style: { width: '100%', maxWidth: '600px' } })));
+                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("img", { src: content.content, style: { width: '100%', maxWidth: '600px' } }));
+        return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "messageBox " + float },
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("img", { src: this.getAvatar(content.role), className: "avatar" }),
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "name" }, name),
+            $content);
     };
     ;
     MessageBoard.prototype.refresh = function () {
@@ -1256,12 +1251,14 @@ var Scene = /** @class */ (function (_super) {
                     oneAxis.to = oneAxis.to ? Math.max(oneAxis.to, p[axis]) : p[axis];
                 });
                 var position = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"](p.x, p.y, p.z);
-                var node = babylonjs__WEBPACK_IMPORTED_MODULE_1__["MeshBuilder"].CreateSphere("node", { diameter: 0.2 }, _this.scene);
-                node.position = position;
+                if (addNodeCount) {
+                    var node = babylonjs__WEBPACK_IMPORTED_MODULE_1__["MeshBuilder"].CreateSphere("node", { diameter: 0.2 }, _this.scene);
+                    node.position = position;
+                }
                 return position;
             });
             for (var c = 0; c < addNodeCount; c++) {
-                var position = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"](_common_CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getRandomNumberInRange(range.x.from, range.x.to, 5), _common_CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getRandomNumberInRange(range.y.from, range.y.to, 5), range.z.from);
+                var position = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"](_common_CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getRandomNumberInRange(range.x.from, range.x.to, 5), _common_CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getRandomNumberInRange(range.y.from, range.y.to, 5), _common_CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getRandomNumberInRange(range.z.from, range.z.to, 5));
                 pointInGroup.push(position);
                 var node = babylonjs__WEBPACK_IMPORTED_MODULE_1__["MeshBuilder"].CreateSphere("node", { diameter: 0.2 }, _this.scene);
                 node.position = position;
@@ -1639,6 +1636,7 @@ var CommonUtility = /** @class */ (function () {
     };
     ;
     CommonUtility.getQueryString = function (field, url) {
+        console.log("try get Query String: " + field);
         var href = url ? url : window.location.href;
         var reg = new RegExp('[?&]' + field + '=([^&#]*)', 'i');
         var string = reg.exec(href);
@@ -4665,7 +4663,7 @@ exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/li
 
 
 // module
-exports.push([module.i, "#messageBoard {\n  pointer-events: none;\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  overflow: hidden;\n  display: flex;\n  justify-content: center; }\n  #messageBoard > div {\n    margin-bottom: 100px; }\n  #messageBoard .messageBoardContent {\n    width: 100%;\n    overflow: hidden; }\n    #messageBoard .messageBoardContent:after {\n      content: \"\";\n      clear: both;\n      display: table; }\n    #messageBoard .messageBoardContent .messageBox {\n      text-shadow: 0px 0px 6px #404040;\n      color: white;\n      position: relative;\n      background-color: rgba(255, 255, 255, 0.05);\n      padding: 3px;\n      margin: 5px 0;\n      border-radius: 3px;\n      width: 50%;\n      color: white; }\n      #messageBoard .messageBoardContent .messageBox .avatar {\n        position: absolute;\n        width: 30px;\n        transform: translateY(40%); }\n      #messageBoard .messageBoardContent .messageBox .name {\n        position: absolute;\n        top: 0px;\n        left: 7px; }\n      #messageBoard .messageBoardContent .messageBox .content {\n        margin: 20px 0 0 30px; }\n  #messageBoard .scrollbarContainer {\n    pointer-events: auto;\n    position: relative;\n    top: 0;\n    right: 0;\n    width: 15px;\n    background-color: rgba(0, 0, 0, 0.1); }\n    #messageBoard .scrollbarContainer .scrollbar {\n      position: absolute;\n      top: 0;\n      right: 1px;\n      width: 12px;\n      height: 100px;\n      background-color: rgba(0, 0, 0, 0.3);\n      border-radius: 5px; }\n\n@media only screen and (min-width: 768px) {\n  .messageBoardContent {\n    padding: 0 50px; } }\n\n@media only screen and (min-width: 1224px) {\n  .messageBoardContent {\n    padding: 0 200px; } }\n", ""]);
+exports.push([module.i, "#messageBoard {\n  pointer-events: none;\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  overflow: hidden;\n  display: flex;\n  justify-content: center; }\n  #messageBoard > div {\n    margin-bottom: 100px; }\n  #messageBoard .messageBoardContent {\n    width: 100%;\n    overflow: hidden; }\n    #messageBoard .messageBoardContent:after {\n      content: \"\";\n      clear: both;\n      display: table; }\n    #messageBoard .messageBoardContent .messageBox {\n      text-shadow: 0px 0px 6px #404040;\n      color: white;\n      position: relative;\n      margin: 15px 0;\n      color: white; }\n      #messageBoard .messageBoardContent .messageBox .avatar {\n        position: absolute;\n        width: 30px; }\n      #messageBoard .messageBoardContent .messageBox .content {\n        padding: 3px 0; }\n    #messageBoard .messageBoardContent .messageBox.left .avatar {\n      left: 0; }\n    #messageBoard .messageBoardContent .messageBox.left .name {\n      display: none; }\n    #messageBoard .messageBoardContent .messageBox.left .content {\n      text-align: left;\n      padding-left: 40px; }\n    #messageBoard .messageBoardContent .messageBox.right .avatar {\n      right: 0; }\n    #messageBoard .messageBoardContent .messageBox.right .name {\n      position: absolute;\n      top: -12px;\n      right: 7px; }\n    #messageBoard .messageBoardContent .messageBox.right .content {\n      text-align: right;\n      padding-right: 40px; }\n  #messageBoard .scrollbarContainer {\n    pointer-events: auto;\n    position: relative;\n    top: 0;\n    right: 1px;\n    width: 25px;\n    background-color: rgba(0, 0, 0, 0.1); }\n    #messageBoard .scrollbarContainer .scrollbar {\n      position: absolute;\n      top: 0;\n      right: 1px;\n      width: 12px;\n      height: 100px;\n      background-color: rgba(0, 0, 0, 0.3);\n      border-radius: 5px; }\n\n@media only screen and (min-width: 768px) {\n  .messageBoardContent {\n    padding: 0 80px; } }\n\n@media only screen and (min-width: 1224px) {\n  .messageBoardContent {\n    padding: 0 250px; } }\n", ""]);
 
 // exports
 
@@ -11736,4 +11734,4 @@ module.exports = ReactDOM;
 /***/ })
 
 /******/ });
-//# sourceMappingURL=bundle.main.1aad74d5f6bf66246a32.js.map
+//# sourceMappingURL=bundle.main.98926d9ad4c8f40b00ae.js.map

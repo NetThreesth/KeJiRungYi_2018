@@ -37,37 +37,30 @@ export class MessageBoard
     };
 
     componentDidUpdate() {
-        this.scrollTo(1, false, () => {
-            this.props.eventCenter.trigger(Scrollbar.UpdateEvent);
-        });
+        setTimeout(() => {
+            this.scrollTo(1, false, () => {
+                this.props.eventCenter.trigger(Scrollbar.UpdateEvent);
+            });
+        }, 0);
     };
 
     private createContent(content: Content) {
-        if (content.type === ContentType.Text)
-            return this.createTextMessage(content);
-        else if (content.type === ContentType.Image)
-            return this.createImageMessage(content);
-    };
-
-    private createTextMessage(content: Content) {
         const isUser = content.role === Roles.User;
         const name = isUser ? GlobalData.userName : '';
         const float = isUser ? 'right' : 'left';
-        return <div className="messageBox" style={{ float: float }}>
-            <img src={this.getAvatar(content.role)} className="avatar" />
-            <div className="name">{name}</div>
-            <div className="content">{content.content}</div>
-        </div>;
-    };
+        const colors = {};
+        colors[Roles.User] = 'white';
+        colors[Roles.Algae] = '#ffffe0';
+        colors[Roles.ChatBot] = '#fff0f2';
+        colors[Roles.AI] = '#e0ffff';
+        const $content = (content.type === ContentType.Text) ?
+            <div className="content" style={{ color: colors[content.role] }}> {content.content}</div > :
+            <div className="content"><img src={content.content} style={{ width: '100%', maxWidth: '600px' }} /></div>;
 
-    private createImageMessage(content: Content) {
-        const isUser = content.role === Roles.User;
-        const name = isUser ? GlobalData.userName : '';
-        const float = isUser ? 'right' : 'left';
-        return <div className="messageBox" style={{ float: float }}>
+        return <div className={`messageBox ${float}`}>
             <img src={this.getAvatar(content.role)} className="avatar" />
             <div className="name">{name}</div>
-            <div className="content"><img src={content.content} style={{ width: '100%', maxWidth: '600px' }} /></div>
+            {$content}
         </div>;
     };
 

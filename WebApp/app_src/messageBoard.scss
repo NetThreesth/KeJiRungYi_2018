@@ -14,24 +14,41 @@
         .messageBox {
             @include white-text;
             position: relative;
-            background-color: rgba(255, 255, 255, 0.05);
-            padding: 3px;
-            margin: 5px 0;
-            border-radius: 3px;
-            width: 50%;
+            margin: 15px 0;
             color: white;
             .avatar {
                 position: absolute;
                 width: 30px;
-                transform: translateY(40%);
+            }
+            .content {
+                padding: 3px 0;
+            }
+        }
+        $content-padding: 40px;
+        .messageBox.left {
+            .avatar {
+                left: 0;
+            }
+            .name {
+                display: none;
+            }
+            .content {
+                text-align: left;
+                padding-left: $content-padding;
+            }
+        }
+        .messageBox.right {
+            .avatar {
+                right: 0;
             }
             .name {
                 position: absolute;
-                top: 0px;
-                left: 7px;
+                top: -12px;
+                right: 7px;
             }
             .content {
-                margin: 20px 0 0 30px;
+                text-align: right;
+                padding-right: $content-padding;
             }
         }
     }
@@ -39,8 +56,8 @@
         pointer-events: auto;
         position: relative;
         top: 0;
-        right: 0;
-        width: 15px;
+        right: 1px;
+        width: 25px;
         background-color: rgba(0, 0, 0, 0.1);
         .scrollbar {
             position: absolute;
@@ -56,12 +73,12 @@
 
 @media only screen and (min-width: 768px) {
     .messageBoardContent {
-        padding: 0 50px;
+        padding: 0 80px;
     }
 }
 
 @media only screen and (min-width: 1224px) {
     .messageBoardContent {
-        padding: 0 200px;
+        padding: 0 250px;
     }
 }

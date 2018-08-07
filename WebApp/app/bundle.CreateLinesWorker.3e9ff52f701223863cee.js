@@ -278,6 +278,7 @@ var CommonUtility = /** @class */ (function () {
     };
     ;
     CommonUtility.getQueryString = function (field, url) {
+        console.log("try get Query String: " + field);
         var href = url ? url : window.location.href;
         var reg = new RegExp('[?&]' + field + '=([^&#]*)', 'i');
         var string = reg.exec(href);
@@ -332,4 +333,4 @@ var CommonUtility = /** @class */ (function () {
 /***/ })
 
 /******/ });
-//# sourceMappingURL=bundle.CreateLinesWorker.bef41e18e0126651b591.js.map
+//# sourceMappingURL=bundle.CreateLinesWorker.3e9ff52f701223863cee.js.map
