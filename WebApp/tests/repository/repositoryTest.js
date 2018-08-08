@@ -1,6 +1,6 @@
 
 const Sequelize = require('sequelize');
-const repo = require('../server/repository.js');
+const repo = require('../../server/repository.js');
 
 
 repo.Message.findAll().then(messages => {
@@ -37,7 +37,7 @@ repo.Message.findAll().then(messages => {
                 [Sequelize.Op.like]: 'unit-test%'
             }
         }
-    })
+    });
 }).then(() => {
     return repo.Message.findAll();
 }).then(messages => {

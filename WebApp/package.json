@@ -1,10 +1,7 @@
 {
-  "name": "prototype",
+  "name": "3sth.net",
   "version": "0.0.1",
   "description": "",
-  "keywords": [
-    ""
-  ],
   "repository": "https://github.com/A-Hsien/KeJiRungYi_2018.git",
   "homepage": "https://github.com/A-Hsien/KeJiRungYi_2018",
   "author": "",
@@ -54,7 +51,6 @@
     "postinstall": "npm update",
     "dev": "rimraf app/bundle.* & webpack --config webpack.dev.js",
     "build": "rimraf app/bundle.* & webpack --config webpack.prod.js",
-    "start": "node server/startup.js",
-    "test": "node tests/repositoryTest.js"
+    "start": "node server/startup.js"
   }
 }

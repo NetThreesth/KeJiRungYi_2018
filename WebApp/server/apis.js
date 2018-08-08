@@ -17,6 +17,13 @@ module.exports.createAPIs = (app) => {
 
     app.route('/apis/uploadDeepAlMessage').post((req, res, next) => {
         const body = req.body;
+
+        repo.Message.create({
+            time: new Date(),
+            message: body.message,
+            name: 'chatbot',
+            chatroomId: body.rid,
+        });
         socketIO.io.sockets.emit('uploadDeepAlMessage', body);
         res.send(true);
     });
@@ -108,14 +115,9 @@ function sentToChatbots(text, rid, userName) {
     setTimeout(() => socketIO.backgroundParticles[rid] -= 1, 30 * 60 * 1000);
 
     repo.Message.create({
-        // id: { type: Sequelize.INTEGER, primaryKey: true },
-        // time: { type: Sequelize.TIME },
         time: new Date(),
-        // message: { type: Sequelize.STRING },
         message: text,
-        // name: { type: Sequelize.STRING },
         name: userName,
-        // chatroomId: { type: Sequelize.STRING },
         chatroomId: rid,
     });
 
@@ -128,24 +130,26 @@ function sentToChatbots(text, rid, userName) {
     }));
     return observable.pipe(map(resp => {
         const now = new Date();
-        repo.Message.bulkCreate(
+        repo.Message.bulkCreate([
             {
                 time: now,
-                message: resp.chatbotResponse,
+                message: resp.data.chatbotResponse,
                 name: 'chatbot',
                 chatroomId: rid,
-            }, {
+            },
+            {
                 time: now,
-                message: resp.algaeResponse,
+                message: resp.data.algaeResponse,
                 name: 'algae',
                 chatroomId: rid,
-            }, {
+            },
+            {
                 time: now,
-                message: resp.chatbot2algaeResponse,
+                message: resp.data.chatbot2algaeResponse,
                 name: 'chatbot',
                 chatroomId: rid,
             }
-        );
+        ]);
         return resp;
     }));
 };
