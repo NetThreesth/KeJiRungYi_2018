@@ -27,6 +27,12 @@ const server = app.listen(PORT, () => {
     logger.info(`App listening. serve path: ${path}, port: ${PORT}`);
     logger.info('Press Ctrl+C to quit.');
 });
+
+const apis = require('./apis.js');
+apis.createAPIs(app);
+
+const socketIO = require('./socketIO.js');
+socketIO.createSocketIO(server);
 // [END Setup]
 
 
@@ -39,35 +45,6 @@ app.all("/3sth/*", (req, res) => {
     return proxy.web(req, res, { changeOrigin: true, target: assetsServer });
 });
 // [END Reverse Proxy]
-
-
-const backgroundParticles = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0 };
-
-
-// [socket.io]
-const io = require('socket.io')(server);
-io.on('connection', socket => {
-    const push = setInterval(() => {
-        socket.emit('updateBackgroundParticles', backgroundParticles)
-    }, 100);
-
-    let userInfo = null;
-
-    socket.on('updateUserInfo', info => {
-        try { JSON.stringify(info); }
-        catch (err) {
-            logger.error('user info parsing error');
-            throw err;
-        }
-        userInfo = info;
-    });
-
-    socket.on('disconnect', () => {
-        clearInterval(push);
-        if (userInfo) logger.info('sign out: ' + JSON.stringify(userInfo));
-    });
-});
-// [END socket.io]
 
 
 
@@ -120,129 +97,3 @@ app.use('/graphql', express_graphql({
     graphiql: true
 }));
 // [END GraphQL]
-
-
-
-
-// [APIs]
-app.route('/apis/uploadAlgaeImage').post((req, res, next) => {
-    const body = req.body;
-    return io.sockets.emit('uploadAlgaeImage', body);
-});
-
-app.route('/apis/uploadDeepAlMessage').post((req, res, next) => {
-    const body = req.body;
-    return io.sockets.emit('uploadDeepAlMessage', body);
-});
-
-app.route('/apis/uploadImage').post((req, res, next) => {
-    logger.info(`${new Date()} uploadImage fired`);
-    const body = req.body;
-    if (!body) {
-        logger.error(`image not exist`);
-        res.status(400).send('image not exist');
-        return;
-    }
-
-    //  Google Cloud Vision Api
-    const vision = require('@google-cloud/vision');
-    const client = new vision.ImageAnnotatorClient();
-    const query = {
-        image: {
-            content: body.base64Image.split(',')[1]
-        },
-        features: [
-            {
-                "type": "LABEL_DETECTION",
-                "maxResults": 6
-            }
-        ]
-    };
-    client.annotateImage(query)
-        .then(results => {
-            logger.info('Vision Api result:' + JSON.stringify(results));
-            const labels = results[0].labelAnnotations;
-            const descriptions = labels.map(label => label.description).join(' ');
-
-            const Translate = require('@google-cloud/translate');
-            const translate = new Translate();
-            return translate.translate(descriptions, 'zh-TW');
-        })
-        .then(results => {
-            let translations = results[0];
-            translations = Array.isArray(translations) ? translations : [translations];
-            const translationResult = translations.join('');
-            logger.info('Translations: ' + translationResult);
-
-            return sentToChatbots(translationResult, body.rid, body.userName);
-        })
-        .then(result => {
-            logger.info(result.data);
-            res.json(result.data);
-            res.end();
-        })
-        .catch(err => errorHandler(err, next));
-});
-
-app.route('/apis/uploadText').post((req, res, next) => {
-    const body = req.body;
-
-    sentToChatbots(body.text, body.rid, body.userName)
-        .then(result => {
-            logger.info(result.data);
-            res.json(result.data);
-            res.end();
-        })
-        .catch(err => errorHandler(err, next));
-});
-
-function sentToChatbots(text, rid, userName) {
-    backgroundParticles[rid] += 1;
-    setTimeout(() => backgroundParticles[rid] -= 1, 30 * 60 * 1000);
-
-    repo.Message.create({
-        // id: { type: Sequelize.INTEGER, primaryKey: true },
-        // time: { type: Sequelize.TIME },
-        time: new Date(),
-        // message: { type: Sequelize.STRING },
-        message: text,
-        // name: { type: Sequelize.STRING },
-        name: userName,
-        // chatroomId: { type: Sequelize.STRING },
-        chatroomId: rid,
-    });
-
-    const axios = require('axios');
-    return axios.post('http://35.236.167.99:5000/3sth/api/v1.0/chatbots/', {
-        msg: text,
-        rid: rid
-    });
-};
-
-app.route('/apis/getPoints').get((req, res, next) => {
-    const fs = require('fs');
-    fs.readFile('nineChatrooms.json', 'utf8', (err, content) => {
-        if (err) errorHandler(err, next);
-
-        const data = JSON.parse(content);
-        const rate = 0.006;
-        Object.keys(data).forEach((key, i) => {
-            const nodesOfRoom = data[key]
-            nodesOfRoom.forEach(n => {
-                n.x = n.x * rate;
-                n.y = n.y * rate;
-                n.z = (Math.random() - Math.random()) * 2;
-            });
-        });
-
-        res.json(data);
-        res.end();
-    });
-});
-
-function errorHandler(err, next) {
-    logger.error(err);
-    logger.error(err.message);
-    if (next) next(err);
-};
-// [END APIs]

@@ -1,6 +1,6 @@
 import * as React from "react";
 import { EventCenter } from './MessageCenter';
-import { AddLogEvent } from '../DevPanel';
+import { AddLogEvent } from '../components/DevPanel';
 
 export class Scrollbar
     extends React.Component<{ syncTarget: string, eventCenter: EventCenter }>{

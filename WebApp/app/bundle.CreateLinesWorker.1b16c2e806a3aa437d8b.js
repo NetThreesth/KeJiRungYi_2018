@@ -277,14 +277,6 @@ var CommonUtility = /** @class */ (function () {
         return array;
     };
     ;
-    CommonUtility.getQueryString = function (field, url) {
-        console.log("try get Query String: " + field);
-        var href = url ? url : window.location.href;
-        var reg = new RegExp('[?&]' + field + '=([^&#]*)', 'i');
-        var string = reg.exec(href);
-        return string ? decodeURIComponent(string[1]) : undefined;
-    };
-    ;
     CommonUtility.deepMerge = function (from, to, propName) {
         if (from instanceof Object && !(from instanceof Date)) {
             if (from instanceof Array)
@@ -324,6 +316,20 @@ var CommonUtility = /** @class */ (function () {
         ;
     };
     ;
+    CommonUtility.getQueryString = function () {
+        var cache = {};
+        return function (field, url) {
+            var href = url ? url : window.location.href;
+            var key = href + "-" + field;
+            if (cache.hasOwnProperty(key))
+                return cache[key];
+            console.log("try get Query String: " + field);
+            var reg = new RegExp('[?&]' + field + '=([^&#]*)', 'i');
+            var string = reg.exec(href);
+            var result = cache[key] = string ? decodeURIComponent(string[1]) : undefined;
+            return result;
+        };
+    }();
     return CommonUtility;
 }());
 
@@ -333,4 +339,4 @@ var CommonUtility = /** @class */ (function () {
 /***/ })
 
 /******/ });
-//# sourceMappingURL=bundle.CreateLinesWorker.3e9ff52f701223863cee.js.map
+//# sourceMappingURL=bundle.CreateLinesWorker.1b16c2e806a3aa437d8b.js.map

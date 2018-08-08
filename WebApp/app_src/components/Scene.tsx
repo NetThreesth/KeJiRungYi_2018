@@ -1,13 +1,13 @@
 import * as React from "react";
 import * as BABYLON from 'babylonjs';
 import * as $ from 'jquery';
-import { socketClient } from './common/SocketClient';
-import { CommonUtility } from './common/CommonUtility';
-import { BabylonUtility, Line } from './common/BabylonUtility';
-import { AsyncWorker } from './common/AsyncWorker';
-import { GlobalData } from './common/GlobalData';
+import { socketClient } from '../common/SocketClient';
+import { CommonUtility } from '../common/CommonUtility';
+import { BabylonUtility, Line } from '../common/BabylonUtility';
+import { AsyncWorker } from '../common/AsyncWorker';
+import { GlobalData } from '../common/GlobalData';
 
-import { EventCenter, Event, ChatBotResponse } from './common/MessageCenter';
+import { EventCenter, Event, ChatBotResponse } from '../common/MessageCenter';
 
 import "./Scene.scss";
 
@@ -24,7 +24,6 @@ export class Scene extends React.Component<
     private cameraLocations: BABYLON.Vector3[] = [];
     private viewPort = { position: BABYLON.Vector3.Zero(), rotation: BABYLON.Vector3.Zero() };
 
-    private glowLayerForParticle: BABYLON.GlowLayer;
     private bubbleSpray: BABYLON.SolidParticleSystem;
     private backgroundParticles: {
         [id: string]: {
@@ -298,17 +297,6 @@ export class Scene extends React.Component<
         });
     };
 
-    /*     
-        private colorsSetForParticle = [
-            { diffuseColor: [253, 245, 134], glowColor: [255, 252, 193, 0.85] },
-            { diffuseColor: [253, 229, 210], glowColor: [255, 219, 225, 0.85] },
-            { diffuseColor: [252, 247, 255], glowColor: [255, 249, 254, 0.85] }
-        ].map(set => {
-            set.diffuseColor = set.diffuseColor.map(n => n / 255);
-            set.glowColor = set.glowColor.map((n, i) => i !== 3 ? n / 255 : n);
-            return set;
-        }); 
-    */
 
     private getTextureForParticle = function () {
         let textures: { [key: number]: BABYLON.Texture } = null;
@@ -327,21 +315,8 @@ export class Scene extends React.Component<
     }.bind(this)();
 
     private createParticle(center: BABYLON.Vector3) {
-        /*  
-            const range = 15;
-            const position = new BABYLON.Vector3(
-             center.x + (CommonUtility.getRandomIntInRange(range * -1, range) * 0.1),
-             center.y + (CommonUtility.getRandomIntInRange(range * -1, range) * 0.1),
-             center.z + (CommonUtility.getRandomIntInRange(range * -1, range) * 0.1),
-            ); 
-        */
 
         const colorSetIndex = CommonUtility.getRandomIntInRange(0, 2);
-        // const colorSet = this.colorsSetForParticle[colorSetIndex];
-        // const colorInRGB = colorSet.diffuseColor;
-        // const color = new BABYLON.Color3(colorInRGB[0], colorInRGB[1], colorInRGB[2]);
-        // const radius = CommonUtility.getRandomIntInRange(10, 20) * 0.01;
-        // const particle = BABYLON.Mesh.CreateSphere(`colorSetIndex:${colorSetIndex}`, 8, radius, this.scene);
 
         const particle = BABYLON.Mesh.CreatePlane(`colorSetIndex:${colorSetIndex}`, 0.5, this.scene);
         particle.position = center.clone();
@@ -349,22 +324,6 @@ export class Scene extends React.Component<
 
         const material = particle.material = new BABYLON.StandardMaterial(`particleMaterial`, this.scene);
         material.diffuseTexture = this.getTextureForParticle();
-
-        /*         
-            material.diffuseColor = color;
-            material.emissiveColor = BABYLON.Color3.Black(); 
-
-            if (!this.glowLayerForParticle) {
-                this.glowLayerForParticle = new BABYLON.GlowLayer("glowLayerForParticle", this.scene);
-                this.glowLayerForParticle.intensity = 0.5;
-                this.glowLayerForParticle.customEmissiveColorSelector = (mesh, subMesh, material, result) => {
-                    const colorSetIndex = mesh.name.replace('colorSetIndex:', '');
-                    const glowColor = this.colorsSetForParticle[colorSetIndex].glowColor;
-                    result.set(glowColor[0], glowColor[1], glowColor[2], glowColor[3]);
-                }
-            }
-            this.glowLayerForParticle.addIncludedOnlyMesh(particle); 
-        */
 
         return particle;
     };

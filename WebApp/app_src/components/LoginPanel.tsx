@@ -1,7 +1,7 @@
 import * as React from "react";
-import { socketClient } from './common/SocketClient';
-import { EventCenter, Event } from './common/MessageCenter';
-import { GlobalData } from './common/GlobalData';
+import { socketClient } from '../common/SocketClient';
+import { EventCenter, Event } from '../common/MessageCenter';
+import { GlobalData } from '../common/GlobalData';
 
 import "./LoginPanel.scss";
 

@@ -1,4 +1,4 @@
-@import 'common/mixin';
+@import '../common/mixin';
 .control-panel {
     @include flex;
     @include flex-column;

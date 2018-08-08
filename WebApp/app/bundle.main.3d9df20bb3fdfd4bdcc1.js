@@ -86,15 +86,556 @@
 /************************************************************************/
 /******/ ({
 
-/***/ "./app_src/ControlPanel.scss":
-/*!***********************************!*\
-  !*** ./app_src/ControlPanel.scss ***!
-  \***********************************/
+/***/ "./app_src/common/AsyncWorker.ts":
+/*!***************************************!*\
+  !*** ./app_src/common/AsyncWorker.ts ***!
+  \***************************************/
+/*! exports provided: AsyncWorker */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "AsyncWorker", function() { return AsyncWorker; });
+var AsyncWorker = /** @class */ (function () {
+    function AsyncWorker(src) {
+        if (!window['Worker'])
+            throw 'Worker not support';
+        this.worker = new Worker(src);
+    }
+    ;
+    AsyncWorker.prototype.asyncExcute = function (input) {
+        var _this = this;
+        return new Promise(function (resolve, reject) {
+            var worker = _this.worker;
+            worker.onmessage = function (message) { return resolve(message.data); };
+            worker.onerror = function (e) { return reject(e.error); };
+            worker.postMessage(input);
+        });
+    };
+    ;
+    return AsyncWorker;
+}());
+
+;
+
+
+/***/ }),
+
+/***/ "./app_src/common/BabylonUtility.ts":
+/*!******************************************!*\
+  !*** ./app_src/common/BabylonUtility.ts ***!
+  \******************************************/
+/*! exports provided: BabylonUtility */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "BabylonUtility", function() { return BabylonUtility; });
+/* harmony import */ var _CommonUtility__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./CommonUtility */ "./app_src/common/CommonUtility.ts");
+
+var BabylonUtility = /** @class */ (function () {
+    function BabylonUtility() {
+    }
+    BabylonUtility.distance = function (v1, v2) {
+        var dx = v1.x - v2.x;
+        var dy = v1.y - v2.y;
+        var dz = v1.z - v2.z;
+        return Math.sqrt(dx * dx + dy * dy + dz * dz);
+    };
+    ;
+    BabylonUtility.degrees = function (v1, v2) {
+        var rad = Math.acos(BABYLON.Vector3.Dot(v1, v2) / (v1.length() * v2.length()));
+        return BABYLON.Angle.FromRadians(rad).degrees() || 0;
+    };
+    ;
+    BabylonUtility.addVector = function (v1, v2) {
+        return new BABYLON.Vector3(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z);
+    };
+    ;
+    BabylonUtility.subtractVector = function (v1, v2) {
+        return new BABYLON.Vector3(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
+    };
+    ;
+    BabylonUtility.getRandomVector3 = function (randomOnX, randomOnY, randomOnZ) {
+        if (randomOnX === void 0) { randomOnX = true; }
+        if (randomOnY === void 0) { randomOnY = true; }
+        if (randomOnZ === void 0) { randomOnZ = true; }
+        return new BABYLON.Vector3(randomOnX ? _CommonUtility__WEBPACK_IMPORTED_MODULE_0__["CommonUtility"].getRandomInt() : 0, randomOnY ? _CommonUtility__WEBPACK_IMPORTED_MODULE_0__["CommonUtility"].getRandomInt() : 0, randomOnZ ? _CommonUtility__WEBPACK_IMPORTED_MODULE_0__["CommonUtility"].getRandomInt() : 0).normalize();
+    };
+    ;
+    BabylonUtility.updatePosition = function (position, translateVector, scale) {
+        position.x += (translateVector.x * scale);
+        position.y += (translateVector.y * scale);
+        position.z += (translateVector.z * scale);
+        return position;
+    };
+    ;
+    BabylonUtility.positionToString = function (position) {
+        var positions = ['x', 'y', 'z'].map(function (k) {
+            return position[k].toFixed(2);
+        });
+        return positions.join(', ');
+    };
+    ;
+    BabylonUtility.getLineToEachOther = function (points) {
+        var lines = [];
+        points.forEach(function (from, iOfFrom) {
+            points.forEach(function (to, iOfTo) {
+                if (iOfFrom < iOfTo) {
+                    var distance = BabylonUtility.distance(from, to);
+                    var key = iOfFrom + "-" + iOfTo;
+                    lines.push({
+                        key: key,
+                        from: from,
+                        to: to,
+                        distance: distance
+                    });
+                }
+            });
+        });
+        return lines;
+    };
+    ;
+    return BabylonUtility;
+}());
+
+;
+;
+
+
+/***/ }),
+
+/***/ "./app_src/common/CommonUtility.ts":
+/*!*****************************************!*\
+  !*** ./app_src/common/CommonUtility.ts ***!
+  \*****************************************/
+/*! exports provided: CommonUtility */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CommonUtility", function() { return CommonUtility; });
+var CommonUtility = /** @class */ (function () {
+    function CommonUtility() {
+    }
+    CommonUtility.getRandomBoolean = function () {
+        return Math.random() >= 0.5;
+    };
+    ;
+    CommonUtility.getRandomNumberInRange = function (min, max, digits) {
+        var rate = Math.pow(10, digits);
+        return CommonUtility.getRandomIntInRange(min * rate, max * rate) / rate;
+    };
+    ;
+    CommonUtility.getRandomIntInRange = function (min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    };
+    ;
+    CommonUtility.getRandomInt = function (digits) {
+        var r = CommonUtility.getRandomBoolean() ? 1 : -1;
+        return CommonUtility.getRandomNegativeInt(digits) * r;
+    };
+    ;
+    CommonUtility.getRandomNegativeInt = function (digits) {
+        return CommonUtility.getRandomNegativeNumber(digits);
+    };
+    ;
+    CommonUtility.getRandomNumber = function (digitsOnInt, digitsOnFloat) {
+        var r = CommonUtility.getRandomBoolean() ? 1 : -1;
+        return CommonUtility.getRandomNegativeNumber(digitsOnInt, digitsOnFloat) * r;
+    };
+    ;
+    CommonUtility.getRandomNegativeNumber = function (digitsOnInt, digitsOnFloat) {
+        digitsOnInt = digitsOnInt || 1;
+        digitsOnFloat = digitsOnFloat || 0;
+        var result = Math.round(Math.random() * Math.pow(10, digitsOnInt + digitsOnFloat));
+        if (digitsOnFloat !== 0)
+            result = result / Math.pow(10, digitsOnFloat);
+        return result;
+    };
+    ;
+    CommonUtility.sort = function (array, func) {
+        array.sort(function (a, b) {
+            return func(a) - func(b);
+        });
+        return array;
+    };
+    ;
+    CommonUtility.shuffle = function (array) {
+        var currentIndex = array.length;
+        var temporaryValue;
+        var randomIndex;
+        // While there remain elements to shuffle...
+        while (0 !== currentIndex) {
+            // Pick a remaining element...
+            randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex -= 1;
+            // And swap it with the current element.
+            temporaryValue = array[currentIndex];
+            array[currentIndex] = array[randomIndex];
+            array[randomIndex] = temporaryValue;
+        }
+        return array;
+    };
+    ;
+    CommonUtility.createArray = function (length) {
+        var array = Array.apply(null, { length: length });
+        return array;
+    };
+    ;
+    CommonUtility.deepMerge = function (from, to, propName) {
+        if (from instanceof Object && !(from instanceof Date)) {
+            if (from instanceof Array)
+                to = to || [];
+            to = to || {};
+            var fromKeys = Object.keys(from);
+            if (fromKeys) {
+                fromKeys.forEach(function (prop) {
+                    to[prop] = CommonUtility.deepMerge(from[prop], to[prop], prop);
+                });
+            }
+        }
+        else
+            to = from;
+        return to;
+    };
+    ;
+    CommonUtility.deepClone = function (obj) {
+        return CommonUtility.deepMerge(obj, {});
+    };
+    ;
+    CommonUtility.asyncPost = function (url, data) {
+        return $.ajax({
+            url: url,
+            type: "post",
+            contentType: "application/json",
+            data: JSON.stringify(data)
+        });
+    };
+    ;
+    CommonUtility.loop = function (count, func) {
+        var finished = 0;
+        while (finished < count) {
+            func(finished);
+            finished++;
+        }
+        ;
+    };
+    ;
+    CommonUtility.getQueryString = function () {
+        var cache = {};
+        return function (field, url) {
+            var href = url ? url : window.location.href;
+            var key = href + "-" + field;
+            if (cache.hasOwnProperty(key))
+                return cache[key];
+            console.log("try get Query String: " + field);
+            var reg = new RegExp('[?&]' + field + '=([^&#]*)', 'i');
+            var string = reg.exec(href);
+            var result = cache[key] = string ? decodeURIComponent(string[1]) : undefined;
+            return result;
+        };
+    }();
+    return CommonUtility;
+}());
+
+;
+
+
+/***/ }),
+
+/***/ "./app_src/common/GlobalData.ts":
+/*!**************************************!*\
+  !*** ./app_src/common/GlobalData.ts ***!
+  \**************************************/
+/*! exports provided: GlobalData, Roles */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "GlobalData", function() { return GlobalData; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Roles", function() { return Roles; });
+var GlobalData = {
+    userName: null,
+    signInTime: null,
+    chatRoomIndex: null
+};
+var Roles;
+(function (Roles) {
+    Roles[Roles["User"] = 0] = "User";
+    Roles[Roles["ChatBot"] = 1] = "ChatBot";
+    Roles[Roles["Algae"] = 2] = "Algae";
+})(Roles || (Roles = {}));
+;
+
+
+/***/ }),
+
+/***/ "./app_src/common/MessageCenter.ts":
+/*!*****************************************!*\
+  !*** ./app_src/common/MessageCenter.ts ***!
+  \*****************************************/
+/*! exports provided: ContentType, MessageCenter, EventCenter, Event */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ContentType", function() { return ContentType; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MessageCenter", function() { return MessageCenter; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "EventCenter", function() { return EventCenter; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Event", function() { return Event; });
+/* harmony import */ var _SocketClient__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./SocketClient */ "./app_src/common/SocketClient.ts");
+/* harmony import */ var _GlobalData__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./GlobalData */ "./app_src/common/GlobalData.ts");
+/* harmony import */ var _CommonUtility__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./CommonUtility */ "./app_src/common/CommonUtility.ts");
+/* harmony import */ var _components_DevPanel__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../components/DevPanel */ "./app_src/components/DevPanel.tsx");
+
+
+
+
+var ContentType;
+(function (ContentType) {
+    ContentType[ContentType["Text"] = 0] = "Text";
+    ContentType[ContentType["Image"] = 1] = "Image";
+})(ContentType || (ContentType = {}));
+;
+;
+var MessageCenter = /** @class */ (function () {
+    function MessageCenter(eventCenter) {
+        var _this = this;
+        this.eventCenter = eventCenter;
+        this.contents = [];
+        _SocketClient__WEBPACK_IMPORTED_MODULE_0__["socketClient"].on('uploadAlgaeImage', function (data) {
+            _this.eventCenter.trigger(_components_DevPanel__WEBPACK_IMPORTED_MODULE_3__["AddLogEvent"], data);
+            _this.addMessage({ role: _GlobalData__WEBPACK_IMPORTED_MODULE_1__["Roles"].Algae, type: ContentType.Image, content: "data:image/png;base64," + data.base64Image });
+        });
+        _SocketClient__WEBPACK_IMPORTED_MODULE_0__["socketClient"].on('uploadDeepAlMessage', function (data) {
+            _this.eventCenter.trigger(_components_DevPanel__WEBPACK_IMPORTED_MODULE_3__["AddLogEvent"], data);
+            _this.addMessage({ role: _GlobalData__WEBPACK_IMPORTED_MODULE_1__["Roles"].ChatBot, type: ContentType.Text, content: data.message });
+        });
+    }
+    ;
+    MessageCenter.prototype.addText = function (role, text) {
+        this.addMessage({ role: role, type: ContentType.Text, content: text });
+        if (role !== _GlobalData__WEBPACK_IMPORTED_MODULE_1__["Roles"].User)
+            return;
+        _CommonUtility__WEBPACK_IMPORTED_MODULE_2__["CommonUtility"].asyncPost('apis/uploadText', {
+            userName: _GlobalData__WEBPACK_IMPORTED_MODULE_1__["GlobalData"].userName,
+            rid: _GlobalData__WEBPACK_IMPORTED_MODULE_1__["GlobalData"].chatRoomIndex,
+            text: text
+        }).done(this.responseHandler.bind(this));
+    };
+    ;
+    MessageCenter.prototype.addImage = function (role, base64Image) {
+        this.addMessage({ role: role, type: ContentType.Image, content: base64Image });
+        _CommonUtility__WEBPACK_IMPORTED_MODULE_2__["CommonUtility"].asyncPost('apis/uploadImage', {
+            userName: _GlobalData__WEBPACK_IMPORTED_MODULE_1__["GlobalData"].userName,
+            rid: _GlobalData__WEBPACK_IMPORTED_MODULE_1__["GlobalData"].chatRoomIndex,
+            base64Image: base64Image
+        }).done(this.responseHandler.bind(this));
+    };
+    ;
+    MessageCenter.prototype.addMessage = function (content) {
+        this.contents.push(content);
+        this.eventCenter.trigger(MessageCenter.eventName);
+    };
+    ;
+    MessageCenter.prototype.responseHandler = function (resp) {
+        var _this = this;
+        this.eventCenter.trigger(_components_DevPanel__WEBPACK_IMPORTED_MODULE_3__["AddLogEvent"], resp);
+        this.eventCenter.trigger(Event.AfterSubmitMessage, resp);
+        this.addText(_GlobalData__WEBPACK_IMPORTED_MODULE_1__["Roles"].ChatBot, resp.chatbotResponse);
+        setTimeout(function () { return _this.addText(_GlobalData__WEBPACK_IMPORTED_MODULE_1__["Roles"].Algae, resp.algaeResponse); }, 5000);
+        setTimeout(function () { return _this.addText(_GlobalData__WEBPACK_IMPORTED_MODULE_1__["Roles"].ChatBot, resp.chatbot2algaeResponse); }, 6000);
+    };
+    ;
+    MessageCenter.eventName = 'addMessage';
+    return MessageCenter;
+}());
+
+;
+;
+;
+var EventCenter = /** @class */ (function () {
+    function EventCenter() {
+        this.eventCenter = $({});
+        this.registeredEventMap = {};
+    }
+    EventCenter.prototype.on = function (event, handler) {
+        this.registeredEventMap[event] = true;
+        console.log("Event registered: " + event);
+        this.eventCenter.on(event, function (event, data) { return handler(data); });
+    };
+    ;
+    EventCenter.prototype.trigger = function (event, data) {
+        if (!this.registeredEventMap[event]) {
+            console.log("Event not registered: " + event);
+            return;
+        }
+        this.eventCenter.trigger(event, data);
+    };
+    ;
+    return EventCenter;
+}());
+
+;
+var Event = /** @class */ (function () {
+    function Event() {
+    }
+    Event.AfterLogin = 'AfterLogin';
+    Event.UpdateDevPanelData = 'UpdateDevPanelData';
+    Event.AfterWordCardsAnimation = 'AfterWordCardsAnimation';
+    Event.AfterSubmitMessage = 'AfterSubmitMessage';
+    Event.None = 'None';
+    return Event;
+}());
+
+;
+
+
+/***/ }),
+
+/***/ "./app_src/common/Scrollbar.tsx":
+/*!**************************************!*\
+  !*** ./app_src/common/Scrollbar.tsx ***!
+  \**************************************/
+/*! exports provided: Scrollbar */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Scrollbar", function() { return Scrollbar; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _components_DevPanel__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../components/DevPanel */ "./app_src/components/DevPanel.tsx");
+var __extends = (undefined && undefined.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+
+
+var Scrollbar = /** @class */ (function (_super) {
+    __extends(Scrollbar, _super);
+    function Scrollbar() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.$syncTarget = null;
+        return _this;
+    }
+    Scrollbar.prototype.render = function () {
+        return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "scrollbarContainer" },
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "scrollbar" }));
+    };
+    ;
+    Scrollbar.prototype.componentDidMount = function () {
+        this.$syncTarget = $(this.props.syncTarget);
+        this.initScrollbar();
+    };
+    ;
+    Scrollbar.prototype.initScrollbar = function () {
+        var _this = this;
+        var eventCenter = this.props.eventCenter;
+        var isDragging = false;
+        var origin = { pageY: 0, scrollbarOffset: 0 };
+        var $scrollbarContainer = $('.scrollbarContainer');
+        var $scrollbar = $scrollbarContainer.find('.scrollbar');
+        $(document)
+            .on('mousedown touchstart', '.scrollbarContainer', function (e) {
+            e.preventDefault();
+            var pageY = (e.type === 'touchstart') ? e.originalEvent.touches[0].pageY : e.pageY;
+            eventCenter.trigger(_components_DevPanel__WEBPACK_IMPORTED_MODULE_1__["AddLogEvent"], e.type + ": pageY- " + pageY);
+            isDragging = true;
+            origin.pageY = pageY;
+            var scrollbarOffset = Number($scrollbar.css('top').replace('px', ''));
+            origin.scrollbarOffset = scrollbarOffset;
+        })
+            .on('mousemove touchmove', '.scrollbarContainer', function (e) {
+            e.preventDefault();
+            if (!isDragging)
+                return;
+            var offsetY = ((e.type === 'touchmove') ? e.originalEvent.touches[0].pageY : e.pageY) - origin.pageY;
+            eventCenter.trigger(_components_DevPanel__WEBPACK_IMPORTED_MODULE_1__["AddLogEvent"], e.type + ": offsetY- " + offsetY);
+            var maxOffset = $scrollbarContainer.height() - $scrollbar.height();
+            var scrollbarOffset = origin.scrollbarOffset + offsetY;
+            if (scrollbarOffset > maxOffset)
+                scrollbarOffset = maxOffset;
+            else if (scrollbarOffset < 0)
+                scrollbarOffset = 0;
+            $scrollbar.css('top', scrollbarOffset);
+            eventCenter.trigger(Scrollbar.ScrollEvent, scrollbarOffset / maxOffset);
+        }).on('mouseup touchend', function (e) {
+            if (!isDragging)
+                return;
+            isDragging = false;
+            eventCenter.trigger(_components_DevPanel__WEBPACK_IMPORTED_MODULE_1__["AddLogEvent"], "" + e.type);
+        });
+        eventCenter.on(Scrollbar.UpdateEvent, function () {
+            _this.adjustScrollbarH();
+            _this.adjustScrollbarOffset();
+        });
+    };
+    ;
+    Scrollbar.prototype.adjustScrollbarH = function () {
+        var $scrollTarget = this.$syncTarget;
+        var targetTotalH = $scrollTarget.prop('scrollHeight');
+        var targetViewH = $scrollTarget.height();
+        var $scrollbarContainer = $('.scrollbarContainer');
+        var scrollbarContainerH = $scrollbarContainer.height();
+        var scrollbarH = scrollbarContainerH * (targetViewH / targetTotalH);
+        $scrollbarContainer.find('.scrollbar').height(scrollbarH);
+    };
+    ;
+    Scrollbar.prototype.adjustScrollbarOffset = function () {
+        var $scrollTarget = this.$syncTarget;
+        var targetTotalH = $scrollTarget.prop('scrollHeight');
+        var targetScrollTop = $scrollTarget.scrollTop();
+        var $scrollbarContainer = $('.scrollbarContainer');
+        var scrollbarContainerH = $scrollbarContainer.height();
+        var offset = scrollbarContainerH * targetScrollTop / targetTotalH;
+        $scrollbarContainer.find('.scrollbar').css('top', offset);
+    };
+    ;
+    Scrollbar.ScrollEvent = 'scroll';
+    Scrollbar.UpdateEvent = 'update';
+    return Scrollbar;
+}(react__WEBPACK_IMPORTED_MODULE_0__["Component"]));
+
+;
+
+
+/***/ }),
+
+/***/ "./app_src/common/SocketClient.ts":
+/*!****************************************!*\
+  !*** ./app_src/common/SocketClient.ts ***!
+  \****************************************/
+/*! exports provided: socketClient */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "socketClient", function() { return socketClient; });
+/* harmony import */ var socket_io_client__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! socket.io-client */ "./node_modules/socket.io-client/lib/index.js");
+/* harmony import */ var socket_io_client__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(socket_io_client__WEBPACK_IMPORTED_MODULE_0__);
+
+var socketClient = socket_io_client__WEBPACK_IMPORTED_MODULE_0__();
+
+
+/***/ }),
+
+/***/ "./app_src/common/site.scss":
+/*!**********************************!*\
+  !*** ./app_src/common/site.scss ***!
+  \**********************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 
-var content = __webpack_require__(/*! !../node_modules/css-loader!../node_modules/sass-loader/lib/loader.js!./ControlPanel.scss */ "./node_modules/css-loader/index.js!./node_modules/sass-loader/lib/loader.js!./app_src/ControlPanel.scss");
+var content = __webpack_require__(/*! !../../node_modules/css-loader!../../node_modules/sass-loader/lib/loader.js!./site.scss */ "./node_modules/css-loader/index.js!./node_modules/sass-loader/lib/loader.js!./app_src/common/site.scss");
 
 if(typeof content === 'string') content = [[module.i, content, '']];
 
@@ -108,7 +649,7 @@ var options = {"hmr":true}
 options.transform = transform
 options.insertInto = undefined;
 
-var update = __webpack_require__(/*! ../node_modules/style-loader/lib/addStyles.js */ "./node_modules/style-loader/lib/addStyles.js")(content, options);
+var update = __webpack_require__(/*! ../../node_modules/style-loader/lib/addStyles.js */ "./node_modules/style-loader/lib/addStyles.js")(content, options);
 
 if(content.locals) module.exports = content.locals;
 
@@ -116,10 +657,40 @@ if(false) {}
 
 /***/ }),
 
-/***/ "./app_src/ControlPanel.tsx":
-/*!**********************************!*\
-  !*** ./app_src/ControlPanel.tsx ***!
-  \**********************************/
+/***/ "./app_src/components/ControlPanel.scss":
+/*!**********************************************!*\
+  !*** ./app_src/components/ControlPanel.scss ***!
+  \**********************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+
+var content = __webpack_require__(/*! !../../node_modules/css-loader!../../node_modules/sass-loader/lib/loader.js!./ControlPanel.scss */ "./node_modules/css-loader/index.js!./node_modules/sass-loader/lib/loader.js!./app_src/components/ControlPanel.scss");
+
+if(typeof content === 'string') content = [[module.i, content, '']];
+
+var transform;
+var insertInto;
+
+
+
+var options = {"hmr":true}
+
+options.transform = transform
+options.insertInto = undefined;
+
+var update = __webpack_require__(/*! ../../node_modules/style-loader/lib/addStyles.js */ "./node_modules/style-loader/lib/addStyles.js")(content, options);
+
+if(content.locals) module.exports = content.locals;
+
+if(false) {}
+
+/***/ }),
+
+/***/ "./app_src/components/ControlPanel.tsx":
+/*!*********************************************!*\
+  !*** ./app_src/components/ControlPanel.tsx ***!
+  \*********************************************/
 /*! exports provided: ControlPanel */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -128,10 +699,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ControlPanel", function() { return ControlPanel; });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _common_SocketClient__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./common/SocketClient */ "./app_src/common/SocketClient.ts");
-/* harmony import */ var _common_MessageCenter__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./common/MessageCenter */ "./app_src/common/MessageCenter.ts");
-/* harmony import */ var _common_GlobalData__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./common/GlobalData */ "./app_src/common/GlobalData.ts");
-/* harmony import */ var _ControlPanel_scss__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./ControlPanel.scss */ "./app_src/ControlPanel.scss");
+/* harmony import */ var _common_SocketClient__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../common/SocketClient */ "./app_src/common/SocketClient.ts");
+/* harmony import */ var _common_MessageCenter__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../common/MessageCenter */ "./app_src/common/MessageCenter.ts");
+/* harmony import */ var _common_GlobalData__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../common/GlobalData */ "./app_src/common/GlobalData.ts");
+/* harmony import */ var _ControlPanel_scss__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./ControlPanel.scss */ "./app_src/components/ControlPanel.scss");
 /* harmony import */ var _ControlPanel_scss__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_ControlPanel_scss__WEBPACK_IMPORTED_MODULE_4__);
 var __extends = (undefined && undefined.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
@@ -274,15 +845,15 @@ var ControlPanel = /** @class */ (function (_super) {
 
 /***/ }),
 
-/***/ "./app_src/DevPanel.scss":
-/*!*******************************!*\
-  !*** ./app_src/DevPanel.scss ***!
-  \*******************************/
+/***/ "./app_src/components/DevPanel.scss":
+/*!******************************************!*\
+  !*** ./app_src/components/DevPanel.scss ***!
+  \******************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 
-var content = __webpack_require__(/*! !../node_modules/css-loader!../node_modules/sass-loader/lib/loader.js!./DevPanel.scss */ "./node_modules/css-loader/index.js!./node_modules/sass-loader/lib/loader.js!./app_src/DevPanel.scss");
+var content = __webpack_require__(/*! !../../node_modules/css-loader!../../node_modules/sass-loader/lib/loader.js!./DevPanel.scss */ "./node_modules/css-loader/index.js!./node_modules/sass-loader/lib/loader.js!./app_src/components/DevPanel.scss");
 
 if(typeof content === 'string') content = [[module.i, content, '']];
 
@@ -296,7 +867,7 @@ var options = {"hmr":true}
 options.transform = transform
 options.insertInto = undefined;
 
-var update = __webpack_require__(/*! ../node_modules/style-loader/lib/addStyles.js */ "./node_modules/style-loader/lib/addStyles.js")(content, options);
+var update = __webpack_require__(/*! ../../node_modules/style-loader/lib/addStyles.js */ "./node_modules/style-loader/lib/addStyles.js")(content, options);
 
 if(content.locals) module.exports = content.locals;
 
@@ -304,10 +875,10 @@ if(false) {}
 
 /***/ }),
 
-/***/ "./app_src/DevPanel.tsx":
-/*!******************************!*\
-  !*** ./app_src/DevPanel.tsx ***!
-  \******************************/
+/***/ "./app_src/components/DevPanel.tsx":
+/*!*****************************************!*\
+  !*** ./app_src/components/DevPanel.tsx ***!
+  \*****************************************/
 /*! exports provided: AddLogEvent, DevPanel */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -317,9 +888,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DevPanel", function() { return DevPanel; });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _common_MessageCenter__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./common/MessageCenter */ "./app_src/common/MessageCenter.ts");
-/* harmony import */ var _common_CommonUtility__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./common/CommonUtility */ "./app_src/common/CommonUtility.ts");
-/* harmony import */ var _DevPanel_scss__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./DevPanel.scss */ "./app_src/DevPanel.scss");
+/* harmony import */ var _common_MessageCenter__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../common/MessageCenter */ "./app_src/common/MessageCenter.ts");
+/* harmony import */ var _common_CommonUtility__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../common/CommonUtility */ "./app_src/common/CommonUtility.ts");
+/* harmony import */ var _DevPanel_scss__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./DevPanel.scss */ "./app_src/components/DevPanel.scss");
 /* harmony import */ var _DevPanel_scss__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_DevPanel_scss__WEBPACK_IMPORTED_MODULE_3__);
 var __extends = (undefined && undefined.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
@@ -398,15 +969,15 @@ var DevPanel = /** @class */ (function (_super) {
 
 /***/ }),
 
-/***/ "./app_src/LoginPanel.scss":
-/*!*********************************!*\
-  !*** ./app_src/LoginPanel.scss ***!
-  \*********************************/
+/***/ "./app_src/components/LoginPanel.scss":
+/*!********************************************!*\
+  !*** ./app_src/components/LoginPanel.scss ***!
+  \********************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 
-var content = __webpack_require__(/*! !../node_modules/css-loader!../node_modules/sass-loader/lib/loader.js!./LoginPanel.scss */ "./node_modules/css-loader/index.js!./node_modules/sass-loader/lib/loader.js!./app_src/LoginPanel.scss");
+var content = __webpack_require__(/*! !../../node_modules/css-loader!../../node_modules/sass-loader/lib/loader.js!./LoginPanel.scss */ "./node_modules/css-loader/index.js!./node_modules/sass-loader/lib/loader.js!./app_src/components/LoginPanel.scss");
 
 if(typeof content === 'string') content = [[module.i, content, '']];
 
@@ -420,7 +991,7 @@ var options = {"hmr":true}
 options.transform = transform
 options.insertInto = undefined;
 
-var update = __webpack_require__(/*! ../node_modules/style-loader/lib/addStyles.js */ "./node_modules/style-loader/lib/addStyles.js")(content, options);
+var update = __webpack_require__(/*! ../../node_modules/style-loader/lib/addStyles.js */ "./node_modules/style-loader/lib/addStyles.js")(content, options);
 
 if(content.locals) module.exports = content.locals;
 
@@ -428,10 +999,10 @@ if(false) {}
 
 /***/ }),
 
-/***/ "./app_src/LoginPanel.tsx":
-/*!********************************!*\
-  !*** ./app_src/LoginPanel.tsx ***!
-  \********************************/
+/***/ "./app_src/components/LoginPanel.tsx":
+/*!*******************************************!*\
+  !*** ./app_src/components/LoginPanel.tsx ***!
+  \*******************************************/
 /*! exports provided: LoginPanel */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -440,10 +1011,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "LoginPanel", function() { return LoginPanel; });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _common_SocketClient__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./common/SocketClient */ "./app_src/common/SocketClient.ts");
-/* harmony import */ var _common_MessageCenter__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./common/MessageCenter */ "./app_src/common/MessageCenter.ts");
-/* harmony import */ var _common_GlobalData__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./common/GlobalData */ "./app_src/common/GlobalData.ts");
-/* harmony import */ var _LoginPanel_scss__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./LoginPanel.scss */ "./app_src/LoginPanel.scss");
+/* harmony import */ var _common_SocketClient__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../common/SocketClient */ "./app_src/common/SocketClient.ts");
+/* harmony import */ var _common_MessageCenter__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../common/MessageCenter */ "./app_src/common/MessageCenter.ts");
+/* harmony import */ var _common_GlobalData__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../common/GlobalData */ "./app_src/common/GlobalData.ts");
+/* harmony import */ var _LoginPanel_scss__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./LoginPanel.scss */ "./app_src/components/LoginPanel.scss");
 /* harmony import */ var _LoginPanel_scss__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_LoginPanel_scss__WEBPACK_IMPORTED_MODULE_4__);
 var __extends = (undefined && undefined.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
@@ -581,15 +1152,15 @@ var LoginPanel = /** @class */ (function (_super) {
 
 /***/ }),
 
-/***/ "./app_src/MessageBoard.scss":
-/*!***********************************!*\
-  !*** ./app_src/MessageBoard.scss ***!
-  \***********************************/
+/***/ "./app_src/components/MessageBoard.scss":
+/*!**********************************************!*\
+  !*** ./app_src/components/MessageBoard.scss ***!
+  \**********************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 
-var content = __webpack_require__(/*! !../node_modules/css-loader!../node_modules/sass-loader/lib/loader.js!./MessageBoard.scss */ "./node_modules/css-loader/index.js!./node_modules/sass-loader/lib/loader.js!./app_src/MessageBoard.scss");
+var content = __webpack_require__(/*! !../../node_modules/css-loader!../../node_modules/sass-loader/lib/loader.js!./MessageBoard.scss */ "./node_modules/css-loader/index.js!./node_modules/sass-loader/lib/loader.js!./app_src/components/MessageBoard.scss");
 
 if(typeof content === 'string') content = [[module.i, content, '']];
 
@@ -603,7 +1174,7 @@ var options = {"hmr":true}
 options.transform = transform
 options.insertInto = undefined;
 
-var update = __webpack_require__(/*! ../node_modules/style-loader/lib/addStyles.js */ "./node_modules/style-loader/lib/addStyles.js")(content, options);
+var update = __webpack_require__(/*! ../../node_modules/style-loader/lib/addStyles.js */ "./node_modules/style-loader/lib/addStyles.js")(content, options);
 
 if(content.locals) module.exports = content.locals;
 
@@ -611,10 +1182,10 @@ if(false) {}
 
 /***/ }),
 
-/***/ "./app_src/MessageBoard.tsx":
-/*!**********************************!*\
-  !*** ./app_src/MessageBoard.tsx ***!
-  \**********************************/
+/***/ "./app_src/components/MessageBoard.tsx":
+/*!*********************************************!*\
+  !*** ./app_src/components/MessageBoard.tsx ***!
+  \*********************************************/
 /*! exports provided: MessageBoard */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -623,10 +1194,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MessageBoard", function() { return MessageBoard; });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _common_MessageCenter__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./common/MessageCenter */ "./app_src/common/MessageCenter.ts");
-/* harmony import */ var _common_Scrollbar__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./common/Scrollbar */ "./app_src/common/Scrollbar.tsx");
-/* harmony import */ var _common_GlobalData__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./common/GlobalData */ "./app_src/common/GlobalData.ts");
-/* harmony import */ var _MessageBoard_scss__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./MessageBoard.scss */ "./app_src/MessageBoard.scss");
+/* harmony import */ var _common_MessageCenter__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../common/MessageCenter */ "./app_src/common/MessageCenter.ts");
+/* harmony import */ var _common_Scrollbar__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../common/Scrollbar */ "./app_src/common/Scrollbar.tsx");
+/* harmony import */ var _common_GlobalData__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../common/GlobalData */ "./app_src/common/GlobalData.ts");
+/* harmony import */ var _MessageBoard_scss__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./MessageBoard.scss */ "./app_src/components/MessageBoard.scss");
 /* harmony import */ var _MessageBoard_scss__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_MessageBoard_scss__WEBPACK_IMPORTED_MODULE_4__);
 var __extends = (undefined && undefined.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
@@ -647,6 +1218,13 @@ var MessageBoard = /** @class */ (function (_super) {
     __extends(MessageBoard, _super);
     function MessageBoard(props) {
         var _this = _super.call(this, props) || this;
+        _this.avatars = function () {
+            var avatars = {};
+            avatars[_common_GlobalData__WEBPACK_IMPORTED_MODULE_3__["Roles"].User] = '3sth/avatar/avatar_white.png';
+            avatars[_common_GlobalData__WEBPACK_IMPORTED_MODULE_3__["Roles"].Algae] = '3sth/avatar/avatar_yellow.png';
+            avatars[_common_GlobalData__WEBPACK_IMPORTED_MODULE_3__["Roles"].ChatBot] = '3sth/avatar/avatar_pink.png';
+            return avatars;
+        }();
         var messageCenter = _this.props.messageCenter;
         _this.state = { contents: messageCenter.contents.slice() };
         _this.props.eventCenter.on(_common_MessageCenter__WEBPACK_IMPORTED_MODULE_1__["MessageCenter"].eventName, _this.refresh.bind(_this));
@@ -663,17 +1241,22 @@ var MessageBoard = /** @class */ (function (_super) {
     ;
     MessageBoard.prototype.componentDidMount = function () {
         var _this = this;
-        this.props.eventCenter.on(_common_Scrollbar__WEBPACK_IMPORTED_MODULE_2__["Scrollbar"].ScrollEvent, function (rate) {
-            _this.scrollTo(rate);
-        });
+        this.props.eventCenter.on(_common_Scrollbar__WEBPACK_IMPORTED_MODULE_2__["Scrollbar"].ScrollEvent, function (rate) { return _this.scrollTo(rate); });
+        this.preloadAvatars();
     };
     ;
     MessageBoard.prototype.componentDidUpdate = function () {
         var _this = this;
         setTimeout(function () {
-            _this.scrollTo(1, false, function () {
-                _this.props.eventCenter.trigger(_common_Scrollbar__WEBPACK_IMPORTED_MODULE_2__["Scrollbar"].UpdateEvent);
-            });
+            return _this.scrollTo(1, false, function () { return _this.props.eventCenter.trigger(_common_Scrollbar__WEBPACK_IMPORTED_MODULE_2__["Scrollbar"].UpdateEvent); });
+        });
+    };
+    ;
+    MessageBoard.prototype.preloadAvatars = function () {
+        var _this = this;
+        Object.keys(this.avatars).forEach(function (type) {
+            var img = new Image();
+            img.src = _this.avatars[type];
         });
     };
     ;
@@ -685,15 +1268,14 @@ var MessageBoard = /** @class */ (function (_super) {
         colors[_common_GlobalData__WEBPACK_IMPORTED_MODULE_3__["Roles"].User] = 'white';
         colors[_common_GlobalData__WEBPACK_IMPORTED_MODULE_3__["Roles"].Algae] = '#ffffe0';
         colors[_common_GlobalData__WEBPACK_IMPORTED_MODULE_3__["Roles"].ChatBot] = '#fff0f2';
-        colors[_common_GlobalData__WEBPACK_IMPORTED_MODULE_3__["Roles"].AI] = '#e0ffff';
         var $content = (content.type === _common_MessageCenter__WEBPACK_IMPORTED_MODULE_1__["ContentType"].Text) ?
             react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "content", style: { color: colors[content.role] } },
                 " ",
                 content.content) :
             react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "content" },
-                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("img", { src: content.content, style: { width: '100%', maxWidth: '600px' } }));
+                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("img", { src: content.content }));
         return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "messageBox " + float },
-            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("img", { src: this.getAvatar(content.role), className: "avatar" }),
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("img", { src: this.avatars[content.role], className: "avatar" }),
             react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "name" }, name),
             $content);
     };
@@ -705,15 +1287,6 @@ var MessageBoard = /** @class */ (function (_super) {
         console.log('refresh fired');
         $('#messageBoard').removeClass('invisible');
         this.setState({ contents: contents });
-    };
-    ;
-    MessageBoard.prototype.getAvatar = function (role) {
-        if (role === _common_GlobalData__WEBPACK_IMPORTED_MODULE_3__["Roles"].User)
-            return '3sth/avatar/avatar_white.png';
-        if (role === _common_GlobalData__WEBPACK_IMPORTED_MODULE_3__["Roles"].Algae)
-            return '3sth/avatar/avatar_yellow.png';
-        if (role === _common_GlobalData__WEBPACK_IMPORTED_MODULE_3__["Roles"].ChatBot)
-            return '3sth/avatar/avatar_pink.png';
     };
     ;
     MessageBoard.prototype.scrollTo = function (rate, immediate, afterFunc) {
@@ -734,15 +1307,15 @@ var MessageBoard = /** @class */ (function (_super) {
 
 /***/ }),
 
-/***/ "./app_src/Scene.scss":
-/*!****************************!*\
-  !*** ./app_src/Scene.scss ***!
-  \****************************/
+/***/ "./app_src/components/Scene.scss":
+/*!***************************************!*\
+  !*** ./app_src/components/Scene.scss ***!
+  \***************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 
-var content = __webpack_require__(/*! !../node_modules/css-loader!../node_modules/sass-loader/lib/loader.js!./Scene.scss */ "./node_modules/css-loader/index.js!./node_modules/sass-loader/lib/loader.js!./app_src/Scene.scss");
+var content = __webpack_require__(/*! !../../node_modules/css-loader!../../node_modules/sass-loader/lib/loader.js!./Scene.scss */ "./node_modules/css-loader/index.js!./node_modules/sass-loader/lib/loader.js!./app_src/components/Scene.scss");
 
 if(typeof content === 'string') content = [[module.i, content, '']];
 
@@ -756,7 +1329,7 @@ var options = {"hmr":true}
 options.transform = transform
 options.insertInto = undefined;
 
-var update = __webpack_require__(/*! ../node_modules/style-loader/lib/addStyles.js */ "./node_modules/style-loader/lib/addStyles.js")(content, options);
+var update = __webpack_require__(/*! ../../node_modules/style-loader/lib/addStyles.js */ "./node_modules/style-loader/lib/addStyles.js")(content, options);
 
 if(content.locals) module.exports = content.locals;
 
@@ -764,10 +1337,10 @@ if(false) {}
 
 /***/ }),
 
-/***/ "./app_src/Scene.tsx":
-/*!***************************!*\
-  !*** ./app_src/Scene.tsx ***!
-  \***************************/
+/***/ "./app_src/components/Scene.tsx":
+/*!**************************************!*\
+  !*** ./app_src/components/Scene.tsx ***!
+  \**************************************/
 /*! exports provided: Scene */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -780,13 +1353,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var babylonjs__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(babylonjs__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! jquery */ "jquery");
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _common_SocketClient__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./common/SocketClient */ "./app_src/common/SocketClient.ts");
-/* harmony import */ var _common_CommonUtility__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./common/CommonUtility */ "./app_src/common/CommonUtility.ts");
-/* harmony import */ var _common_BabylonUtility__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./common/BabylonUtility */ "./app_src/common/BabylonUtility.ts");
-/* harmony import */ var _common_AsyncWorker__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./common/AsyncWorker */ "./app_src/common/AsyncWorker.ts");
-/* harmony import */ var _common_GlobalData__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./common/GlobalData */ "./app_src/common/GlobalData.ts");
-/* harmony import */ var _common_MessageCenter__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./common/MessageCenter */ "./app_src/common/MessageCenter.ts");
-/* harmony import */ var _Scene_scss__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./Scene.scss */ "./app_src/Scene.scss");
+/* harmony import */ var _common_SocketClient__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../common/SocketClient */ "./app_src/common/SocketClient.ts");
+/* harmony import */ var _common_CommonUtility__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../common/CommonUtility */ "./app_src/common/CommonUtility.ts");
+/* harmony import */ var _common_BabylonUtility__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../common/BabylonUtility */ "./app_src/common/BabylonUtility.ts");
+/* harmony import */ var _common_AsyncWorker__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../common/AsyncWorker */ "./app_src/common/AsyncWorker.ts");
+/* harmony import */ var _common_GlobalData__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../common/GlobalData */ "./app_src/common/GlobalData.ts");
+/* harmony import */ var _common_MessageCenter__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../common/MessageCenter */ "./app_src/common/MessageCenter.ts");
+/* harmony import */ var _Scene_scss__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./Scene.scss */ "./app_src/components/Scene.scss");
 /* harmony import */ var _Scene_scss__WEBPACK_IMPORTED_MODULE_9___default = /*#__PURE__*/__webpack_require__.n(_Scene_scss__WEBPACK_IMPORTED_MODULE_9__);
 var __extends = (undefined && undefined.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
@@ -826,17 +1399,6 @@ var Scene = /** @class */ (function (_super) {
         }();
         _this.algaes = [];
         _this.maskColor = { r: 0, g: 255, b: 0, a: 0.1 };
-        /*
-            private colorsSetForParticle = [
-                { diffuseColor: [253, 245, 134], glowColor: [255, 252, 193, 0.85] },
-                { diffuseColor: [253, 229, 210], glowColor: [255, 219, 225, 0.85] },
-                { diffuseColor: [252, 247, 255], glowColor: [255, 249, 254, 0.85] }
-            ].map(set => {
-                set.diffuseColor = set.diffuseColor.map(n => n / 255);
-                set.glowColor = set.glowColor.map((n, i) => i !== 3 ? n / 255 : n);
-                return set;
-            });
-        */
         _this.getTextureForParticle = function () {
             var _this = this;
             var textures = null;
@@ -1076,40 +1638,12 @@ var Scene = /** @class */ (function (_super) {
     };
     ;
     Scene.prototype.createParticle = function (center) {
-        /*
-            const range = 15;
-            const position = new BABYLON.Vector3(
-             center.x + (CommonUtility.getRandomIntInRange(range * -1, range) * 0.1),
-             center.y + (CommonUtility.getRandomIntInRange(range * -1, range) * 0.1),
-             center.z + (CommonUtility.getRandomIntInRange(range * -1, range) * 0.1),
-            );
-        */
         var colorSetIndex = _common_CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getRandomIntInRange(0, 2);
-        // const colorSet = this.colorsSetForParticle[colorSetIndex];
-        // const colorInRGB = colorSet.diffuseColor;
-        // const color = new BABYLON.Color3(colorInRGB[0], colorInRGB[1], colorInRGB[2]);
-        // const radius = CommonUtility.getRandomIntInRange(10, 20) * 0.01;
-        // const particle = BABYLON.Mesh.CreateSphere(`colorSetIndex:${colorSetIndex}`, 8, radius, this.scene);
         var particle = babylonjs__WEBPACK_IMPORTED_MODULE_1__["Mesh"].CreatePlane("colorSetIndex:" + colorSetIndex, 0.5, this.scene);
         particle.position = center.clone();
         particle.billboardMode = babylonjs__WEBPACK_IMPORTED_MODULE_1__["Mesh"].BILLBOARDMODE_ALL;
         var material = particle.material = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["StandardMaterial"]("particleMaterial", this.scene);
         material.diffuseTexture = this.getTextureForParticle();
-        /*
-            material.diffuseColor = color;
-            material.emissiveColor = BABYLON.Color3.Black();
-
-            if (!this.glowLayerForParticle) {
-                this.glowLayerForParticle = new BABYLON.GlowLayer("glowLayerForParticle", this.scene);
-                this.glowLayerForParticle.intensity = 0.5;
-                this.glowLayerForParticle.customEmissiveColorSelector = (mesh, subMesh, material, result) => {
-                    const colorSetIndex = mesh.name.replace('colorSetIndex:', '');
-                    const glowColor = this.colorsSetForParticle[colorSetIndex].glowColor;
-                    result.set(glowColor[0], glowColor[1], glowColor[2], glowColor[3]);
-                }
-            }
-            this.glowLayerForParticle.addIncludedOnlyMesh(particle);
-        */
         return particle;
     };
     ;
@@ -1438,572 +1972,6 @@ var TranslateType;
 
 /***/ }),
 
-/***/ "./app_src/common/AsyncWorker.ts":
-/*!***************************************!*\
-  !*** ./app_src/common/AsyncWorker.ts ***!
-  \***************************************/
-/*! exports provided: AsyncWorker */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "AsyncWorker", function() { return AsyncWorker; });
-var AsyncWorker = /** @class */ (function () {
-    function AsyncWorker(src) {
-        if (!window['Worker'])
-            throw 'Worker not support';
-        this.worker = new Worker(src);
-    }
-    ;
-    AsyncWorker.prototype.asyncExcute = function (input) {
-        var _this = this;
-        return new Promise(function (resolve, reject) {
-            var worker = _this.worker;
-            worker.onmessage = function (message) { return resolve(message.data); };
-            worker.onerror = function (e) { return reject(e.error); };
-            worker.postMessage(input);
-        });
-    };
-    ;
-    return AsyncWorker;
-}());
-
-;
-
-
-/***/ }),
-
-/***/ "./app_src/common/BabylonUtility.ts":
-/*!******************************************!*\
-  !*** ./app_src/common/BabylonUtility.ts ***!
-  \******************************************/
-/*! exports provided: BabylonUtility */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "BabylonUtility", function() { return BabylonUtility; });
-/* harmony import */ var _CommonUtility__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./CommonUtility */ "./app_src/common/CommonUtility.ts");
-
-var BabylonUtility = /** @class */ (function () {
-    function BabylonUtility() {
-    }
-    BabylonUtility.distance = function (v1, v2) {
-        var dx = v1.x - v2.x;
-        var dy = v1.y - v2.y;
-        var dz = v1.z - v2.z;
-        return Math.sqrt(dx * dx + dy * dy + dz * dz);
-    };
-    ;
-    BabylonUtility.degrees = function (v1, v2) {
-        var rad = Math.acos(BABYLON.Vector3.Dot(v1, v2) / (v1.length() * v2.length()));
-        return BABYLON.Angle.FromRadians(rad).degrees() || 0;
-    };
-    ;
-    BabylonUtility.addVector = function (v1, v2) {
-        return new BABYLON.Vector3(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z);
-    };
-    ;
-    BabylonUtility.subtractVector = function (v1, v2) {
-        return new BABYLON.Vector3(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
-    };
-    ;
-    BabylonUtility.getRandomVector3 = function (randomOnX, randomOnY, randomOnZ) {
-        if (randomOnX === void 0) { randomOnX = true; }
-        if (randomOnY === void 0) { randomOnY = true; }
-        if (randomOnZ === void 0) { randomOnZ = true; }
-        return new BABYLON.Vector3(randomOnX ? _CommonUtility__WEBPACK_IMPORTED_MODULE_0__["CommonUtility"].getRandomInt() : 0, randomOnY ? _CommonUtility__WEBPACK_IMPORTED_MODULE_0__["CommonUtility"].getRandomInt() : 0, randomOnZ ? _CommonUtility__WEBPACK_IMPORTED_MODULE_0__["CommonUtility"].getRandomInt() : 0).normalize();
-    };
-    ;
-    BabylonUtility.updatePosition = function (position, translateVector, scale) {
-        position.x += (translateVector.x * scale);
-        position.y += (translateVector.y * scale);
-        position.z += (translateVector.z * scale);
-        return position;
-    };
-    ;
-    BabylonUtility.positionToString = function (position) {
-        var positions = ['x', 'y', 'z'].map(function (k) {
-            return position[k].toFixed(2);
-        });
-        return positions.join(', ');
-    };
-    ;
-    BabylonUtility.getLineToEachOther = function (points) {
-        var lines = [];
-        points.forEach(function (from, iOfFrom) {
-            points.forEach(function (to, iOfTo) {
-                if (iOfFrom < iOfTo) {
-                    var distance = BabylonUtility.distance(from, to);
-                    var key = iOfFrom + "-" + iOfTo;
-                    lines.push({
-                        key: key,
-                        from: from,
-                        to: to,
-                        distance: distance
-                    });
-                }
-            });
-        });
-        return lines;
-    };
-    ;
-    return BabylonUtility;
-}());
-
-;
-;
-
-
-/***/ }),
-
-/***/ "./app_src/common/CommonUtility.ts":
-/*!*****************************************!*\
-  !*** ./app_src/common/CommonUtility.ts ***!
-  \*****************************************/
-/*! exports provided: CommonUtility */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CommonUtility", function() { return CommonUtility; });
-var CommonUtility = /** @class */ (function () {
-    function CommonUtility() {
-    }
-    CommonUtility.getRandomBoolean = function () {
-        return Math.random() >= 0.5;
-    };
-    ;
-    CommonUtility.getRandomNumberInRange = function (min, max, digits) {
-        var rate = Math.pow(10, digits);
-        return CommonUtility.getRandomIntInRange(min * rate, max * rate) / rate;
-    };
-    ;
-    CommonUtility.getRandomIntInRange = function (min, max) {
-        return Math.floor(Math.random() * (max - min + 1)) + min;
-    };
-    ;
-    CommonUtility.getRandomInt = function (digits) {
-        var r = CommonUtility.getRandomBoolean() ? 1 : -1;
-        return CommonUtility.getRandomNegativeInt(digits) * r;
-    };
-    ;
-    CommonUtility.getRandomNegativeInt = function (digits) {
-        return CommonUtility.getRandomNegativeNumber(digits);
-    };
-    ;
-    CommonUtility.getRandomNumber = function (digitsOnInt, digitsOnFloat) {
-        var r = CommonUtility.getRandomBoolean() ? 1 : -1;
-        return CommonUtility.getRandomNegativeNumber(digitsOnInt, digitsOnFloat) * r;
-    };
-    ;
-    CommonUtility.getRandomNegativeNumber = function (digitsOnInt, digitsOnFloat) {
-        digitsOnInt = digitsOnInt || 1;
-        digitsOnFloat = digitsOnFloat || 0;
-        var result = Math.round(Math.random() * Math.pow(10, digitsOnInt + digitsOnFloat));
-        if (digitsOnFloat !== 0)
-            result = result / Math.pow(10, digitsOnFloat);
-        return result;
-    };
-    ;
-    CommonUtility.sort = function (array, func) {
-        array.sort(function (a, b) {
-            return func(a) - func(b);
-        });
-        return array;
-    };
-    ;
-    CommonUtility.shuffle = function (array) {
-        var currentIndex = array.length;
-        var temporaryValue;
-        var randomIndex;
-        // While there remain elements to shuffle...
-        while (0 !== currentIndex) {
-            // Pick a remaining element...
-            randomIndex = Math.floor(Math.random() * currentIndex);
-            currentIndex -= 1;
-            // And swap it with the current element.
-            temporaryValue = array[currentIndex];
-            array[currentIndex] = array[randomIndex];
-            array[randomIndex] = temporaryValue;
-        }
-        return array;
-    };
-    ;
-    CommonUtility.createArray = function (length) {
-        var array = Array.apply(null, { length: length });
-        return array;
-    };
-    ;
-    CommonUtility.getQueryString = function (field, url) {
-        console.log("try get Query String: " + field);
-        var href = url ? url : window.location.href;
-        var reg = new RegExp('[?&]' + field + '=([^&#]*)', 'i');
-        var string = reg.exec(href);
-        return string ? decodeURIComponent(string[1]) : undefined;
-    };
-    ;
-    CommonUtility.deepMerge = function (from, to, propName) {
-        if (from instanceof Object && !(from instanceof Date)) {
-            if (from instanceof Array)
-                to = to || [];
-            to = to || {};
-            var fromKeys = Object.keys(from);
-            if (fromKeys) {
-                fromKeys.forEach(function (prop) {
-                    to[prop] = CommonUtility.deepMerge(from[prop], to[prop], prop);
-                });
-            }
-        }
-        else
-            to = from;
-        return to;
-    };
-    ;
-    CommonUtility.deepClone = function (obj) {
-        return CommonUtility.deepMerge(obj, {});
-    };
-    ;
-    CommonUtility.asyncPost = function (url, data) {
-        return $.ajax({
-            url: url,
-            type: "post",
-            contentType: "application/json",
-            data: JSON.stringify(data)
-        });
-    };
-    ;
-    CommonUtility.loop = function (count, func) {
-        var finished = 0;
-        while (finished < count) {
-            func(finished);
-            finished++;
-        }
-        ;
-    };
-    ;
-    return CommonUtility;
-}());
-
-;
-
-
-/***/ }),
-
-/***/ "./app_src/common/GlobalData.ts":
-/*!**************************************!*\
-  !*** ./app_src/common/GlobalData.ts ***!
-  \**************************************/
-/*! exports provided: GlobalData, Roles */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "GlobalData", function() { return GlobalData; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Roles", function() { return Roles; });
-var GlobalData = {
-    userName: null,
-    signInTime: null,
-    chatRoomIndex: null
-};
-var Roles;
-(function (Roles) {
-    Roles[Roles["User"] = 0] = "User";
-    Roles[Roles["ChatBot"] = 1] = "ChatBot";
-    Roles[Roles["Algae"] = 2] = "Algae";
-    Roles[Roles["AI"] = 3] = "AI";
-})(Roles || (Roles = {}));
-;
-
-
-/***/ }),
-
-/***/ "./app_src/common/MessageCenter.ts":
-/*!*****************************************!*\
-  !*** ./app_src/common/MessageCenter.ts ***!
-  \*****************************************/
-/*! exports provided: ContentType, MessageCenter, EventCenter, Event */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ContentType", function() { return ContentType; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MessageCenter", function() { return MessageCenter; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "EventCenter", function() { return EventCenter; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Event", function() { return Event; });
-/* harmony import */ var _SocketClient__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./SocketClient */ "./app_src/common/SocketClient.ts");
-/* harmony import */ var _GlobalData__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./GlobalData */ "./app_src/common/GlobalData.ts");
-/* harmony import */ var _CommonUtility__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./CommonUtility */ "./app_src/common/CommonUtility.ts");
-/* harmony import */ var _DevPanel__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../DevPanel */ "./app_src/DevPanel.tsx");
-
-
-
-
-var ContentType;
-(function (ContentType) {
-    ContentType[ContentType["Text"] = 0] = "Text";
-    ContentType[ContentType["Image"] = 1] = "Image";
-})(ContentType || (ContentType = {}));
-;
-;
-var MessageCenter = /** @class */ (function () {
-    function MessageCenter(eventCenter) {
-        var _this = this;
-        this.eventCenter = eventCenter;
-        this.contents = [];
-        _SocketClient__WEBPACK_IMPORTED_MODULE_0__["socketClient"].on('uploadAlgaeImage', function (data) {
-            _this.eventCenter.trigger(_DevPanel__WEBPACK_IMPORTED_MODULE_3__["AddLogEvent"], data);
-            _this.addMessage({ role: _GlobalData__WEBPACK_IMPORTED_MODULE_1__["Roles"].Algae, type: ContentType.Image, content: data.base64Image });
-        });
-        _SocketClient__WEBPACK_IMPORTED_MODULE_0__["socketClient"].on('uploadDeepAlMessage', function (data) {
-            _this.eventCenter.trigger(_DevPanel__WEBPACK_IMPORTED_MODULE_3__["AddLogEvent"], data);
-            _this.addMessage({ role: _GlobalData__WEBPACK_IMPORTED_MODULE_1__["Roles"].AI, type: ContentType.Text, content: data.message });
-        });
-    }
-    ;
-    MessageCenter.prototype.addText = function (role, text) {
-        this.addMessage({ role: role, type: ContentType.Text, content: text });
-        if (role !== _GlobalData__WEBPACK_IMPORTED_MODULE_1__["Roles"].User)
-            return;
-        _CommonUtility__WEBPACK_IMPORTED_MODULE_2__["CommonUtility"].asyncPost('apis/uploadText', {
-            userName: _GlobalData__WEBPACK_IMPORTED_MODULE_1__["GlobalData"].userName,
-            rid: _GlobalData__WEBPACK_IMPORTED_MODULE_1__["GlobalData"].chatRoomIndex,
-            text: text
-        }).done(this.responseHandler.bind(this));
-    };
-    ;
-    MessageCenter.prototype.addImage = function (role, base64Image) {
-        this.addMessage({ role: role, type: ContentType.Image, content: base64Image });
-        _CommonUtility__WEBPACK_IMPORTED_MODULE_2__["CommonUtility"].asyncPost('apis/uploadImage', {
-            userName: _GlobalData__WEBPACK_IMPORTED_MODULE_1__["GlobalData"].userName,
-            rid: _GlobalData__WEBPACK_IMPORTED_MODULE_1__["GlobalData"].chatRoomIndex,
-            base64Image: base64Image
-        }).done(this.responseHandler.bind(this));
-    };
-    ;
-    MessageCenter.prototype.addMessage = function (content) {
-        this.contents.push(content);
-        this.eventCenter.trigger(MessageCenter.eventName);
-    };
-    ;
-    MessageCenter.prototype.responseHandler = function (resp) {
-        var _this = this;
-        this.eventCenter.trigger(_DevPanel__WEBPACK_IMPORTED_MODULE_3__["AddLogEvent"], resp);
-        this.eventCenter.trigger(Event.AfterSubmitMessage, resp);
-        this.addText(_GlobalData__WEBPACK_IMPORTED_MODULE_1__["Roles"].ChatBot, resp.chatbotResponse);
-        setTimeout(function () { return _this.addText(_GlobalData__WEBPACK_IMPORTED_MODULE_1__["Roles"].Algae, resp.algaeResponse); }, 1000);
-        setTimeout(function () { return _this.addText(_GlobalData__WEBPACK_IMPORTED_MODULE_1__["Roles"].ChatBot, resp.chatbot2algaeResponse); }, 2000);
-    };
-    ;
-    MessageCenter.eventName = 'addMessage';
-    return MessageCenter;
-}());
-
-;
-;
-;
-var EventCenter = /** @class */ (function () {
-    function EventCenter() {
-        this.eventCenter = $({});
-        this.registeredEventMap = {};
-    }
-    EventCenter.prototype.on = function (event, handler) {
-        this.registeredEventMap[event] = true;
-        console.log("Event registered: " + event);
-        this.eventCenter.on(event, function (event, data) { return handler(data); });
-    };
-    ;
-    EventCenter.prototype.trigger = function (event, data) {
-        if (!this.registeredEventMap[event]) {
-            console.log("Event not registered: " + event);
-            return;
-        }
-        this.eventCenter.trigger(event, data);
-    };
-    ;
-    return EventCenter;
-}());
-
-;
-var Event = /** @class */ (function () {
-    function Event() {
-    }
-    Event.AfterLogin = 'AfterLogin';
-    Event.UpdateDevPanelData = 'UpdateDevPanelData';
-    Event.AfterWordCardsAnimation = 'AfterWordCardsAnimation';
-    Event.AfterSubmitMessage = 'AfterSubmitMessage';
-    Event.None = 'None';
-    return Event;
-}());
-
-;
-
-
-/***/ }),
-
-/***/ "./app_src/common/Scrollbar.tsx":
-/*!**************************************!*\
-  !*** ./app_src/common/Scrollbar.tsx ***!
-  \**************************************/
-/*! exports provided: Scrollbar */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Scrollbar", function() { return Scrollbar; });
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _DevPanel__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../DevPanel */ "./app_src/DevPanel.tsx");
-var __extends = (undefined && undefined.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-
-
-var Scrollbar = /** @class */ (function (_super) {
-    __extends(Scrollbar, _super);
-    function Scrollbar() {
-        var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.$syncTarget = null;
-        return _this;
-    }
-    Scrollbar.prototype.render = function () {
-        return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "scrollbarContainer" },
-            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "scrollbar" }));
-    };
-    ;
-    Scrollbar.prototype.componentDidMount = function () {
-        this.$syncTarget = $(this.props.syncTarget);
-        this.initScrollbar();
-    };
-    ;
-    Scrollbar.prototype.initScrollbar = function () {
-        var _this = this;
-        var eventCenter = this.props.eventCenter;
-        var isDragging = false;
-        var origin = { pageY: 0, scrollbarOffset: 0 };
-        var $scrollbarContainer = $('.scrollbarContainer');
-        var $scrollbar = $scrollbarContainer.find('.scrollbar');
-        $(document)
-            .on('mousedown touchstart', '.scrollbarContainer', function (e) {
-            e.preventDefault();
-            var pageY = (e.type === 'touchstart') ? e.originalEvent.touches[0].pageY : e.pageY;
-            eventCenter.trigger(_DevPanel__WEBPACK_IMPORTED_MODULE_1__["AddLogEvent"], e.type + ": pageY- " + pageY);
-            isDragging = true;
-            origin.pageY = pageY;
-            var scrollbarOffset = Number($scrollbar.css('top').replace('px', ''));
-            origin.scrollbarOffset = scrollbarOffset;
-        })
-            .on('mousemove touchmove', '.scrollbarContainer', function (e) {
-            e.preventDefault();
-            if (!isDragging)
-                return;
-            var offsetY = ((e.type === 'touchmove') ? e.originalEvent.touches[0].pageY : e.pageY) - origin.pageY;
-            eventCenter.trigger(_DevPanel__WEBPACK_IMPORTED_MODULE_1__["AddLogEvent"], e.type + ": offsetY- " + offsetY);
-            var maxOffset = $scrollbarContainer.height() - $scrollbar.height();
-            var scrollbarOffset = origin.scrollbarOffset + offsetY;
-            if (scrollbarOffset > maxOffset)
-                scrollbarOffset = maxOffset;
-            else if (scrollbarOffset < 0)
-                scrollbarOffset = 0;
-            $scrollbar.css('top', scrollbarOffset);
-            eventCenter.trigger(Scrollbar.ScrollEvent, scrollbarOffset / maxOffset);
-        }).on('mouseup touchend', function (e) {
-            if (!isDragging)
-                return;
-            isDragging = false;
-            eventCenter.trigger(_DevPanel__WEBPACK_IMPORTED_MODULE_1__["AddLogEvent"], "" + e.type);
-        });
-        eventCenter.on(Scrollbar.UpdateEvent, function () {
-            _this.adjustScrollbarH();
-            _this.adjustScrollbarOffset();
-        });
-    };
-    ;
-    Scrollbar.prototype.adjustScrollbarH = function () {
-        var $scrollTarget = this.$syncTarget;
-        var targetTotalH = $scrollTarget.prop('scrollHeight');
-        var targetViewH = $scrollTarget.height();
-        var $scrollbarContainer = $('.scrollbarContainer');
-        var scrollbarContainerH = $scrollbarContainer.height();
-        var scrollbarH = scrollbarContainerH * (targetViewH / targetTotalH);
-        $scrollbarContainer.find('.scrollbar').height(scrollbarH);
-    };
-    ;
-    Scrollbar.prototype.adjustScrollbarOffset = function () {
-        var $scrollTarget = this.$syncTarget;
-        var targetTotalH = $scrollTarget.prop('scrollHeight');
-        var targetScrollTop = $scrollTarget.scrollTop();
-        var $scrollbarContainer = $('.scrollbarContainer');
-        var scrollbarContainerH = $scrollbarContainer.height();
-        var offset = scrollbarContainerH * targetScrollTop / targetTotalH;
-        $scrollbarContainer.find('.scrollbar').css('top', offset);
-    };
-    ;
-    Scrollbar.ScrollEvent = 'scroll';
-    Scrollbar.UpdateEvent = 'update';
-    return Scrollbar;
-}(react__WEBPACK_IMPORTED_MODULE_0__["Component"]));
-
-;
-
-
-/***/ }),
-
-/***/ "./app_src/common/SocketClient.ts":
-/*!****************************************!*\
-  !*** ./app_src/common/SocketClient.ts ***!
-  \****************************************/
-/*! exports provided: socketClient */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "socketClient", function() { return socketClient; });
-/* harmony import */ var socket_io_client__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! socket.io-client */ "./node_modules/socket.io-client/lib/index.js");
-/* harmony import */ var socket_io_client__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(socket_io_client__WEBPACK_IMPORTED_MODULE_0__);
-
-var socketClient = socket_io_client__WEBPACK_IMPORTED_MODULE_0__();
-
-
-/***/ }),
-
-/***/ "./app_src/common/site.scss":
-/*!**********************************!*\
-  !*** ./app_src/common/site.scss ***!
-  \**********************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-
-var content = __webpack_require__(/*! !../../node_modules/css-loader!../../node_modules/sass-loader/lib/loader.js!./site.scss */ "./node_modules/css-loader/index.js!./node_modules/sass-loader/lib/loader.js!./app_src/common/site.scss");
-
-if(typeof content === 'string') content = [[module.i, content, '']];
-
-var transform;
-var insertInto;
-
-
-
-var options = {"hmr":true}
-
-options.transform = transform
-options.insertInto = undefined;
-
-var update = __webpack_require__(/*! ../../node_modules/style-loader/lib/addStyles.js */ "./node_modules/style-loader/lib/addStyles.js")(content, options);
-
-if(content.locals) module.exports = content.locals;
-
-if(false) {}
-
-/***/ }),
-
 /***/ "./app_src/main.tsx":
 /*!**************************!*\
   !*** ./app_src/main.tsx ***!
@@ -2020,11 +1988,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! react-dom */ "react-dom");
 /* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(react_dom__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var _common_MessageCenter__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./common/MessageCenter */ "./app_src/common/MessageCenter.ts");
-/* harmony import */ var _Scene__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./Scene */ "./app_src/Scene.tsx");
-/* harmony import */ var _DevPanel__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./DevPanel */ "./app_src/DevPanel.tsx");
-/* harmony import */ var _LoginPanel__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./LoginPanel */ "./app_src/LoginPanel.tsx");
-/* harmony import */ var _ControlPanel__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./ControlPanel */ "./app_src/ControlPanel.tsx");
-/* harmony import */ var _MessageBoard__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./MessageBoard */ "./app_src/MessageBoard.tsx");
+/* harmony import */ var _components_Scene__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./components/Scene */ "./app_src/components/Scene.tsx");
+/* harmony import */ var _components_DevPanel__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./components/DevPanel */ "./app_src/components/DevPanel.tsx");
+/* harmony import */ var _components_LoginPanel__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./components/LoginPanel */ "./app_src/components/LoginPanel.tsx");
+/* harmony import */ var _components_ControlPanel__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./components/ControlPanel */ "./app_src/components/ControlPanel.tsx");
+/* harmony import */ var _components_MessageBoard__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./components/MessageBoard */ "./app_src/components/MessageBoard.tsx");
 /* harmony import */ var _common_CommonUtility__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./common/CommonUtility */ "./app_src/common/CommonUtility.ts");
 
 
@@ -2042,11 +2010,11 @@ if (!isdev)
 var eventCenter = new _common_MessageCenter__WEBPACK_IMPORTED_MODULE_3__["EventCenter"]();
 var messageCenter = new _common_MessageCenter__WEBPACK_IMPORTED_MODULE_3__["MessageCenter"](eventCenter);
 react_dom__WEBPACK_IMPORTED_MODULE_2__["render"](react__WEBPACK_IMPORTED_MODULE_1__["createElement"]("div", null,
-    react__WEBPACK_IMPORTED_MODULE_1__["createElement"](_Scene__WEBPACK_IMPORTED_MODULE_4__["Scene"], { eventCenter: eventCenter }),
-    react__WEBPACK_IMPORTED_MODULE_1__["createElement"](_DevPanel__WEBPACK_IMPORTED_MODULE_5__["DevPanel"], { eventCenter: eventCenter }),
-    react__WEBPACK_IMPORTED_MODULE_1__["createElement"](_LoginPanel__WEBPACK_IMPORTED_MODULE_6__["LoginPanel"], { eventCenter: eventCenter }),
-    react__WEBPACK_IMPORTED_MODULE_1__["createElement"](_MessageBoard__WEBPACK_IMPORTED_MODULE_8__["MessageBoard"], { messageCenter: messageCenter, eventCenter: eventCenter }),
-    react__WEBPACK_IMPORTED_MODULE_1__["createElement"](_ControlPanel__WEBPACK_IMPORTED_MODULE_7__["ControlPanel"], { messageCenter: messageCenter, eventCenter: eventCenter })), document.getElementById("app"));
+    react__WEBPACK_IMPORTED_MODULE_1__["createElement"](_components_Scene__WEBPACK_IMPORTED_MODULE_4__["Scene"], { eventCenter: eventCenter }),
+    react__WEBPACK_IMPORTED_MODULE_1__["createElement"](_components_DevPanel__WEBPACK_IMPORTED_MODULE_5__["DevPanel"], { eventCenter: eventCenter }),
+    react__WEBPACK_IMPORTED_MODULE_1__["createElement"](_components_LoginPanel__WEBPACK_IMPORTED_MODULE_6__["LoginPanel"], { eventCenter: eventCenter }),
+    react__WEBPACK_IMPORTED_MODULE_1__["createElement"](_components_MessageBoard__WEBPACK_IMPORTED_MODULE_8__["MessageBoard"], { messageCenter: messageCenter, eventCenter: eventCenter }),
+    react__WEBPACK_IMPORTED_MODULE_1__["createElement"](_components_ControlPanel__WEBPACK_IMPORTED_MODULE_7__["ControlPanel"], { messageCenter: messageCenter, eventCenter: eventCenter })), document.getElementById("app"));
 
 
 /***/ }),
@@ -4602,101 +4570,6 @@ module.exports = function(a, b){
 
 /***/ }),
 
-/***/ "./node_modules/css-loader/index.js!./node_modules/sass-loader/lib/loader.js!./app_src/ControlPanel.scss":
-/*!******************************************************************************************************!*\
-  !*** ./node_modules/css-loader!./node_modules/sass-loader/lib/loader.js!./app_src/ControlPanel.scss ***!
-  \******************************************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(false);
-// imports
-
-
-// module
-exports.push([module.i, ".control-panel {\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  justify-content: center;\n  -webkit-transition: all 0.3s ease;\n  -moz-transition: all 0.3s ease;\n  -o-transition: all 0.3s ease;\n  transition: all 0.3s ease;\n  position: fixed;\n  bottom: 30px;\n  left: 0;\n  width: 100%;\n  height: 70px; }\n  .control-panel .buttons > * {\n    margin: 0 3px; }\n  .control-panel .button {\n    background-color: transparent;\n    cursor: pointer;\n    text-shadow: 0px 0px 6px #404040;\n    color: white;\n    font-size: 28px;\n    border: 0; }\n  .control-panel .textInput {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    -webkit-transition: all 0.3s ease;\n    -moz-transition: all 0.3s ease;\n    -o-transition: all 0.3s ease;\n    transition: all 0.3s ease;\n    width: 100%;\n    max-width: 35em; }\n  .control-panel .textInput input {\n    background-color: transparent;\n    border: solid 1px white;\n    border-radius: 1px;\n    width: 80%; }\n  .control-panel .textInput button {\n    border: solid 1px white;\n    font-size: 14px;\n    border-radius: 1px;\n    margin-left: 3px;\n    padding: 2px; }\n  .control-panel .userRecord {\n    display: none;\n    position: absolute;\n    top: -10px;\n    left: 50%;\n    transform: translate(-50%, -100%);\n    padding: 10px;\n    background-color: rgba(255, 255, 255, 0.6);\n    border: 1px solid #ccc;\n    border-radius: 3px;\n    -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);\n    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175); }\n    .control-panel .userRecord div {\n      padding: 2px 0; }\n", ""]);
-
-// exports
-
-
-/***/ }),
-
-/***/ "./node_modules/css-loader/index.js!./node_modules/sass-loader/lib/loader.js!./app_src/DevPanel.scss":
-/*!**************************************************************************************************!*\
-  !*** ./node_modules/css-loader!./node_modules/sass-loader/lib/loader.js!./app_src/DevPanel.scss ***!
-  \**************************************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(false);
-// imports
-
-
-// module
-exports.push([module.i, "#devPanel {\n  display: none;\n  position: fixed;\n  top: 0;\n  right: 0;\n  background-color: rgba(0, 0, 0, 0.2);\n  width: 280px; }\n  #devPanel table {\n    width: 100%; }\n    #devPanel table ul {\n      padding-left: 15px; }\n\n#devPanel td {\n  width: 50px;\n  padding: 3px;\n  word-break: break-all; }\n", ""]);
-
-// exports
-
-
-/***/ }),
-
-/***/ "./node_modules/css-loader/index.js!./node_modules/sass-loader/lib/loader.js!./app_src/LoginPanel.scss":
-/*!****************************************************************************************************!*\
-  !*** ./node_modules/css-loader!./node_modules/sass-loader/lib/loader.js!./app_src/LoginPanel.scss ***!
-  \****************************************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(false);
-// imports
-
-
-// module
-exports.push([module.i, "#loginPanel {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  background-color: rgba(0, 0, 0, 0.3);\n  overflow: auto; }\n  #loginPanel > .wordCard {\n    text-shadow: 0px 0px 6px #404040;\n    color: white;\n    display: none;\n    white-space: nowrap; }\n  #loginPanel .skipAnimation {\n    position: absolute;\n    bottom: 10%;\n    left: 50%;\n    transform: translate(-50%); }\n    #loginPanel .skipAnimation > button {\n      background-color: transparent;\n      cursor: pointer;\n      text-shadow: 0px 0px 6px #404040;\n      color: white;\n      border: 1px solid white;\n      border-radius: 2px;\n      padding: 0 20px; }\n\n#signInWrapper .label {\n  text-shadow: 0px 0px 6px #404040;\n  color: white;\n  height: 24px;\n  line-height: 24px; }\n\n#signInWrapper .icon {\n  height: 24px;\n  line-height: 24px;\n  background: url(\"https://google-developers.appspot.com/identity/sign-in/g-normal.png\") transparent -7px 50% no-repeat;\n  display: inline-block;\n  vertical-align: middle;\n  width: 25px; }\n\n.signInButton {\n  background: transparent;\n  padding: 0;\n  border: none;\n  color: #ecffec;\n  font-size: 18px;\n  cursor: pointer; }\n", ""]);
-
-// exports
-
-
-/***/ }),
-
-/***/ "./node_modules/css-loader/index.js!./node_modules/sass-loader/lib/loader.js!./app_src/MessageBoard.scss":
-/*!******************************************************************************************************!*\
-  !*** ./node_modules/css-loader!./node_modules/sass-loader/lib/loader.js!./app_src/MessageBoard.scss ***!
-  \******************************************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(false);
-// imports
-
-
-// module
-exports.push([module.i, "#messageBoard {\n  pointer-events: none;\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  overflow: hidden;\n  display: flex;\n  justify-content: center; }\n  #messageBoard > div {\n    margin-bottom: 100px; }\n  #messageBoard .messageBoardContent {\n    width: 100%;\n    overflow: hidden; }\n    #messageBoard .messageBoardContent:after {\n      content: \"\";\n      clear: both;\n      display: table; }\n    #messageBoard .messageBoardContent .messageBox {\n      text-shadow: 0px 0px 6px #404040;\n      color: white;\n      position: relative;\n      margin: 15px 0;\n      color: white; }\n      #messageBoard .messageBoardContent .messageBox .avatar {\n        position: absolute;\n        width: 30px; }\n      #messageBoard .messageBoardContent .messageBox .content {\n        padding: 3px 0; }\n    #messageBoard .messageBoardContent .messageBox.left .avatar {\n      left: 0; }\n    #messageBoard .messageBoardContent .messageBox.left .name {\n      display: none; }\n    #messageBoard .messageBoardContent .messageBox.left .content {\n      text-align: left;\n      padding-left: 40px; }\n    #messageBoard .messageBoardContent .messageBox.right .avatar {\n      right: 0; }\n    #messageBoard .messageBoardContent .messageBox.right .name {\n      position: absolute;\n      top: -12px;\n      right: 7px; }\n    #messageBoard .messageBoardContent .messageBox.right .content {\n      text-align: right;\n      padding-right: 40px; }\n  #messageBoard .scrollbarContainer {\n    pointer-events: auto;\n    position: relative;\n    top: 0;\n    right: 1px;\n    width: 25px;\n    background-color: rgba(0, 0, 0, 0.1); }\n    #messageBoard .scrollbarContainer .scrollbar {\n      position: absolute;\n      top: 0;\n      right: 1px;\n      width: 12px;\n      height: 100px;\n      background-color: rgba(0, 0, 0, 0.3);\n      border-radius: 5px; }\n\n@media only screen and (min-width: 768px) {\n  .messageBoardContent {\n    padding: 0 80px; } }\n\n@media only screen and (min-width: 1224px) {\n  .messageBoardContent {\n    padding: 0 250px; } }\n", ""]);
-
-// exports
-
-
-/***/ }),
-
-/***/ "./node_modules/css-loader/index.js!./node_modules/sass-loader/lib/loader.js!./app_src/Scene.scss":
-/*!***********************************************************************************************!*\
-  !*** ./node_modules/css-loader!./node_modules/sass-loader/lib/loader.js!./app_src/Scene.scss ***!
-  \***********************************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-exports = module.exports = __webpack_require__(/*! ../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(false);
-// imports
-
-
-// module
-exports.push([module.i, "#renderCanvas {\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  overflow: hidden;\n  touch-action: none; }\n\n#greenMask {\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  overflow: hidden;\n  pointer-events: none;\n  -webkit-transition: all 0.3s ease;\n  -moz-transition: all 0.3s ease;\n  -o-transition: all 0.3s ease;\n  transition: all 0.3s ease; }\n", ""]);
-
-// exports
-
-
-/***/ }),
-
 /***/ "./node_modules/css-loader/index.js!./node_modules/sass-loader/lib/loader.js!./app_src/common/site.scss":
 /*!*****************************************************************************************************!*\
   !*** ./node_modules/css-loader!./node_modules/sass-loader/lib/loader.js!./app_src/common/site.scss ***!
@@ -4710,6 +4583,101 @@ exports = module.exports = __webpack_require__(/*! ../../node_modules/css-loader
 
 // module
 exports.push([module.i, "html,\nbody {\n  font-family: Microsoft JhengHei;\n  overflow: hidden;\n  width: 100%;\n  height: 100%;\n  margin: 0;\n  padding: 0; }\n\n.flash {\n  -webkit-animation-name: flash-animation;\n  -webkit-animation-duration: 1s;\n  animation-name: flash-animation;\n  animation-duration: 1s; }\n\n@-webkit-keyframes flash-animation {\n  from {\n    background: rgba(255, 255, 255, 0.8); }\n  to {\n    background: default; } }\n\n@keyframes flash-animation {\n  from {\n    background: rgba(255, 255, 255, 0.8); }\n  to {\n    background: default; } }\n\ninput[type=text] {\n  background-color: transparent;\n  border: 1px solid #ffffff;\n  border-radius: 3px;\n  height: 24px;\n  color: #ffffff; }\n\n.text-center {\n  text-align: center; }\n\n.visible {\n  opacity: 1; }\n\n.invisible {\n  opacity: 0; }\n\n.untouchable {\n  pointer-events: none; }\n", ""]);
+
+// exports
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/index.js!./node_modules/sass-loader/lib/loader.js!./app_src/components/ControlPanel.scss":
+/*!*****************************************************************************************************************!*\
+  !*** ./node_modules/css-loader!./node_modules/sass-loader/lib/loader.js!./app_src/components/ControlPanel.scss ***!
+  \*****************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(/*! ../../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(false);
+// imports
+
+
+// module
+exports.push([module.i, ".control-panel {\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  justify-content: center;\n  -webkit-transition: all 0.3s ease;\n  -moz-transition: all 0.3s ease;\n  -o-transition: all 0.3s ease;\n  transition: all 0.3s ease;\n  position: fixed;\n  bottom: 30px;\n  left: 0;\n  width: 100%;\n  height: 70px; }\n  .control-panel .buttons > * {\n    margin: 0 3px; }\n  .control-panel .button {\n    background-color: transparent;\n    cursor: pointer;\n    text-shadow: 0px 0px 6px #404040;\n    color: white;\n    font-size: 28px;\n    border: 0; }\n  .control-panel .textInput {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    -webkit-transition: all 0.3s ease;\n    -moz-transition: all 0.3s ease;\n    -o-transition: all 0.3s ease;\n    transition: all 0.3s ease;\n    width: 100%;\n    max-width: 35em; }\n  .control-panel .textInput input {\n    background-color: transparent;\n    border: solid 1px white;\n    border-radius: 1px;\n    width: 80%; }\n  .control-panel .textInput button {\n    border: solid 1px white;\n    font-size: 14px;\n    border-radius: 1px;\n    margin-left: 3px;\n    padding: 2px; }\n  .control-panel .userRecord {\n    display: none;\n    position: absolute;\n    top: -10px;\n    left: 50%;\n    transform: translate(-50%, -100%);\n    padding: 10px;\n    background-color: rgba(255, 255, 255, 0.6);\n    border: 1px solid #ccc;\n    border-radius: 3px;\n    -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);\n    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175); }\n    .control-panel .userRecord div {\n      padding: 2px 0; }\n", ""]);
+
+// exports
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/index.js!./node_modules/sass-loader/lib/loader.js!./app_src/components/DevPanel.scss":
+/*!*************************************************************************************************************!*\
+  !*** ./node_modules/css-loader!./node_modules/sass-loader/lib/loader.js!./app_src/components/DevPanel.scss ***!
+  \*************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(/*! ../../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(false);
+// imports
+
+
+// module
+exports.push([module.i, "#devPanel {\n  display: none;\n  position: fixed;\n  top: 0;\n  right: 0;\n  background-color: rgba(0, 0, 0, 0.2);\n  width: 280px; }\n  #devPanel table {\n    width: 100%; }\n    #devPanel table ul {\n      padding-left: 15px; }\n\n#devPanel td {\n  width: 50px;\n  padding: 3px;\n  word-break: break-all; }\n", ""]);
+
+// exports
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/index.js!./node_modules/sass-loader/lib/loader.js!./app_src/components/LoginPanel.scss":
+/*!***************************************************************************************************************!*\
+  !*** ./node_modules/css-loader!./node_modules/sass-loader/lib/loader.js!./app_src/components/LoginPanel.scss ***!
+  \***************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(/*! ../../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(false);
+// imports
+
+
+// module
+exports.push([module.i, "#loginPanel {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  background-color: rgba(0, 0, 0, 0.3);\n  overflow: auto; }\n  #loginPanel > .wordCard {\n    text-shadow: 0px 0px 6px #404040;\n    color: white;\n    display: none;\n    white-space: nowrap; }\n  #loginPanel .skipAnimation {\n    position: absolute;\n    bottom: 10%;\n    left: 50%;\n    transform: translate(-50%); }\n    #loginPanel .skipAnimation > button {\n      background-color: transparent;\n      cursor: pointer;\n      text-shadow: 0px 0px 6px #404040;\n      color: white;\n      border: 1px solid white;\n      border-radius: 2px;\n      padding: 0 20px; }\n\n#signInWrapper .label {\n  text-shadow: 0px 0px 6px #404040;\n  color: white;\n  height: 24px;\n  line-height: 24px; }\n\n#signInWrapper .icon {\n  height: 24px;\n  line-height: 24px;\n  background: url(\"https://google-developers.appspot.com/identity/sign-in/g-normal.png\") transparent -7px 50% no-repeat;\n  display: inline-block;\n  vertical-align: middle;\n  width: 25px; }\n\n.signInButton {\n  background: transparent;\n  padding: 0;\n  border: none;\n  color: #ecffec;\n  font-size: 18px;\n  cursor: pointer; }\n", ""]);
+
+// exports
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/index.js!./node_modules/sass-loader/lib/loader.js!./app_src/components/MessageBoard.scss":
+/*!*****************************************************************************************************************!*\
+  !*** ./node_modules/css-loader!./node_modules/sass-loader/lib/loader.js!./app_src/components/MessageBoard.scss ***!
+  \*****************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(/*! ../../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(false);
+// imports
+
+
+// module
+exports.push([module.i, "#messageBoard {\n  pointer-events: none;\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  overflow: hidden;\n  display: flex;\n  justify-content: center; }\n  #messageBoard > div {\n    margin-bottom: 100px; }\n  #messageBoard .messageBoardContent {\n    width: 100%;\n    overflow: hidden; }\n    #messageBoard .messageBoardContent:after {\n      content: \"\";\n      clear: both;\n      display: table; }\n    #messageBoard .messageBoardContent .messageBox {\n      text-shadow: 0px 0px 6px #404040;\n      color: white;\n      position: relative;\n      margin: 15px 0;\n      color: white; }\n      #messageBoard .messageBoardContent .messageBox .avatar {\n        position: absolute;\n        width: 30px; }\n      #messageBoard .messageBoardContent .messageBox .content {\n        padding: 3px 0; }\n        #messageBoard .messageBoardContent .messageBox .content img {\n          max-width: 80%;\n          max-height: 350px; }\n    #messageBoard .messageBoardContent .messageBox.left .avatar {\n      left: 0; }\n    #messageBoard .messageBoardContent .messageBox.left .name {\n      display: none; }\n    #messageBoard .messageBoardContent .messageBox.left .content {\n      text-align: left;\n      padding-left: 40px; }\n    #messageBoard .messageBoardContent .messageBox.right .avatar {\n      right: 0; }\n    #messageBoard .messageBoardContent .messageBox.right .name {\n      position: absolute;\n      top: -12px;\n      right: 7px; }\n    #messageBoard .messageBoardContent .messageBox.right .content {\n      text-align: right;\n      padding-right: 40px; }\n  #messageBoard .scrollbarContainer {\n    pointer-events: auto;\n    position: relative;\n    top: 0;\n    right: 1px;\n    width: 25px;\n    background-color: rgba(0, 0, 0, 0.1); }\n    #messageBoard .scrollbarContainer .scrollbar {\n      position: absolute;\n      top: 0;\n      right: 1px;\n      width: 12px;\n      height: 100px;\n      background-color: rgba(0, 0, 0, 0.3);\n      border-radius: 5px; }\n\n@media only screen and (min-width: 768px) {\n  .messageBoardContent {\n    padding: 0 80px; } }\n\n@media only screen and (min-width: 1224px) {\n  .messageBoardContent {\n    padding: 0 250px; } }\n", ""]);
+
+// exports
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/index.js!./node_modules/sass-loader/lib/loader.js!./app_src/components/Scene.scss":
+/*!**********************************************************************************************************!*\
+  !*** ./node_modules/css-loader!./node_modules/sass-loader/lib/loader.js!./app_src/components/Scene.scss ***!
+  \**********************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(/*! ../../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(false);
+// imports
+
+
+// module
+exports.push([module.i, "#renderCanvas {\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  overflow: hidden;\n  touch-action: none; }\n\n#greenMask {\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  overflow: hidden;\n  pointer-events: none;\n  -webkit-transition: all 0.3s ease;\n  -moz-transition: all 0.3s ease;\n  -o-transition: all 0.3s ease;\n  transition: all 0.3s ease; }\n", ""]);
 
 // exports
 
@@ -11742,4 +11710,4 @@ module.exports = ReactDOM;
 /***/ })
 
 /******/ });
-//# sourceMappingURL=bundle.main.393c34b24c6a1ca7a835.js.map
+//# sourceMappingURL=bundle.main.3d9df20bb3fdfd4bdcc1.js.map

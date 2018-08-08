@@ -1,8 +1,8 @@
 import * as React from "react";
 
-import { MessageCenter, Content, ContentType, EventCenter } from './common/MessageCenter';
-import { Scrollbar } from './common/Scrollbar';
-import { GlobalData, Roles } from './common/GlobalData';
+import { MessageCenter, Content, ContentType, EventCenter } from '../common/MessageCenter';
+import { Scrollbar } from '../common/Scrollbar';
+import { GlobalData, Roles } from '../common/GlobalData';
 
 import "./MessageBoard.scss";
 
@@ -13,6 +13,14 @@ export class MessageBoard
     { contents: Content[] }
     >{
 
+
+    private avatars = function () {
+        const avatars: { [key: number]: string } = {};
+        avatars[Roles.User] = '3sth/avatar/avatar_white.png';
+        avatars[Roles.Algae] = '3sth/avatar/avatar_yellow.png';
+        avatars[Roles.ChatBot] = '3sth/avatar/avatar_pink.png';
+        return avatars;
+    }();
 
     constructor(props) {
         super(props);
@@ -31,16 +39,20 @@ export class MessageBoard
     };
 
     componentDidMount() {
-        this.props.eventCenter.on<number>(Scrollbar.ScrollEvent, rate => {
-            this.scrollTo(rate);
-        });
+        this.props.eventCenter.on<number>(Scrollbar.ScrollEvent, rate => this.scrollTo(rate));
+        this.preloadAvatars();
     };
 
     componentDidUpdate() {
-        setTimeout(() => {
-            this.scrollTo(1, false, () => {
-                this.props.eventCenter.trigger(Scrollbar.UpdateEvent);
-            });
+        setTimeout(() =>
+            this.scrollTo(1, false, () => this.props.eventCenter.trigger(Scrollbar.UpdateEvent))
+        );
+    };
+
+    private preloadAvatars() {
+        Object.keys(this.avatars).forEach(type => {
+            const img = new Image();
+            img.src = this.avatars[type];
         });
     };
 
@@ -52,13 +64,12 @@ export class MessageBoard
         colors[Roles.User] = 'white';
         colors[Roles.Algae] = '#ffffe0';
         colors[Roles.ChatBot] = '#fff0f2';
-        colors[Roles.AI] = '#e0ffff';
         const $content = (content.type === ContentType.Text) ?
             <div className="content" style={{ color: colors[content.role] }}> {content.content}</div > :
-            <div className="content"><img src={content.content} style={{ width: '100%', maxWidth: '600px' }} /></div>;
+            <div className="content"><img src={content.content} /></div>;
 
         return <div className={`messageBox ${float}`}>
-            <img src={this.getAvatar(content.role)} className="avatar" />
+            <img src={this.avatars[content.role]} className="avatar" />
             <div className="name">{name}</div>
             {$content}
         </div>;
@@ -72,14 +83,6 @@ export class MessageBoard
         this.setState({ contents: contents });
     };
 
-    private getAvatar(role: Roles) {
-        if (role === Roles.User)
-            return '3sth/avatar/avatar_white.png';
-        if (role === Roles.Algae)
-            return '3sth/avatar/avatar_yellow.png';
-        if (role === Roles.ChatBot)
-            return '3sth/avatar/avatar_pink.png';
-    };
 
     private scrollTo(rate: number, immediate = true, afterFunc = () => { }) {
         const $scrollTarget = $('.messageBoardContent');

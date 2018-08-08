@@ -1,8 +1,10 @@
+'use strict';
 
 const fs = require('fs');
 const path = require('path');
 const winston = require('winston');
 require('winston-daily-rotate-file');
+const common = require('./commonNodeJSUtility.js');
 
 const folderName = 'logs';
 
@@ -34,7 +36,7 @@ const accessLogStream = fs.createWriteStream(path.join(__dirname, `../${folderNa
 
 module.exports = {
     accessLogStream: accessLogStream,
-    info: msg => logger.info(JSON.stringify(msg)),
-    debug: msg => logger.debug(JSON.stringify(msg)),
-    error: msg => logger.error(JSON.stringify(msg)),
+    info: msg => logger.info(common.deserializeSafely(msg)),
+    debug: msg => logger.debug(common.deserializeSafely(msg)),
+    error: msg => logger.error(common.deserializeSafely(msg)),
 };

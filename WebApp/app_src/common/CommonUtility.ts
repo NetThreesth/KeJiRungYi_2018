@@ -70,13 +70,19 @@ export class CommonUtility {
         return array as T[];
     };
 
-    static getQueryString(field: string, url?: string) {
-        console.log(`try get Query String: ${field}`)
-        const href = url ? url : window.location.href;
-        const reg = new RegExp('[?&]' + field + '=([^&#]*)', 'i');
-        const string = reg.exec(href);
-        return string ? decodeURIComponent(string[1]) : undefined;
-    };
+    static getQueryString = function () {
+        const cache: any = {};
+        return (field: string, url?: string) => {
+            const href = url ? url : window.location.href;
+            const key = `${href}-${field}`;
+            if (cache.hasOwnProperty(key)) return cache[key];
+            console.log(`try get Query String: ${field}`)
+            const reg = new RegExp('[?&]' + field + '=([^&#]*)', 'i');
+            const string = reg.exec(href);
+            const result = cache[key] = string ? decodeURIComponent(string[1]) : undefined;
+            return result;
+        };
+    }();
 
     static deepMerge<T>(from: T, to: T, propName?): T {
         if (from instanceof Object && !(from instanceof Date)) {

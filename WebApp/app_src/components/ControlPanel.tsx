@@ -1,7 +1,7 @@
 import * as React from "react";
-import { socketClient } from './common/SocketClient';
-import { MessageCenter, EventCenter, Event } from './common/MessageCenter';
-import { Roles, GlobalData } from './common/GlobalData';
+import { socketClient } from '../common/SocketClient';
+import { MessageCenter, EventCenter, Event } from '../common/MessageCenter';
+import { Roles, GlobalData } from '../common/GlobalData';
 
 import "./ControlPanel.scss";
 

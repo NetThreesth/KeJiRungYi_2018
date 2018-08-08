@@ -1,7 +1,7 @@
 import { socketClient } from './SocketClient';
 import { Roles, GlobalData } from './GlobalData';
 import { CommonUtility } from './CommonUtility';
-import { AddLogEvent } from '../DevPanel';
+import { AddLogEvent } from '../components/DevPanel';
 
 export enum ContentType { Text, Image };
 
@@ -22,11 +22,11 @@ export class MessageCenter {
     ) {
         socketClient.on('uploadAlgaeImage', data => {
             this.eventCenter.trigger(AddLogEvent, data);
-            this.addMessage({ role: Roles.Algae, type: ContentType.Image, content: data.base64Image });
+            this.addMessage({ role: Roles.Algae, type: ContentType.Image, content: `data:image/png;base64,${data.base64Image}` });
         });
         socketClient.on('uploadDeepAlMessage', data => {
             this.eventCenter.trigger(AddLogEvent, data);
-            this.addMessage({ role: Roles.AI, type: ContentType.Text, content: data.message });
+            this.addMessage({ role: Roles.ChatBot, type: ContentType.Text, content: data.message });
         });
     };
 
@@ -68,8 +68,8 @@ export class MessageCenter {
         this.eventCenter.trigger(Event.AfterSubmitMessage, resp);
 
         this.addText(Roles.ChatBot, resp.chatbotResponse);
-        setTimeout(() => this.addText(Roles.Algae, resp.algaeResponse), 1000);
-        setTimeout(() => this.addText(Roles.ChatBot, resp.chatbot2algaeResponse), 2000);
+        setTimeout(() => this.addText(Roles.Algae, resp.algaeResponse), 5000);
+        setTimeout(() => this.addText(Roles.ChatBot, resp.chatbot2algaeResponse), 6000);
     };
 };
 

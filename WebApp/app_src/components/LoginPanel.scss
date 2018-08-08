@@ -1,4 +1,4 @@
-@import 'common/mixin';
+@import '../common/mixin';
 #loginPanel {
     @include flex;
     @include flex-center;

@@ -1,4 +1,4 @@
-@import 'common/mixin';
+@import '../common/mixin';
 #renderCanvas {
     @include full-page;
     touch-action: none;

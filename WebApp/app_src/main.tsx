@@ -4,11 +4,11 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 
 import { MessageCenter, EventCenter, Event } from './common/MessageCenter';
-import { Scene } from './Scene';
-import { DevPanel } from './DevPanel';
-import { LoginPanel } from './LoginPanel';
-import { ControlPanel } from './ControlPanel';
-import { MessageBoard } from './MessageBoard';
+import { Scene } from './components/Scene';
+import { DevPanel } from './components/DevPanel';
+import { LoginPanel } from './components/LoginPanel';
+import { ControlPanel } from './components/ControlPanel';
+import { MessageBoard } from './components/MessageBoard';
 import { CommonUtility } from './common/CommonUtility';
 
 

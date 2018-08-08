@@ -14,6 +14,5 @@ export const GlobalData: {
 export enum Roles {
     User,
     ChatBot,
-    Algae,
-    AI,
+    Algae
 };
