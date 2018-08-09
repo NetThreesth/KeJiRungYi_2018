@@ -322,6 +322,29 @@ var CommonUtility = /** @class */ (function () {
         ;
     };
     ;
+    CommonUtility.getCookie = function (name) {
+        var value = "; " + document.cookie;
+        var parts = value.split("; " + name + "=");
+        if (parts.length == 2)
+            return parts.pop().split(";").shift();
+    };
+    ;
+    /**
+     * Set cookie.
+     * @param name - Cookie name.
+     * @param value - Cookie value.
+     * @param days - Expire days.
+     */
+    CommonUtility.setCookie = function (name, value, days) {
+        var expires = '';
+        if (days) {
+            var date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            expires = "; expires=" + date.toGMTString();
+        }
+        document.cookie = name + "=" + value + expires + "; path=/";
+    };
+    ;
     CommonUtility.getQueryString = function () {
         var cache = {};
         return function (field, url) {
@@ -1014,8 +1037,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _common_SocketClient__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../common/SocketClient */ "./app_src/common/SocketClient.ts");
 /* harmony import */ var _common_MessageCenter__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../common/MessageCenter */ "./app_src/common/MessageCenter.ts");
 /* harmony import */ var _common_GlobalData__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../common/GlobalData */ "./app_src/common/GlobalData.ts");
-/* harmony import */ var _LoginPanel_scss__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./LoginPanel.scss */ "./app_src/components/LoginPanel.scss");
-/* harmony import */ var _LoginPanel_scss__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_LoginPanel_scss__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _common_CommonUtility__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../common/CommonUtility */ "./app_src/common/CommonUtility.ts");
+/* harmony import */ var _LoginPanel_scss__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./LoginPanel.scss */ "./app_src/components/LoginPanel.scss");
+/* harmony import */ var _LoginPanel_scss__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_LoginPanel_scss__WEBPACK_IMPORTED_MODULE_5__);
 var __extends = (undefined && undefined.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -1031,11 +1055,15 @@ var __extends = (undefined && undefined.__extends) || (function () {
 
 
 
+
 var LoginPanel = /** @class */ (function (_super) {
     __extends(LoginPanel, _super);
-    function LoginPanel() {
-        return _super !== null && _super.apply(this, arguments) || this;
+    function LoginPanel(props) {
+        var _this = _super.call(this, props) || this;
+        _this.state = { signInName: _common_CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getCookie('signInName') };
+        return _this;
     }
+    ;
     LoginPanel.prototype.render = function () {
         return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { id: "loginPanel", onClick: this.focus.bind(this) },
             react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "text-center wordCard" },
@@ -1060,7 +1088,7 @@ var LoginPanel = /** @class */ (function (_super) {
                 " \u5468\u800C\u5FA9\u59CB\u3002"),
             react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { id: "signInWrapper", className: "wordCard" },
                 react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("span", { className: "label" }, "Sign in with:\u00A0"),
-                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("input", { type: "text", id: "signInName", onKeyPress: this.keyPress.bind(this) }),
+                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("input", { type: "text", id: "signInName", value: this.state.signInName, onKeyPress: this.keyPress.bind(this), onChange: this.signInNameChanged.bind(this) }),
                 react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("button", { type: "button", className: "signInButton", onClick: this.signInButtonClickHandler.bind(this) },
                     react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("i", { className: "fas fa-arrow-circle-right" }))),
             react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "skipAnimation" },
@@ -1127,16 +1155,21 @@ var LoginPanel = /** @class */ (function (_super) {
         setTimeout(function () { return $('#signInName').focus(); });
     };
     ;
+    LoginPanel.prototype.signInNameChanged = function (e) {
+        this.setState({ signInName: e.target.value });
+    };
+    ;
     LoginPanel.prototype.keyPress = function (e) {
         if (e.which == 13 || e.keyCode == 13)
             this.signInButtonClickHandler();
     };
     ;
     LoginPanel.prototype.signInButtonClickHandler = function () {
-        var signInName = $('#signInName').val();
+        var signInName = this.state.signInName;
         if (signInName.length === 0)
             return;
-        _common_GlobalData__WEBPACK_IMPORTED_MODULE_3__["GlobalData"].userName = signInName;
+        _common_GlobalData__WEBPACK_IMPORTED_MODULE_3__["GlobalData"].userName = this.state.signInName;
+        _common_CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].setCookie('signInName', _common_GlobalData__WEBPACK_IMPORTED_MODULE_3__["GlobalData"].userName, 30);
         _common_GlobalData__WEBPACK_IMPORTED_MODULE_3__["GlobalData"].signInTime = new Date();
         setTimeout(function () { return _common_SocketClient__WEBPACK_IMPORTED_MODULE_1__["socketClient"].emit('updateUserInfo', _common_GlobalData__WEBPACK_IMPORTED_MODULE_3__["GlobalData"]); }, 0);
         var $loginPanel = $('#loginPanel');
@@ -1945,8 +1978,17 @@ var Scene = /** @class */ (function (_super) {
     };
     ;
     Scene.prototype.zoomIn = function () {
-        _common_GlobalData__WEBPACK_IMPORTED_MODULE_7__["GlobalData"].chatRoomIndex = Number(_common_CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getQueryString('chatRoomIndex')) ||
-            _common_CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getRandomIntInRange(0, this.chatRoomsCenter.length - 1);
+        var checkChatRoomIndex = function (chatRoomIndex) {
+            return !!chatRoomIndex || chatRoomIndex === '0' || chatRoomIndex === 0;
+        };
+        var chatRoomIndex = _common_CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getQueryString('chatRoomIndex');
+        if (!checkChatRoomIndex(chatRoomIndex))
+            chatRoomIndex = _common_CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getCookie('chatRoomIndex');
+        if (checkChatRoomIndex(chatRoomIndex))
+            _common_GlobalData__WEBPACK_IMPORTED_MODULE_7__["GlobalData"].chatRoomIndex = Number(chatRoomIndex);
+        if (!checkChatRoomIndex(_common_GlobalData__WEBPACK_IMPORTED_MODULE_7__["GlobalData"].chatRoomIndex))
+            _common_GlobalData__WEBPACK_IMPORTED_MODULE_7__["GlobalData"].chatRoomIndex = _common_CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getRandomIntInRange(0, this.chatRoomsCenter.length - 1);
+        _common_CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].setCookie('chatRoomIndex', String(_common_GlobalData__WEBPACK_IMPORTED_MODULE_7__["GlobalData"].chatRoomIndex), 30);
         var chatRoom = this.chatRoomsCenter[_common_GlobalData__WEBPACK_IMPORTED_MODULE_7__["GlobalData"].chatRoomIndex];
         var destination = chatRoom ?
             new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"](chatRoom.x * 2.5, chatRoom.y * 2.5, 0) :
@@ -11710,4 +11752,4 @@ module.exports = ReactDOM;
 /***/ })
 
 /******/ });
-//# sourceMappingURL=bundle.main.3d9df20bb3fdfd4bdcc1.js.map
+//# sourceMappingURL=bundle.main.1c42b128c3bbc45f6d66.js.map

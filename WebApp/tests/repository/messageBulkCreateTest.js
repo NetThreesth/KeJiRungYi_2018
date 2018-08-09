@@ -1,17 +1,17 @@
 const Sequelize = require('sequelize');
-const repo = require('../../server/repository.js');
+const { Message: repo } = require('../../server/repository.js');
 
 const now = new Date();
 const testName = 'unit-test-name';
 const testMsg = 'bulk create test';
 const rid = 8;
 
-repo.Message.findAll().then(messages => {
+repo.findAll().then(messages => {
 
     console.log(`before bulkCreate:`);
     console.log(`len: ${messages.length}`);
 
-    return repo.Message.bulkCreate([
+    return repo.bulkCreate([
         {
             time: now,
             message: testMsg,
@@ -31,13 +31,13 @@ repo.Message.findAll().then(messages => {
     ]);
 }).then(() => {
     console.log('bulkCreate done');
-    return repo.Message.findAll()
+    return repo.findAll()
 }).then(messages => {
 
     console.log(`after bulkCreate:`);
     console.log(`len: ${messages.length}`)
 
-    return repo.Message.destroy({
+    return repo.destroy({
         where: {
             name: {
                 [Sequelize.Op.like]: 'unit-test%'
@@ -45,7 +45,7 @@ repo.Message.findAll().then(messages => {
         }
     });
 }).then(() => {
-    return repo.Message.findAll();
+    return repo.findAll();
 }).then(messages => {
     console.log(`after destroy:`);
     console.log(`len: ${messages.length}`);

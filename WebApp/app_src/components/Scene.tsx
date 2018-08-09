@@ -659,8 +659,16 @@ export class Scene extends React.Component<
     };
 
     private zoomIn() {
-        GlobalData.chatRoomIndex = Number(CommonUtility.getQueryString('chatRoomIndex')) ||
-            CommonUtility.getRandomIntInRange(0, this.chatRoomsCenter.length - 1);
+        const checkChatRoomIndex = (chatRoomIndex) => {
+            return !!chatRoomIndex || chatRoomIndex === '0' || chatRoomIndex === 0;
+        };
+        let chatRoomIndex = CommonUtility.getQueryString('chatRoomIndex');
+        if (!checkChatRoomIndex(chatRoomIndex)) chatRoomIndex = CommonUtility.getCookie('chatRoomIndex');
+        if (checkChatRoomIndex(chatRoomIndex)) GlobalData.chatRoomIndex = Number(chatRoomIndex);
+        if (!checkChatRoomIndex(GlobalData.chatRoomIndex))
+            GlobalData.chatRoomIndex = CommonUtility.getRandomIntInRange(0, this.chatRoomsCenter.length - 1);
+
+        CommonUtility.setCookie('chatRoomIndex', String(GlobalData.chatRoomIndex), 30);
         const chatRoom = this.chatRoomsCenter[GlobalData.chatRoomIndex];
         const destination = chatRoom ?
             new BABYLON.Vector3(chatRoom.x * 2.5, chatRoom.y * 2.5, 0) :

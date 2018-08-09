@@ -2,11 +2,19 @@ import * as React from "react";
 import { socketClient } from '../common/SocketClient';
 import { EventCenter, Event } from '../common/MessageCenter';
 import { GlobalData } from '../common/GlobalData';
+import { CommonUtility } from '../common/CommonUtility';
 
 import "./LoginPanel.scss";
 
-export class LoginPanel
-    extends React.Component<{ eventCenter: EventCenter }> {
+export class LoginPanel extends React.Component<
+    { eventCenter: EventCenter },
+    { signInName: string }
+    > {
+
+    constructor(props) {
+        super(props);
+        this.state = { signInName: CommonUtility.getCookie('signInName') };
+    };
 
     render() {
         return <div id="loginPanel"
@@ -31,7 +39,9 @@ export class LoginPanel
             <div id="signInWrapper" className="wordCard">
                 <span className="label">Sign in with:&nbsp;</span>
                 <input type="text" id="signInName"
-                    onKeyPress={this.keyPress.bind(this)} />
+                    value={this.state.signInName}
+                    onKeyPress={this.keyPress.bind(this)}
+                    onChange={this.signInNameChanged.bind(this)} />
                 <button type="button" className="signInButton"
                     onClick={this.signInButtonClickHandler.bind(this)}>
                     <i className="fas fa-arrow-circle-right"></i>
@@ -127,16 +137,21 @@ export class LoginPanel
         setTimeout(() => $('#signInName').focus());
     };
 
-    private keyPress(e) {
+    private signInNameChanged(e: React.ChangeEvent<HTMLInputElement>) {
+        this.setState({ signInName: e.target.value });
+    };
+
+    private keyPress(e: React.KeyboardEvent<HTMLInputElement>) {
         if (e.which == 13 || e.keyCode == 13)
             this.signInButtonClickHandler();
     };
 
     private signInButtonClickHandler() {
-        const signInName = $('#signInName').val() as string;
+        const signInName = this.state.signInName;
         if (signInName.length === 0) return;
 
-        GlobalData.userName = signInName;
+        GlobalData.userName = this.state.signInName;
+        CommonUtility.setCookie('signInName', GlobalData.userName, 30);
         GlobalData.signInTime = new Date();
         setTimeout(() => socketClient.emit('updateUserInfo', GlobalData), 0);
 

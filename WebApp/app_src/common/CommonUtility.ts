@@ -120,4 +120,26 @@ export class CommonUtility {
             finished++;
         };
     };
+
+    static getCookie(name: string) {
+        var value = "; " + document.cookie;
+        var parts = value.split("; " + name + "=");
+        if (parts.length == 2) return parts.pop().split(";").shift();
+    };
+
+    /**
+     * Set cookie.
+     * @param name - Cookie name.
+     * @param value - Cookie value.
+     * @param days - Expire days.
+     */
+    static setCookie(name: string, value: string, days: number) {
+        let expires = '';
+        if (days) {
+            const date: any = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            expires = `; expires=${date.toGMTString()}`;
+        }
+        document.cookie = `${name}=${value}${expires}; path=/`;
+    };
 };

@@ -316,6 +316,29 @@ var CommonUtility = /** @class */ (function () {
         ;
     };
     ;
+    CommonUtility.getCookie = function (name) {
+        var value = "; " + document.cookie;
+        var parts = value.split("; " + name + "=");
+        if (parts.length == 2)
+            return parts.pop().split(";").shift();
+    };
+    ;
+    /**
+     * Set cookie.
+     * @param name - Cookie name.
+     * @param value - Cookie value.
+     * @param days - Expire days.
+     */
+    CommonUtility.setCookie = function (name, value, days) {
+        var expires = '';
+        if (days) {
+            var date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            expires = "; expires=" + date.toGMTString();
+        }
+        document.cookie = name + "=" + value + expires + "; path=/";
+    };
+    ;
     CommonUtility.getQueryString = function () {
         var cache = {};
         return function (field, url) {
@@ -339,4 +362,4 @@ var CommonUtility = /** @class */ (function () {
 /***/ })
 
 /******/ });
-//# sourceMappingURL=bundle.CreateLinesWorker.1b16c2e806a3aa437d8b.js.map
+//# sourceMappingURL=bundle.CreateLinesWorker.5f3c1182e5f94e53cc07.js.map
