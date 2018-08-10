@@ -1,17 +1,13 @@
 import { combineReducers } from 'redux';
-import { DevPanelData } from '../components/DevPanel';
-
-
-export enum ActionTypes {
-    ADD_LOG, UPDATE_DATA
-};
+import { DevPanelData } from '../models/DevPanelData';
+import { ActionType } from '../actions';
 
 const updateDevPanel = (
     state: DevPanelData = {} as DevPanelData,
-    action: { type: ActionTypes, data: DevPanelData }
+    action: { type: ActionType, data: DevPanelData }
 ) => {
     switch (action.type) {
-        case ActionTypes.UPDATE_DATA:
+        case ActionType.updateDevPanelData:
             return { ...state, ...action.data };
         default:
             return state;
@@ -21,10 +17,10 @@ const updateDevPanel = (
 
 const addLog = (
     state: string[] = [],
-    action: { type: ActionTypes, content: string }
+    action: { type: ActionType, content: string }
 ) => {
     switch (action.type) {
-        case ActionTypes.ADD_LOG:
+        case ActionType.addDevPanelLog:
             return state.push(action.content);
         default:
             return state

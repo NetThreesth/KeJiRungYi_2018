@@ -1,7 +1,7 @@
 import * as React from "react";
-import { EventCenter, Event } from '../common/MessageCenter';
 import { CommonUtility } from '../common/CommonUtility';
 import { connect } from 'react-redux';
+import { DevPanelData } from '../models/DevPanelData';
 
 
 
@@ -9,11 +9,8 @@ export const AddLogEvent = 'AddLogEvent';
 
 import "./DevPanel.scss";
 
-class DevPanel
+class DevPanelView
     extends React.Component<DevPanelData> {
-
-
-
 
     render() {
         return <div id="devPanel">
@@ -45,21 +42,13 @@ class DevPanel
         </div>;
     };
 
-
-
     componentDidMount() {
         if (CommonUtility.getQueryString('isdev'))
             $('#devPanel').show();
     };
 };
 
-export interface DevPanelData {
-    fps: string;
-    coordinate: string;
-    linesystemPerformance: string;
-    greenMask: string;
-    log: string[];
-};
+
 
 
 const mapStateToProps: (state: any) => DevPanelData = (state) => {
@@ -68,6 +57,6 @@ const mapStateToProps: (state: any) => DevPanelData = (state) => {
     return props;
 };
 
-export const devPanel = connect(
+export const DevPanel = connect(
     mapStateToProps
-)(DevPanel);
+)(DevPanelView);

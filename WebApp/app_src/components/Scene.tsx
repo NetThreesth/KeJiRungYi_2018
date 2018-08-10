@@ -6,14 +6,20 @@ import { CommonUtility } from '../common/CommonUtility';
 import { BabylonUtility, Line } from '../common/BabylonUtility';
 import { AsyncWorker } from '../common/AsyncWorker';
 import { GlobalData } from '../common/GlobalData';
+import { connect } from 'react-redux';
 
 import { EventCenter, Event, ChatBotResponse } from '../common/MessageCenter';
+import { updateDevPanelData } from '../actions';
+import { DevPanelData } from '../models/DevPanelData';
 
 import "./Scene.scss";
 
 
-export class Scene extends React.Component<
-    { eventCenter: EventCenter }
+class SceneView extends React.Component<
+    {
+        eventCenter: EventCenter,
+        updateDevPanelData: (data: DevPanelData) => void
+    }
     > {
 
     private engine: BABYLON.Engine;
@@ -93,7 +99,7 @@ export class Scene extends React.Component<
         const color = this.maskColor;
         const setting = `rgba(${color.r},${color.g},${color.b},${color.a})`;
         $('#greenMask').css('background-color', setting);
-        this.props.eventCenter.trigger(Event.UpdateDevPanelData, { greenMask: setting });
+        this.props.updateDevPanelData({ greenMask: setting });
     };
 
     private startUpdateBackgroundParticles() {
@@ -193,7 +199,7 @@ export class Scene extends React.Component<
 
 
     private renderAfter() {
-        this.props.eventCenter.trigger(Event.UpdateDevPanelData, {
+        this.props.updateDevPanelData({
             fps: this.engine.getFps().toFixed() + ' fps',
             coordinate: BabylonUtility.positionToString(this.camera.position)
         });
@@ -355,9 +361,9 @@ export class Scene extends React.Component<
                 if (newCount > 100) updatedNodes.length = newCount;
             }
 
-            this.props.eventCenter.trigger(Event.UpdateDevPanelData, {
-                linesystemPerformance: linesystemPerformance
-            });
+
+            this.props.updateDevPanelData({ linesystemPerformance: String(linesystemPerformance) });
+
             this.linesystemPerformance = 0;
             this.startUpdateTextNodes(updatedNodes);
         });
@@ -696,3 +702,17 @@ interface TranslatableNode {
     scale?: number,
     translateVector?: BABYLON.Vector3
 };
+
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        updateDevPanelData: (data) => {
+            dispatch(updateDevPanelData(data))
+        }
+    };
+};
+
+export const Scene = connect(
+    null,
+    mapDispatchToProps
+)(SceneView)
