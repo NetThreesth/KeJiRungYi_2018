@@ -65,22 +65,24 @@ export class ControlPanel extends React.Component<
         });
 
         $(document).on('mouseup touchend click', () => {
-            const newState = Object.assign({}, this.state, {
+            const newState = {
+                ...this.state,
                 touchEventCount: this.state.touchEventCount + 1
-            });
+            };
             this.setState(newState);
             setTimeout(() => {
                 socketClient.emit(
                     'updateUserInfo',
-                    Object.assign({ touchEventCount: newState.touchEventCount }, GlobalData)
+                    { touchEventCount: newState.touchEventCount, ...GlobalData }
                 );
             }, 0);
         });
         setInterval(() => {
             if (!GlobalData.signInTime) return;
-            const newState = Object.assign({}, this.state, {
+            const newState = {
+                ...this.state,
                 time: new Date().getTime() - GlobalData.signInTime.getTime(),
-            });
+            };
             this.setState(newState);
         }, 200);
     };

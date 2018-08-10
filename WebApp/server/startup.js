@@ -1,6 +1,6 @@
 'use strict';
 
-// [Setup]
+// [Basic]
 const express = require('express');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
@@ -27,13 +27,14 @@ const server = app.listen(PORT, () => {
     logger.info(`App listening. serve path: ${path}, port: ${PORT}`);
     logger.info('Press Ctrl+C to quit.');
 });
+// [END Basic]
 
-const apis = require('./apis.js');
-apis.createAPIs(app);
 
-const socketIO = require('./socketIO.js');
-socketIO.createSocketIO(server);
-// [END Setup]
+// [Advanced]
+require('./apis.js').initAPIs(app);
+require('./socketIO.js').initSocketIO(server);
+require('./graphQL.js').initGraphQL(app);
+// [END Advanced]
 
 
 // [Reverse Proxy (For Assets)]
@@ -45,55 +46,3 @@ app.all("/3sth/*", (req, res) => {
     return proxy.web(req, res, { changeOrigin: true, target: assetsServer });
 });
 // [END Reverse Proxy]
-
-
-
-
-// [GraphQL]
-const express_graphql = require('express-graphql');
-const graphql = require('graphql');
-const repo = require('./repository.js');
-
-const rootQuery = new graphql.GraphQLObjectType({
-    name: 'Query',
-    fields: {
-        messages: {
-            type: new graphql.GraphQLList(
-                new graphql.GraphQLObjectType({
-                    name: 'Message',
-                    fields: {
-                        id: { type: graphql.GraphQLInt },
-                        time: { type: graphql.GraphQLString },
-                        message: { type: graphql.GraphQLString },
-                        name: { type: graphql.GraphQLString },
-                        chatroomId: { type: graphql.GraphQLString },
-                    }
-                })
-            ),
-            resolve: () => repo.Message.findAll()
-        },
-
-        userLog: {
-            type: new graphql.GraphQLList(
-                new graphql.GraphQLObjectType({
-                    name: 'UserLog',
-                    fields: {
-                        id: { type: graphql.GraphQLInt },
-                        userName: { type: graphql.GraphQLString },
-                        chatRoomIndex: { type: graphql.GraphQLString },
-                        touchEventCount: { type: graphql.GraphQLInt },
-                        signInTime: { type: graphql.GraphQLString },
-                        stayTime: { type: graphql.GraphQLInt }
-                    }
-                })
-            ),
-            resolve: () => repo.UserLog.findAll()
-        }
-    }
-});
-
-app.use('/graphql', express_graphql({
-    schema: new graphql.GraphQLSchema({ query: rootQuery }),
-    graphiql: true
-}));
-// [END GraphQL]

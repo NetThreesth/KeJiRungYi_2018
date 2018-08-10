@@ -6,7 +6,7 @@ const socketIO = require('./socketIO.js');
 const repo = require('./repository.js');
 
 
-module.exports.createAPIs = (app) => {
+module.exports.initAPIs = (app) => {
 
     app.route('/apis/uploadAlgaeImage').post((req, res, next) => {
         const body = req.body;

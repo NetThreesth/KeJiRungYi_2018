@@ -1,35 +1,19 @@
 import * as React from "react";
 import { EventCenter, Event } from '../common/MessageCenter';
 import { CommonUtility } from '../common/CommonUtility';
+import { connect } from 'react-redux';
+
+
 
 export const AddLogEvent = 'AddLogEvent';
 
 import "./DevPanel.scss";
 
-export class DevPanel
-    extends React.Component<{ eventCenter: EventCenter }, DevPanelData> {
+class DevPanel
+    extends React.Component<DevPanelData> {
 
-    private isdev = CommonUtility.getQueryString('isdev');
-    state = { log: [] } as DevPanelData;
 
-    constructor(props) {
-        super(props);
 
-        if (!this.isdev) return;
-
-        const eventCenter = this.props.eventCenter;
-
-        eventCenter.on<DevPanelData>(Event.UpdateDevPanelData, data => {
-            if (Object.keys(data).some(key => this.state[key] !== data[key]))
-                this.setState(Object.assign({}, this.state, data));
-        });
-
-        eventCenter.on<string>(AddLogEvent, log => {
-            this.state.log.push(JSON.stringify(log));
-            if (this.state.log.length > 3) this.state.log.shift();
-            this.setState(Object.assign({}, this.state));
-        });
-    };
 
     render() {
         return <div id="devPanel">
@@ -37,36 +21,35 @@ export class DevPanel
                 <tbody>
                     <tr>
                         <td>FPS</td>
-                        <td>{this.state.fps}</td>
+                        <td>{this.props.fps}</td>
                     </tr>
                     <tr>
                         <td>LSPerformance</td>
-                        <td>{this.state.linesystemPerformance}</td>
+                        <td>{this.props.linesystemPerformance}</td>
                     </tr>
                     <tr>
                         <td>Coordinate</td>
-                        <td>{this.state.coordinate}</td>
+                        <td>{this.props.coordinate}</td>
                     </tr>
                     <tr>
                         <td>GreenMask</td>
-                        <td>{this.state.greenMask}</td>
+                        <td>{this.props.greenMask}</td>
                     </tr>
                     <tr>
-                        <td colSpan={2}>{this.renderLog()}</td>
+                        <td colSpan={2}><ul>{
+                            this.props.log.map(e => <li>{e}</li>)
+                        }</ul></td>
                     </tr>
                 </tbody>
             </table>
         </div>;
     };
 
-    private renderLog() {
-        const lis = this.state.log.map(e => <li>{e}</li>);
-        return <ul>{lis}</ul>;
-    };
+
 
     componentDidMount() {
-        if (!this.isdev) return;
-        $('#devPanel').show();
+        if (CommonUtility.getQueryString('isdev'))
+            $('#devPanel').show();
     };
 };
 
@@ -77,3 +60,14 @@ export interface DevPanelData {
     greenMask: string;
     log: string[];
 };
+
+
+const mapStateToProps: (state: any) => DevPanelData = (state) => {
+    const props = state.devPanelData as DevPanelData;
+    props.log = state.log;
+    return props;
+};
+
+export const devPanel = connect(
+    mapStateToProps
+)(DevPanel);
