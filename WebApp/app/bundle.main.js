@@ -90,22 +90,52 @@
 /*!**********************************!*\
   !*** ./app_src/actions/index.ts ***!
   \**********************************/
-/*! exports provided: ActionType, updateDevPanelData */
+/*! exports provided: ActionType, SceneEventName, addLogAction, updateDevPanelAction, sceneEventAction */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ActionType", function() { return ActionType; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "updateDevPanelData", function() { return updateDevPanelData; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SceneEventName", function() { return SceneEventName; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "addLogAction", function() { return addLogAction; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "updateDevPanelAction", function() { return updateDevPanelAction; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "sceneEventAction", function() { return sceneEventAction; });
 var ActionType;
 (function (ActionType) {
-    ActionType[ActionType["addDevPanelLog"] = 0] = "addDevPanelLog";
-    ActionType[ActionType["updateDevPanelData"] = 1] = "updateDevPanelData";
+    ActionType["addDevPanelLog"] = "addDevPanelLog";
+    ActionType["updateDevPanelData"] = "updateDevPanelData";
+    ActionType["sceneEvent"] = "sceneEvent";
 })(ActionType || (ActionType = {}));
 ;
-function updateDevPanelData(data) {
+var SceneEventName;
+(function (SceneEventName) {
+    SceneEventName["none"] = "none";
+    SceneEventName["afterWordCardsAnimation"] = "afterWordCardsAnimation";
+    SceneEventName["afterLogin"] = "afterLogin";
+    SceneEventName["afterSubmitMessage"] = "afterSubmitMessage";
+})(SceneEventName || (SceneEventName = {}));
+;
+;
+function addLogAction(content) {
+    return {
+        type: ActionType.addDevPanelLog,
+        content: content
+    };
+}
+;
+;
+function updateDevPanelAction(data) {
     return {
         type: ActionType.updateDevPanelData,
+        data: data
+    };
+}
+;
+;
+function sceneEventAction(sceneEventName, data) {
+    return {
+        type: ActionType.sceneEvent,
+        sceneEventName: sceneEventName,
         data: data
     };
 }
@@ -1049,11 +1079,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _common_SocketClient__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../common/SocketClient */ "./app_src/common/SocketClient.ts");
-/* harmony import */ var _common_MessageCenter__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../common/MessageCenter */ "./app_src/common/MessageCenter.ts");
-/* harmony import */ var _common_GlobalData__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../common/GlobalData */ "./app_src/common/GlobalData.ts");
-/* harmony import */ var _common_CommonUtility__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../common/CommonUtility */ "./app_src/common/CommonUtility.ts");
-/* harmony import */ var _LoginPanel_scss__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./LoginPanel.scss */ "./app_src/components/LoginPanel.scss");
-/* harmony import */ var _LoginPanel_scss__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_LoginPanel_scss__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var _common_GlobalData__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../common/GlobalData */ "./app_src/common/GlobalData.ts");
+/* harmony import */ var _common_CommonUtility__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../common/CommonUtility */ "./app_src/common/CommonUtility.ts");
+/* harmony import */ var _actions__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../actions */ "./app_src/actions/index.ts");
+/* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/es/index.js");
+/* harmony import */ var _LoginPanel_scss__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./LoginPanel.scss */ "./app_src/components/LoginPanel.scss");
+/* harmony import */ var _LoginPanel_scss__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(_LoginPanel_scss__WEBPACK_IMPORTED_MODULE_6__);
 var __extends = (undefined && undefined.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -1070,15 +1101,16 @@ var __extends = (undefined && undefined.__extends) || (function () {
 
 
 
-var LoginPanel = /** @class */ (function (_super) {
-    __extends(LoginPanel, _super);
-    function LoginPanel(props) {
+
+var LoginPanelView = /** @class */ (function (_super) {
+    __extends(LoginPanelView, _super);
+    function LoginPanelView(props) {
         var _this = _super.call(this, props) || this;
-        _this.state = { signInName: _common_CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getCookie('signInName') };
+        _this.state = { signInName: _common_CommonUtility__WEBPACK_IMPORTED_MODULE_3__["CommonUtility"].getCookie('signInName') };
         return _this;
     }
     ;
-    LoginPanel.prototype.render = function () {
+    LoginPanelView.prototype.render = function () {
         return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { id: "loginPanel", onClick: this.focus.bind(this) },
             react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "text-center wordCard" },
                 "\u6982\u5FF5\u6709\u540D\u800C\u6210\u6578\u64DA\uFF0C",
@@ -1109,11 +1141,11 @@ var LoginPanel = /** @class */ (function (_super) {
                 react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("button", { type: "button", onClick: this.skipAnimation.bind(this) }, "skip")));
     };
     ;
-    LoginPanel.prototype.componentDidMount = function () {
+    LoginPanelView.prototype.componentDidMount = function () {
         this.wordCardsAnimation();
     };
     ;
-    LoginPanel.prototype.fadeAnimation = function (ele, setting, afterFunc) {
+    LoginPanelView.prototype.fadeAnimation = function (ele, setting, afterFunc) {
         var animation = $(ele).fadeIn(setting.fadeIn, undefined, function () {
             if (!setting.fadeOut)
                 afterFunc(ele);
@@ -1125,7 +1157,7 @@ var LoginPanel = /** @class */ (function (_super) {
         });
     };
     ;
-    LoginPanel.prototype.fadeSequence = function (eleArray, setting, afterFunc) {
+    LoginPanelView.prototype.fadeSequence = function (eleArray, setting, afterFunc) {
         var _this = this;
         setting.fadeOut = (eleArray.length === 1) ? null : setting.fadeOut;
         this.fadeAnimation(eleArray.shift(), setting, function (ele) {
@@ -1136,7 +1168,7 @@ var LoginPanel = /** @class */ (function (_super) {
         });
     };
     ;
-    LoginPanel.prototype.wordCardsAnimation = function () {
+    LoginPanelView.prototype.wordCardsAnimation = function () {
         var _this = this;
         var wordCards = $('.wordCard').toArray();
         var setting = {
@@ -1150,7 +1182,7 @@ var LoginPanel = /** @class */ (function (_super) {
         });
     };
     ;
-    LoginPanel.prototype.skipAnimation = function (e) {
+    LoginPanelView.prototype.skipAnimation = function (e) {
         e.stopPropagation();
         var $wordCards = $('.wordCard');
         $wordCards.stop(true);
@@ -1160,41 +1192,48 @@ var LoginPanel = /** @class */ (function (_super) {
         this.afterWordCardsAnimation();
     };
     ;
-    LoginPanel.prototype.afterWordCardsAnimation = function () {
+    LoginPanelView.prototype.afterWordCardsAnimation = function () {
         $('.skipAnimation').hide();
-        this.props.eventCenter.trigger(_common_MessageCenter__WEBPACK_IMPORTED_MODULE_2__["Event"].AfterWordCardsAnimation);
+        this.props.triggerSceneEvent(_actions__WEBPACK_IMPORTED_MODULE_4__["SceneEventName"].afterWordCardsAnimation);
     };
     ;
-    LoginPanel.prototype.focus = function () {
+    LoginPanelView.prototype.focus = function () {
         setTimeout(function () { return $('#signInName').focus(); });
     };
     ;
-    LoginPanel.prototype.signInNameChanged = function (e) {
+    LoginPanelView.prototype.signInNameChanged = function (e) {
         this.setState({ signInName: e.target.value });
     };
     ;
-    LoginPanel.prototype.keyPress = function (e) {
+    LoginPanelView.prototype.keyPress = function (e) {
         if (e.which == 13 || e.keyCode == 13)
             this.signInButtonClickHandler();
     };
     ;
-    LoginPanel.prototype.signInButtonClickHandler = function () {
+    LoginPanelView.prototype.signInButtonClickHandler = function () {
         var signInName = this.state.signInName;
         if (signInName.length === 0)
             return;
-        _common_GlobalData__WEBPACK_IMPORTED_MODULE_3__["GlobalData"].userName = this.state.signInName;
-        _common_CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].setCookie('signInName', _common_GlobalData__WEBPACK_IMPORTED_MODULE_3__["GlobalData"].userName, 30);
-        _common_GlobalData__WEBPACK_IMPORTED_MODULE_3__["GlobalData"].signInTime = new Date();
-        setTimeout(function () { return _common_SocketClient__WEBPACK_IMPORTED_MODULE_1__["socketClient"].emit('updateUserInfo', _common_GlobalData__WEBPACK_IMPORTED_MODULE_3__["GlobalData"]); }, 0);
+        _common_GlobalData__WEBPACK_IMPORTED_MODULE_2__["GlobalData"].userName = this.state.signInName;
+        _common_CommonUtility__WEBPACK_IMPORTED_MODULE_3__["CommonUtility"].setCookie('signInName', _common_GlobalData__WEBPACK_IMPORTED_MODULE_2__["GlobalData"].userName, 30);
+        _common_GlobalData__WEBPACK_IMPORTED_MODULE_2__["GlobalData"].signInTime = new Date();
+        setTimeout(function () { return _common_SocketClient__WEBPACK_IMPORTED_MODULE_1__["socketClient"].emit('updateUserInfo', _common_GlobalData__WEBPACK_IMPORTED_MODULE_2__["GlobalData"]); }, 0);
         var $loginPanel = $('#loginPanel');
         $loginPanel.animate({ opacity: 0 }, 2000, function () { return $loginPanel.hide(); });
-        this.props.eventCenter.trigger(_common_MessageCenter__WEBPACK_IMPORTED_MODULE_2__["Event"].AfterLogin);
+        this.props.triggerSceneEvent(_actions__WEBPACK_IMPORTED_MODULE_4__["SceneEventName"].afterLogin);
     };
     ;
-    return LoginPanel;
+    return LoginPanelView;
 }(react__WEBPACK_IMPORTED_MODULE_0__["Component"]));
-
 ;
+var mapDispatchToProps = function (dispatch) {
+    return {
+        triggerSceneEvent: function (sceneEventName) {
+            dispatch(Object(_actions__WEBPACK_IMPORTED_MODULE_4__["sceneEventAction"])(sceneEventName));
+        }
+    };
+};
+var LoginPanel = Object(react_redux__WEBPACK_IMPORTED_MODULE_5__["connect"])(null, mapDispatchToProps)(LoginPanelView);
 
 
 /***/ }),
@@ -1497,6 +1536,17 @@ var SceneView = /** @class */ (function (_super) {
         this.props.eventCenter.on(_common_MessageCenter__WEBPACK_IMPORTED_MODULE_9__["Event"].AfterSubmitMessage, this.cmdHandler.bind(this));
         window.addEventListener("resize", this.engine.resize.bind(this.engine));
         this.updateMask();
+    };
+    ;
+    SceneView.prototype.componentDidUpdate = function (prevProps) {
+        switch (this.props.eventName) {
+            case _actions__WEBPACK_IMPORTED_MODULE_10__["SceneEventName"].afterWordCardsAnimation:
+                break;
+            case _actions__WEBPACK_IMPORTED_MODULE_10__["SceneEventName"].afterLogin:
+                break;
+            case _actions__WEBPACK_IMPORTED_MODULE_10__["SceneEventName"].afterSubmitMessage:
+                break;
+        }
     };
     ;
     SceneView.prototype.updateMask = function () {
@@ -2025,14 +2075,17 @@ var TranslateType;
 })(TranslateType || (TranslateType = {}));
 ;
 ;
+var mapStateToProps = function (state) {
+    return { eventName: state.sceneEvent };
+};
 var mapDispatchToProps = function (dispatch) {
     return {
         updateDevPanelData: function (data) {
-            dispatch(Object(_actions__WEBPACK_IMPORTED_MODULE_10__["updateDevPanelData"])(data));
+            dispatch(Object(_actions__WEBPACK_IMPORTED_MODULE_10__["updateDevPanelAction"])(data));
         }
     };
 };
-var Scene = Object(react_redux__WEBPACK_IMPORTED_MODULE_8__["connect"])(null, mapDispatchToProps)(SceneView);
+var Scene = Object(react_redux__WEBPACK_IMPORTED_MODULE_8__["connect"])(mapStateToProps, mapDispatchToProps)(SceneView);
 
 
 /***/ }),
@@ -2095,7 +2148,7 @@ store.dispatch(updateDevPanelData({
 var App = function () { return (react__WEBPACK_IMPORTED_MODULE_1__["createElement"]("div", null,
     react__WEBPACK_IMPORTED_MODULE_1__["createElement"](_components_Scene__WEBPACK_IMPORTED_MODULE_6__["Scene"], { eventCenter: eventCenter }),
     react__WEBPACK_IMPORTED_MODULE_1__["createElement"](_components_DevPanel__WEBPACK_IMPORTED_MODULE_7__["DevPanel"], null),
-    react__WEBPACK_IMPORTED_MODULE_1__["createElement"](_components_LoginPanel__WEBPACK_IMPORTED_MODULE_8__["LoginPanel"], { eventCenter: eventCenter }),
+    react__WEBPACK_IMPORTED_MODULE_1__["createElement"](_components_LoginPanel__WEBPACK_IMPORTED_MODULE_8__["LoginPanel"], null),
     react__WEBPACK_IMPORTED_MODULE_1__["createElement"](_components_MessageBoard__WEBPACK_IMPORTED_MODULE_10__["MessageBoard"], { messageCenter: messageCenter, eventCenter: eventCenter }),
     react__WEBPACK_IMPORTED_MODULE_1__["createElement"](_components_ControlPanel__WEBPACK_IMPORTED_MODULE_9__["ControlPanel"], { messageCenter: messageCenter, eventCenter: eventCenter }))); };
 react_dom__WEBPACK_IMPORTED_MODULE_2__["render"](react__WEBPACK_IMPORTED_MODULE_1__["createElement"](react_redux__WEBPACK_IMPORTED_MODULE_4__["Provider"], { store: store },
@@ -2140,16 +2193,29 @@ var addLog = function (state, action) {
     if (state === void 0) { state = []; }
     switch (action.type) {
         case _actions__WEBPACK_IMPORTED_MODULE_1__["ActionType"].addDevPanelLog:
-            return state.push(action.content);
-        default:
-            return state;
+            state.push(action.content);
     }
     ;
+    return state;
+};
+var triggerSceneEvent = function (state, action) {
+    if (state === void 0) { state = {
+        type: _actions__WEBPACK_IMPORTED_MODULE_1__["ActionType"].sceneEvent,
+        sceneEventName: _actions__WEBPACK_IMPORTED_MODULE_1__["SceneEventName"].none,
+    }; }
+    switch (action.type) {
+        case _actions__WEBPACK_IMPORTED_MODULE_1__["ActionType"].sceneEvent:
+            return action;
+    }
+    ;
+    return state;
 };
 var rootReducer = Object(redux__WEBPACK_IMPORTED_MODULE_0__["combineReducers"])({
     devPanelData: updateDevPanel,
-    log: addLog
+    log: addLog,
+    sceneEvent: triggerSceneEvent
 });
+;
 
 
 /***/ }),

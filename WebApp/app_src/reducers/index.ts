@@ -1,13 +1,13 @@
 import { combineReducers } from 'redux';
 import { DevPanelData } from '../models/DevPanelData';
-import { ActionType } from '../actions';
+import * as actions from '../actions';
 
 const updateDevPanel = (
     state: DevPanelData = {} as DevPanelData,
-    action: { type: ActionType, data: DevPanelData }
-) => {
+    action: actions.UpdateDevPanelAction
+): DevPanelData => {
     switch (action.type) {
-        case ActionType.updateDevPanelData:
+        case actions.ActionType.updateDevPanelData:
             return { ...state, ...action.data };
         default:
             return state;
@@ -17,18 +17,40 @@ const updateDevPanel = (
 
 const addLog = (
     state: string[] = [],
-    action: { type: ActionType, content: string }
-) => {
+    action: actions.AddLogAction
+): string[] => {
     switch (action.type) {
-        case ActionType.addDevPanelLog:
-            return state.push(action.content);
-        default:
-            return state
+        case actions.ActionType.addDevPanelLog:
+            state.push(action.content);
     };
+    return state;
 };
 
 
-export const rootReducer = combineReducers({
+const triggerSceneEvent = (
+    state: actions.SceneEventAction = {
+        type: actions.ActionType.sceneEvent,
+        sceneEventName: actions.SceneEventName.none,
+    },
+    action: actions.SceneEventAction
+): actions.SceneEventAction => {
+    switch (action.type) {
+        case actions.ActionType.sceneEvent:
+            return action;
+    };
+    return state;
+};
+
+
+export const rootReducer = combineReducers<State>({
     devPanelData: updateDevPanel,
-    log: addLog
+    log: addLog,
+    sceneEvent: triggerSceneEvent
 });
+
+
+export interface State {
+    devPanelData: DevPanelData,
+    log: string[],
+    sceneEvent
+};

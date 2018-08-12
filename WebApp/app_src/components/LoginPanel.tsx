@@ -3,11 +3,13 @@ import { socketClient } from '../common/SocketClient';
 import { EventCenter, Event } from '../common/MessageCenter';
 import { GlobalData } from '../common/GlobalData';
 import { CommonUtility } from '../common/CommonUtility';
+import { sceneEventAction, SceneEventName } from '../actions';
+import { connect } from 'react-redux';
 
 import "./LoginPanel.scss";
 
-export class LoginPanel extends React.Component<
-    { eventCenter: EventCenter },
+class LoginPanelView extends React.Component<
+    { triggerSceneEvent: (sceneEventName: SceneEventName) => void },
     { signInName: string }
     > {
 
@@ -130,7 +132,7 @@ export class LoginPanel extends React.Component<
 
     private afterWordCardsAnimation() {
         $('.skipAnimation').hide();
-        this.props.eventCenter.trigger(Event.AfterWordCardsAnimation);
+        this.props.triggerSceneEvent(SceneEventName.afterWordCardsAnimation);
     };
 
     private focus() {
@@ -157,6 +159,23 @@ export class LoginPanel extends React.Component<
 
         const $loginPanel = $('#loginPanel');
         $loginPanel.animate({ opacity: 0 }, 2000, () => $loginPanel.hide());
-        this.props.eventCenter.trigger(Event.AfterLogin);
+        this.props.triggerSceneEvent(SceneEventName.afterLogin);
     };
 };
+
+
+
+
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        triggerSceneEvent: (sceneEventName: SceneEventName) => {
+            dispatch(sceneEventAction(sceneEventName))
+        }
+    };
+};
+
+export const LoginPanel = connect(
+    null,
+    mapDispatchToProps
+)(LoginPanelView);

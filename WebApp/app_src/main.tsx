@@ -12,7 +12,6 @@ import { LoginPanel } from './components/LoginPanel';
 import { ControlPanel } from './components/ControlPanel';
 import { MessageBoard } from './components/MessageBoard';
 import { CommonUtility } from './common/CommonUtility';
-import { ActionType, updateDevPanelData } from './actions';
 import { rootReducer } from './reducers';
 
 
@@ -42,7 +41,7 @@ const App = () => (
     <div>
         <Scene eventCenter={eventCenter} />
         <DevPanel />
-        <LoginPanel eventCenter={eventCenter} />
+        <LoginPanel />
         <MessageBoard messageCenter={messageCenter} eventCenter={eventCenter} />
         <ControlPanel messageCenter={messageCenter} eventCenter={eventCenter} />
     </div>

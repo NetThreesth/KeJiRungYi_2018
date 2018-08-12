@@ -2,6 +2,7 @@ import * as React from "react";
 import { CommonUtility } from '../common/CommonUtility';
 import { connect } from 'react-redux';
 import { DevPanelData } from '../models/DevPanelData';
+import { State } from '../reducers';
 
 
 
@@ -51,8 +52,8 @@ class DevPanelView
 
 
 
-const mapStateToProps: (state: any) => DevPanelData = (state) => {
-    const props = state.devPanelData as DevPanelData;
+const mapStateToProps = (state: State) => {
+    const props = state.devPanelData;
     props.log = state.log;
     return props;
 };

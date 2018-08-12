@@ -9,18 +9,18 @@ import { GlobalData } from '../common/GlobalData';
 import { connect } from 'react-redux';
 
 import { EventCenter, Event, ChatBotResponse } from '../common/MessageCenter';
-import { updateDevPanelData } from '../actions';
+import { updateDevPanelAction, SceneEventName } from '../actions';
 import { DevPanelData } from '../models/DevPanelData';
+import { State } from '../reducers';
 
 import "./Scene.scss";
 
 
-class SceneView extends React.Component<
-    {
-        eventCenter: EventCenter,
-        updateDevPanelData: (data: DevPanelData) => void
-    }
-    > {
+class SceneView extends React.Component<{
+    eventCenter: EventCenter,
+    updateDevPanelData: (data: DevPanelData) => void,
+    eventName: SceneEventName
+}> {
 
     private engine: BABYLON.Engine;
     private scene: BABYLON.Scene;
@@ -92,6 +92,17 @@ class SceneView extends React.Component<
         window.addEventListener("resize", this.engine.resize.bind(this.engine));
 
         this.updateMask();
+    };
+
+    componentDidUpdate(prevProps) {
+        switch (this.props.eventName) {
+            case SceneEventName.afterWordCardsAnimation:
+                break;
+            case SceneEventName.afterLogin:
+                break;
+            case SceneEventName.afterSubmitMessage:
+                break;
+        }
     };
 
 
@@ -704,15 +715,20 @@ interface TranslatableNode {
 };
 
 
+
+const mapStateToProps = (state: State) => {
+    return { eventName: state.sceneEvent };
+};
+
 const mapDispatchToProps = (dispatch) => {
     return {
         updateDevPanelData: (data) => {
-            dispatch(updateDevPanelData(data))
+            dispatch(updateDevPanelAction(data))
         }
     };
 };
 
 export const Scene = connect(
-    null,
+    mapStateToProps,
     mapDispatchToProps
-)(SceneView)
+)(SceneView);
