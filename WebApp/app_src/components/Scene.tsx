@@ -229,12 +229,12 @@ export class Scene extends React.Component<
             particle.position.y = 0;
             particle.position.z = 0;
 
-            const speed = 0.01;
+            const speed = 0.006;
             particle.velocity.x = (Math.random() - 0.5) * speed / 3;
             particle.velocity.y = Math.random() * speed;
             particle.velocity.z = (Math.random() - 0.5) * speed / 3;
 
-            const scale = Math.random() + 0.2;
+            const scale = (Math.random() / 2) + 0.5;
             particle.scale.x = scale;
             particle.scale.y = scale;
             particle.scale.z = scale;
@@ -243,7 +243,6 @@ export class Scene extends React.Component<
             particle.uvs.y = Math.random() >= 0.5 ? 0.5 : 0;
             particle.uvs.z = particle.uvs.x + 0.5;
             particle.uvs.w = particle.uvs.y + 0.5;
-            // particle['age'] = Math.random() * 2 + 2;
 
             return particle;
         };
@@ -254,16 +253,12 @@ export class Scene extends React.Component<
             direction.y = direction.y * -1;
         }
         bubbleSpray.updateParticle = (particle) => {
-            /*             
-                if (particle['age'] < 0)  initParticle(particle);
-                particle['age'] -= 0.01; 
-             */
             particle.position.addInPlace(particle.velocity); // 擴散
-            const rise = 0.01;
+            const rise = 0.001;
             particle.position.x += (direction.x * rise); // 上升x
             particle.position.y += (direction.y * rise); // 上升y 
 
-            const scale = particle.scale.x + 0.002;
+            const scale = particle.scale.x + 0.000005;
             particle.scale.x = scale;
             particle.scale.y = scale;
             particle.scale.z = scale;
