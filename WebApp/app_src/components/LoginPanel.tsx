@@ -51,7 +51,7 @@ export class LoginPanel extends React.Component<
             <div className="skipAnimation">
                 <button type="button"
                     onClick={this.skipAnimation.bind(this)}>
-                    skip
+                    跳過動畫
                 </button>
             </div>
         </div>;

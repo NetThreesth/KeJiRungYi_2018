@@ -14,13 +14,18 @@
         overflow: hidden;
         padding: 0 30px;
         .messageBox {
-            @include white-text;
+            // @include white-text;
+            color: white;
             position: relative;
             margin: 15px 0;
             color: white;
             .avatar {
                 position: absolute;
                 width: 30px;
+            }
+            .name {
+                position: absolute;
+                top: -12px;
             }
             .content {
                 padding: 3px 0;
@@ -36,7 +41,7 @@
                 left: 0;
             }
             .name {
-                display: none;
+                left: 0;
             }
             .content {
                 text-align: left;
@@ -48,9 +53,7 @@
                 right: 0;
             }
             .name {
-                position: absolute;
-                top: -12px;
-                right: 7px;
+                right: -6px;
             }
             .content {
                 text-align: right;

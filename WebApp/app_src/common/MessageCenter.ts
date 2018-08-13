@@ -3,12 +3,13 @@ import { Roles, GlobalData } from './GlobalData';
 import { CommonUtility } from './CommonUtility';
 import { AddLogEvent } from '../components/DevPanel';
 
-export enum ContentType { Text, Image };
+export enum ContentType { Text, Image, Algae };
 
 export interface Content {
     role: Roles;
     type: ContentType;
-    content: string;
+    content?: string;
+    algaeCount?: number;
 };
 
 export class MessageCenter {
@@ -68,6 +69,7 @@ export class MessageCenter {
         this.eventCenter.trigger(Event.AfterSubmitMessage, resp);
 
         this.addText(Roles.ChatBot, resp.chatbotResponse);
+        this.addMessage({ role: Roles.Algae, type: ContentType.Algae, algaeCount: resp.density / 10 });
         setTimeout(() => this.addText(Roles.Algae, resp.algaeResponse), 5000);
         setTimeout(() => this.addText(Roles.ChatBot, resp.chatbot2algaeResponse), 6000);
     };

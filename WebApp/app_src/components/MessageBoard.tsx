@@ -5,6 +5,7 @@ import { Scrollbar } from '../common/Scrollbar';
 import { GlobalData, Roles } from '../common/GlobalData';
 
 import "./MessageBoard.scss";
+import { CommonUtility } from "../common/CommonUtility";
 
 
 export class MessageBoard
@@ -58,15 +59,31 @@ export class MessageBoard
 
     private createContent(content: Content) {
         const isUser = content.role === Roles.User;
-        const name = isUser ? GlobalData.userName : '';
+        const name = isUser ? GlobalData.userName :
+            content.role === Roles.Algae ? 'aigae' : 'bot';
         const float = isUser ? 'right' : 'left';
         const colors = {};
         colors[Roles.User] = 'white';
         colors[Roles.Algae] = '#ffffe0';
         colors[Roles.ChatBot] = '#fff0f2';
-        const $content = (content.type === ContentType.Text) ?
-            <div className="content" style={{ color: colors[content.role] }}> {content.content}</div > :
-            <div className="content"><img src={content.content} /></div>;
+        let $content: JSX.Element = null;
+        if (content.type === ContentType.Text) {
+            $content = <div className="content" style={{ color: colors[content.role] }}>
+                {content.content}
+            </div >;
+        }
+        else if (content.type === ContentType.Image) {
+            $content = <div className="content"><img src={content.content} /></div>;
+        }
+        else if (content.type === ContentType.Algae) {
+            let algaes = [];
+            CommonUtility.loop(content.algaeCount, () => {
+                algaes.push(<img src='3sth/algae/algae_particle.png' />);
+            });
+            $content = <div className="content">
+                {algaes}
+            </div>;
+        }
 
         return <div className={`messageBox ${float}`}>
             <img src={this.avatars[content.role]} className="avatar" />
