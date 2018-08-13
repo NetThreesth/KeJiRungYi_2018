@@ -25,32 +25,18 @@ export class Scene extends React.Component<
     private viewPort = { position: BABYLON.Vector3.Zero(), rotation: BABYLON.Vector3.Zero() };
 
     private bubbleSpray: BABYLON.SolidParticleSystem;
-    private backgroundParticles: {
-        [id: string]: {
-            targetCount: number,
-            particles: {
-                mesh: BABYLON.Mesh,
-                translateVector: BABYLON.Vector3,
-                duration: number
-            }[]
-        }
-    } = function () {
-        const dic = {};
+    private backgroundParticles: { [color: string]: ParticlesSetting }[] = function () {
+        const backgroundParticles = [];
         for (let i = 0; i < 9; i++) {
-            dic[i] = {
-                targetCount: 0,
-                particles: []
-            };
+            backgroundParticles.push({
+                white: { targetCount: 0, particles: [] },
+                yellow: { targetCount: 0, particles: [] },
+                pink: { targetCount: 0, particles: [] }
+            });
         }
-        return dic;
+        return backgroundParticles;
     }();
 
-    private algaes: {
-        createTime: Date,
-        mesh: BABYLON.Mesh,
-        translateVector: BABYLON.Vector3,
-        duration: number
-    }[] = [];
 
     private createLinesWorker: AsyncWorker<BABYLON.Vector3[], BABYLON.Vector3[][]>;
 
@@ -97,10 +83,11 @@ export class Scene extends React.Component<
     };
 
     private startUpdateBackgroundParticles() {
-        socketClient.on('updateBackgroundParticles', data => {
-            Object.keys(data).forEach(i => {
-                this.backgroundParticles[i] = this.backgroundParticles[i] || {} as any;
-                this.backgroundParticles[i].targetCount = data[i];
+        socketClient.on('updateBackgroundParticles', dataForEachRoom => {
+            dataForEachRoom.forEach((data, i) => {
+                this.backgroundParticles[i].white.targetCount = data.white;
+                this.backgroundParticles[i].yellow.targetCount = data.yellow;
+                this.backgroundParticles[i].pink.targetCount = data.pink;
             });
         });
     };
@@ -141,7 +128,6 @@ export class Scene extends React.Component<
         this.updateCameraPosition();
         this.translateLinesForTextNodes();
         this.updateParticles();
-        this.checkAlgaes();
         this.translateParticles();
         if (this.bubbleSpray) this.bubbleSpray.setParticles();
     };
@@ -176,20 +162,6 @@ export class Scene extends React.Component<
     };
 
 
-    private checkAlgaes() {
-        if (this.algaes.length === 0) return;
-        const disposeTime = new Date(Date.now() - 30 * 60 * 1000);
-        if (this.algaes[0].mesh.scaling.x < 0.01) {
-            const algae = this.algaes.shift();
-            algae.mesh.dispose();
-        }
-        this.algaes.forEach(algae => {
-            let scaling = algae.mesh.scaling.x;
-            if (algae.createTime < disposeTime) scaling -= 0.01;
-            else if (scaling <= 1) scaling += ((1 - scaling) * 0.007);
-            algae.mesh.scaling = new BABYLON.Vector3(scaling, scaling, scaling);
-        });
-    };
 
 
     private renderAfter() {
@@ -271,57 +243,94 @@ export class Scene extends React.Component<
     };
 
 
-    private updateParticles() {
-        this.chatRoomsCenter.forEach((center, i) => {
-            const particlesSetting = this.backgroundParticles[i];
-            const count = particlesSetting.targetCount - particlesSetting.particles.length;
-            if (count > 0) {
-                for (let i = 0; i < count; i++) {
-                    const particle = this.createParticle(center);
-
-                    particlesSetting.particles.push({
-                        mesh: particle,
-                        translateVector: BabylonUtility.getRandomVector3(),
-                        duration: this.getDurationForParticle()
-                    });
-                }
-            } else if (count < 0) {
-                const toRemove = particlesSetting.particles.splice(0, count * -1);
-                toRemove.forEach(e => e.mesh.dispose());
-            }
-        });
-    };
-
 
     private getTextureForParticle = function () {
-        let textures: { [key: number]: BABYLON.Texture } = null;
-        return () => {
+        let textures: { [key: string]: BABYLON.Texture } = null;
+        return (color: string) => {
             if (!textures) {
                 textures = {
-                    0: new BABYLON.Texture('3sth/particles/pink_particle.png', this.scene),
-                    1: new BABYLON.Texture('3sth/particles/white_particle.png', this.scene),
-                    2: new BABYLON.Texture('3sth/particles/yellow_particle.png', this.scene)
+                    pink: new BABYLON.Texture('3sth/particles/pink_particle.png', this.scene),
+                    white: new BABYLON.Texture('3sth/particles/white_particle.png', this.scene),
+                    yellow: new BABYLON.Texture('3sth/particles/yellow_particle.png', this.scene)
                 };
                 Object.keys(textures).forEach(key => textures[key].hasAlpha = true);
             }
-            const key = CommonUtility.getRandomIntInRange(0, 2);
-            return textures[key];
+            return textures[color];
         }
     }.bind(this)();
 
-    private createParticle(center: BABYLON.Vector3) {
-
-        const colorSetIndex = CommonUtility.getRandomIntInRange(0, 2);
-
-        const particle = BABYLON.Mesh.CreatePlane(`colorSetIndex:${colorSetIndex}`, 0.5, this.scene);
+    private createParticle(center: BABYLON.Vector3, color: string) {
+        const particle = BABYLON.Mesh.CreatePlane(`particle`, 0.5, this.scene);
         particle.position = center.clone();
         particle.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL;
 
         const material = particle.material = new BABYLON.StandardMaterial(`particleMaterial`, this.scene);
-        material.diffuseTexture = this.getTextureForParticle();
-
+        material.diffuseTexture = this.getTextureForParticle(color);
+        const scaling = 0.1;
+        particle.scaling = new BABYLON.Vector3(scaling, scaling, scaling);
         return particle;
     };
+
+    private updateParticles() {
+        this.chatRoomsCenter.forEach((center, i) => {
+            const particlesSettings = this.backgroundParticles[i];
+            ['white', 'yellow', 'pink'].forEach(color => {
+                const particlesForOneColor = particlesSettings[color];
+                const count = particlesForOneColor.targetCount - particlesForOneColor.particles.length;
+                if (count > 0) {
+                    for (let i = 0; i < count; i++) {
+                        const particle = this.createParticle(center, color);
+
+                        particlesForOneColor.particles.push({
+                            mesh: particle,
+                            translateVector: BabylonUtility.getRandomVector3(),
+                            duration: this.getDurationForParticle(),
+                            scaleOut: false
+                        });
+                    }
+                } else if (count < 0) {
+                    const toScaleOutCount = count * -1;
+                    particlesForOneColor.particles.forEach((particle, i) => {
+                        if (i + 1 > toScaleOutCount) return;
+                        particle.scaleOut = true;
+                        const mesh = particle.mesh;
+                        const scale = mesh.scaling.x * 0.95;
+                        mesh.scaling = new BABYLON.Vector3(scale, scale, scale);
+                    });
+                    const first = particlesForOneColor.particles[0];
+                    if (first.mesh.scaling.x < 0.05) {
+                        particlesForOneColor.particles.shift();
+                        first.mesh.dispose();
+                    }
+                }
+            });
+        });
+    };
+
+    private translateParticles() {
+        let particles: Particle[] = [];
+        this.backgroundParticles.forEach(particlesForOneRoom => {
+            ['white', 'yellow', 'pink'].forEach(color => {
+                particles = particles.concat(particlesForOneRoom[color].particles);
+            });
+        });
+        if (particles.length === 0) return;
+
+        particles.forEach(p => {
+            if (p.duration <= 0) {
+                p.translateVector = BabylonUtility.getRandomVector3();
+                p.duration = this.getDurationForParticle();
+            }
+            if (!p.scaleOut && p.mesh.scaling.x < 1) {
+                const oldScale = p.mesh.scaling.x;
+                const newScale = (oldScale > 0.95) ? 1 : (1 - oldScale) * 0.01 + oldScale;
+                p.mesh.scaling = new BABYLON.Vector3(newScale, newScale, newScale);
+            }
+            BabylonUtility.updatePosition(p.mesh.position, p.translateVector, 0.003);
+            p.duration -= 1;
+        });
+    };
+
 
 
     private linesForLinesystem: BABYLON.Vector3[][] = [];
@@ -329,8 +338,8 @@ export class Scene extends React.Component<
     private translateType: TranslateType = TranslateType.Simple;
     private linesystemPerformance = 0;
 
-    private startUpdateTextNodes(textNodes: TranslatableNode[]) {
-        let updatedNodes: TranslatableNode[];
+    private startUpdateTextNodes(textNodes: TextNode[]) {
+        let updatedNodes: TextNode[];
         switch (this.translateType) {
             case TranslateType.Simple: {
                 updatedNodes = this.updateTextNodeForSimpleMotion(textNodes);
@@ -358,7 +367,7 @@ export class Scene extends React.Component<
         });
     };
 
-    private updateTextNodeForSimpleMotion(nodesToTranslate: TranslatableNode[]) {
+    private updateTextNodeForSimpleMotion(nodesToTranslate: TextNode[]) {
         const nodes = nodesToTranslate.map((node, i) => {
             if (node.position.z > -13)
                 node.translateVector.z = -1;
@@ -369,7 +378,7 @@ export class Scene extends React.Component<
         });
         return nodes;
     };
-    private updateTextNodeForForward(nodesToTranslate: TranslatableNode[]) {
+    private updateTextNodeForForward(nodesToTranslate: TextNode[]) {
         const maxMove = 0.3;
         let count = 0;
         const nodes = nodesToTranslate.map((node, i) => {
@@ -425,25 +434,6 @@ export class Scene extends React.Component<
         }
 
         if (linesForChatRoomLen < linesystemLen) this.linesForLinesystem.pop();
-    };
-
-    private translateParticles() {
-        let particles = [];
-        Object.keys(this.backgroundParticles).forEach(key => {
-            particles = particles.concat(this.backgroundParticles[key].particles);
-        });
-        particles = particles.concat(this.algaes);
-        if (particles.length === 0) return;
-
-        const scale = 0.003;
-        particles.forEach(p => {
-            if (p.duration <= 0) {
-                p.translateVector = BabylonUtility.getRandomVector3();
-                p.duration = this.getDurationForParticle();
-            }
-            BabylonUtility.updatePosition(p.mesh.position, p.translateVector, scale);
-            p.duration -= 1;
-        });
     };
 
     /** unit in frame number */
@@ -616,27 +606,8 @@ export class Scene extends React.Component<
         this.maskColor.a = (alpha < 0.3) ? Number(alpha.toFixed(3)) : 0.3;
         this.updateMask();
 
-        const center = this.chatRoomsCenter[GlobalData.chatRoomIndex];
-
-        // Algae
-        const algae = BABYLON.Mesh.CreatePlane(`algae-${this.algaes.length}`, 0.5, this.scene);
-        algae.position.x = center.x + CommonUtility.getRandomNumberInRange(-1, 1, 2);
-        algae.position.y = center.y + CommonUtility.getRandomNumberInRange(-1, 1, 2);
-        algae.position.z = center.z + CommonUtility.getRandomNumberInRange(-1, 1, 2);
-        algae.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL;
-        algae.scaling = new BABYLON.Vector3(0.1, 0.1, 0.1);
-
-        const material = algae.material = new BABYLON.StandardMaterial(`algaeMaterial`, this.scene);
-        material.diffuseTexture = new BABYLON.Texture('3sth/algae/algae_particle.png', this.scene);
-        material.diffuseTexture.hasAlpha = true;
-        this.algaes.push({
-            mesh: algae,
-            createTime: new Date(),
-            translateVector: BabylonUtility.getRandomVector3(),
-            duration: this.getDurationForParticle()
-        });
-
         // Bubble
+        const center = this.chatRoomsCenter[GlobalData.chatRoomIndex];
         this.createBubbleSpray(center, 12 + (chatBotResponse.text2cmd.pumpValue * 2));
     };
 
@@ -686,8 +657,20 @@ export class Scene extends React.Component<
 enum TranslateType { 'Simple', 'Forward', 'Expand' };
 
 
-interface TranslatableNode {
+interface TextNode {
     position: BABYLON.Vector3,
     scale?: number,
     translateVector?: BABYLON.Vector3
+};
+
+interface Particle {
+    mesh: BABYLON.Mesh,
+    scaleOut: boolean,
+    translateVector: BABYLON.Vector3,
+    duration: number
+};
+
+interface ParticlesSetting {
+    targetCount: number,
+    particles: Particle[]
 };
