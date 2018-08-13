@@ -37,8 +37,9 @@ export class LoginPanel extends React.Component<
                     <br /> 周而復始。
                 </div>
             <div id="signInWrapper" className="wordCard">
-                <span className="label">Sign in with:&nbsp;</span>
+                <div className="label text-center ">登入</div>
                 <input type="text" id="signInName"
+                    placeholder="使用者名稱"
                     value={this.state.signInName}
                     onKeyPress={this.keyPress.bind(this)}
                     onChange={this.signInNameChanged.bind(this)} />
@@ -138,7 +139,9 @@ export class LoginPanel extends React.Component<
     };
 
     private signInNameChanged(e: React.ChangeEvent<HTMLInputElement>) {
-        this.setState({ signInName: e.target.value });
+        let value = e.target.value;
+        if (value.length > 6) value = value.substr(0, 6);
+        this.setState({ signInName: value });
     };
 
     private keyPress(e: React.KeyboardEvent<HTMLInputElement>) {

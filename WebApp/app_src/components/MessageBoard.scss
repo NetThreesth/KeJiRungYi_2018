@@ -5,12 +5,14 @@
     @include flex;
     @include flex-horizontalCenter;
     >div {
+        margin-top: 10px;
         margin-bottom: 100px;
     }
     .messageBoardContent {
         @include clearfix;
         width: 100%;
         overflow: hidden;
+        padding: 0 30px;
         .messageBox {
             @include white-text;
             position: relative;
@@ -77,7 +79,7 @@
 
 @media only screen and (min-width: 768px) {
     .messageBoardContent {
-        padding: 0 80px;
+        padding: 0 120px;
     }
 }
 

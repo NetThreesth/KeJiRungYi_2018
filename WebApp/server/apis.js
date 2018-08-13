@@ -2,16 +2,18 @@
 
 const logger = require('./logger');
 const common = require('./commonNodeJSUtility.js');
-const socketIO = require('./socketIO.js');
+const { io, backgroundParticles } = require('./socketIO.js');
 const repo = require('./repository.js');
 
 
 module.exports.initAPIs = (app) => {
 
     app.route('/apis/uploadAlgaeImage').post((req, res, next) => {
+
         const body = req.body;
         body.base64Image = body.base64Image.replace(/b'/g, '').replace(/'/g, '');
-        socketIO.io.sockets.emit('uploadAlgaeImage', body);
+        io.sockets.emit('uploadAlgaeImage', body);
+        createParticle(body.rid, 'yellow', 0);
         res.send(true);
     });
 
@@ -24,7 +26,8 @@ module.exports.initAPIs = (app) => {
             name: 'chatbot',
             chatroomId: body.rid,
         });
-        socketIO.io.sockets.emit('uploadDeepAlMessage', body);
+        io.sockets.emit('uploadDeepAlMessage', body);
+        createParticle(body.rid, 'pink', 0);
         res.send(true);
     });
 
@@ -111,8 +114,6 @@ module.exports.initAPIs = (app) => {
 };
 
 function sentToChatbots(text, rid, userName) {
-    socketIO.backgroundParticles[rid] += 1;
-    setTimeout(() => socketIO.backgroundParticles[rid] -= 1, 30 * 60 * 1000);
 
     repo.Message.create({
         time: new Date(),
@@ -120,6 +121,7 @@ function sentToChatbots(text, rid, userName) {
         name: userName,
         chatroomId: rid,
     });
+    createParticle(rid, 'white', 0);
 
     const { from } = require('rxjs');
     const { map } = require('rxjs/operators');
@@ -130,6 +132,7 @@ function sentToChatbots(text, rid, userName) {
     }));
     return observable.pipe(map(resp => {
         const now = new Date();
+        createParticlesForResponse(rid);
         repo.Message.bulkCreate([
             {
                 time: now,
@@ -158,4 +161,32 @@ function errorHandler(err, next) {
     logger.error(err);
     logger.error(err.message);
     if (next) next(err);
+};
+
+function createParticle(rid, color, delay) {
+    if (!rid && rid !== 0) {
+        return logger.error(`rid undefined, rid: ${rid}`);
+    }
+
+    const reduceTime = 0.5 * 60 * 1000;
+    const particles = backgroundParticles[rid];
+    setTimeout(() => {
+
+        particles[color] += 1;
+        logger.info(`rid: ${rid}, add ${color} to: ${particles[color]}`);
+
+        setTimeout(() => {
+            particles[color] -= 1;
+            logger.info(`rid: ${rid}, reduce ${color} to: ${particles[color]}`);
+        }, reduceTime);
+
+    }, delay);
+};
+
+function createParticlesForResponse(rid) {
+    createParticle(rid, 'pink', 0);
+    createParticle(rid, 'pink', 0.5 * 1000);
+    createParticle(rid, 'yellow', 3 * 1000);
+    createParticle(rid, 'yellow', 6 * 1000);
+    createParticle(rid, 'pink', 7 * 1000);
 };
