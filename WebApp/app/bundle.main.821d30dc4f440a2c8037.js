@@ -1617,10 +1617,10 @@ var Scene = /** @class */ (function (_super) {
             direction.y = direction.y * -1;
         }
         bubbleSpray.updateParticle = function (particle) {
-            particle.position.addInPlace(particle.velocity); // ´æ•£
+            particle.position.addInPlace(particle.velocity); // ï¿½æ•£
             var rise = 0.001;
-            particle.position.x += (direction.x * rise); // ä¸Šåx
-            particle.position.y += (direction.y * rise); // ä¸Šåy 
+            particle.position.x += (direction.x * rise); // ä¸Šï¿½x
+            particle.position.y += (direction.y * rise); // ä¸Šï¿½y 
             var scale = particle.scale.x + 0.000005;
             particle.scale.x = scale;
             particle.scale.y = scale;
@@ -1932,7 +1932,7 @@ var Scene = /** @class */ (function (_super) {
                 return {
                     position: position,
                     scale: _common_CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getRandomNumberInRange(0.005, 0.01, 3),
-                    translateVector: new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"](0, 0, position.z < initialZ ? 1 : -1) // å¹å
+                    translateVector: new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"](0, 0, position.z < initialZ ? 1 : -1) // ï¿½ï¿½ï¿½
                 };
             });
             _this.startUpdateTextNodes(textNodes);
@@ -8320,7 +8320,7 @@ module.exports = Object.keys || function keys (obj){
 			return continuationByte & 0x3F;
 		}
 
-		// If we end up here, it™s not a continuation byte
+		// If we end up here, itâ€™s not a continuation byte
 		throw Error('Invalid continuation byte');
 	}
 
@@ -11744,4 +11744,4 @@ module.exports = ReactDOM;
 /***/ })
 
 /******/ });
-//# sourceMappingURL=bundle.main.4f426afb2c168ea33e9e.js.map
+//# sourceMappingURL=bundle.main.821d30dc4f440a2c8037.js.map
