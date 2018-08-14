@@ -1,11 +1,11 @@
 @import '../common/mixin';
 #renderCanvas {
-    @include full-page;
+    @include fullPageWithoutScrollbar;
     touch-action: none;
 }
 
 #greenMask {
-    @include full-page;
+    @include fullPageWithoutScrollbar;
     @include untouchable;
     @include transition-all;
 }

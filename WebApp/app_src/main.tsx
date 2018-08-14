@@ -9,6 +9,8 @@ import { DevPanel } from './components/DevPanel';
 import { LoginPanel } from './components/LoginPanel';
 import { ControlPanel } from './components/ControlPanel';
 import { MessageBoard } from './components/MessageBoard';
+import { ProjectInfo } from './components/ProjectInfo';
+
 import { CommonUtility } from './common/CommonUtility';
 
 
@@ -27,6 +29,7 @@ const App = () => (
         <LoginPanel eventCenter={eventCenter} />
         <MessageBoard messageCenter={messageCenter} eventCenter={eventCenter} />
         <ControlPanel messageCenter={messageCenter} eventCenter={eventCenter} />
+        <ProjectInfo />
     </div>
 );
 

@@ -1,0 +1,23 @@
+@import '../common/mixin';
+#projectInfo {
+    color: #474747;
+    .infoIcon {
+        z-index: 99;
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        font-size: 24px;
+        cursor: pointer;
+    }
+    .container {
+        @include fullPage;
+        background-color: rgba(255, 255, 255, 0.8);
+        overflow: auto;
+        z-index: 98;
+    }
+    .content {
+        margin: 20px auto;
+        position: relative;
+        max-width: 600px;
+    }
+}

@@ -1,7 +1,7 @@
 @import '../common/mixin';
 #messageBoard {
     @include untouchable;
-    @include full-page;
+    @include fullPageWithoutScrollbar;
     @include flex;
     @include flex-horizontalCenter;
     >div {

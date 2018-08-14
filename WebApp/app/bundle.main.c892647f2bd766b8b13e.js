@@ -1372,6 +1372,115 @@ var MessageBoard = /** @class */ (function (_super) {
 
 /***/ }),
 
+/***/ "./app_src/components/ProjectInfo.scss":
+/*!*********************************************!*\
+  !*** ./app_src/components/ProjectInfo.scss ***!
+  \*********************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+
+var content = __webpack_require__(/*! !../../node_modules/css-loader!../../node_modules/sass-loader/lib/loader.js!./ProjectInfo.scss */ "./node_modules/css-loader/index.js!./node_modules/sass-loader/lib/loader.js!./app_src/components/ProjectInfo.scss");
+
+if(typeof content === 'string') content = [[module.i, content, '']];
+
+var transform;
+var insertInto;
+
+
+
+var options = {"hmr":true}
+
+options.transform = transform
+options.insertInto = undefined;
+
+var update = __webpack_require__(/*! ../../node_modules/style-loader/lib/addStyles.js */ "./node_modules/style-loader/lib/addStyles.js")(content, options);
+
+if(content.locals) module.exports = content.locals;
+
+if(false) {}
+
+/***/ }),
+
+/***/ "./app_src/components/ProjectInfo.tsx":
+/*!********************************************!*\
+  !*** ./app_src/components/ProjectInfo.tsx ***!
+  \********************************************/
+/*! exports provided: ProjectInfo */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ProjectInfo", function() { return ProjectInfo; });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _ProjectInfo_scss__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ProjectInfo.scss */ "./app_src/components/ProjectInfo.scss");
+/* harmony import */ var _ProjectInfo_scss__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_ProjectInfo_scss__WEBPACK_IMPORTED_MODULE_1__);
+var __extends = (undefined && undefined.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+
+
+var ProjectInfo = /** @class */ (function (_super) {
+    __extends(ProjectInfo, _super);
+    function ProjectInfo() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    ProjectInfo.prototype.render = function () {
+        return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { id: "projectInfo" },
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { id: "showIcon", onClick: this.showContent.bind(this), className: "infoIcon" },
+                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("i", { className: "fas fa-info-circle" })),
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { id: "hideIcon", onClick: this.hideContent.bind(this), className: "infoIcon", style: { display: 'none' } },
+                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("i", { className: "fas fa-times" })),
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "container", style: { display: 'none' } },
+                react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "content" },
+                    "\u95DC\u65BC",
+                    react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("br", null),
+                    "\u793E\u7FA4\u7E54\u884D\u8A08\u756B3sth.net",
+                    react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("br", null),
+                    react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("br", null),
+                    "2006\u5E74\u5C0F\u8AAA\u300A\u4E09\u9AD4\u300B\u7684\u554F\u4E16\uFF0C\u8B93\u9019\u4E00\u53E4\u8001\u7684\u5929\u6587\u7269\u7406\u96E3\u984C\u518D\u5EA6\u4F86\u5230\u4E16\u4EBA\u9762\u524D\uFF0C\u4E09\u9AD4\u554F\u984C\u6240\u5F15\u767C\u7684\u601D\u8FA8\uFF0C\u4EA6\u53EF\u8F49\u800C\u63A2\u8A0E\u7576\u4EE3\u6587\u660E\u7684\u904B\u4F5C\u6A21\u5F0F\uFF1A\u4E0D\u540C\u65BC\u5148\u53E4\u4EBA\u5011\u5C0D\u65BC\u4E00\u9AD4\u4E16\u754C\u7684\u8A6E\u91CB(\u81EA\u7136\u754C)\u3001\u6587\u85DD\u5FA9\u8208\u4EE5\u964D\u4E4B\u4E8C\u9AD4\u4E16\u754C\u89C0(\u4EBA\u8207\u7269\u3001\u4E3B\u9AD4\u8207\u5BA2\u9AD4)\uFF0C\u7576\u4EE3\u793E\u6703\u6F38\u6F38\u5F62\u6210\u4EE5\u6578\u64DA\u70BA\u57FA\u790E\uFF0C\u81EA\u7136\u3001\u4EBA\u985E\u3001\u79D1\u6280\u4E09\u9AD4\u4EA4\u4E92\u4F5C\u7528\u800C\u69CB\u7BC9\u7684\u6709\u6A5F\u7DB2\u7D61\u6027\u793E\u6703\u3002",
+                    react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("br", null),
+                    react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("br", null),
+                    "\u79D1\u6280\u7684\u98DB\u901F\u9032\u5C55\u4E0B\uFF0C\u7269\u7406\u771F\u5BE6\u8207\u865B\u64EC\u771F\u5BE6\u56E0\u6578\u64DA\u4E4B\u7522\u88FD\u8207\u5229\u7528\u76F8\u4E92\u4EA4\u878D\u758A\u52A0\uFF0C\u800C\u6578\u64DA\u4E5F\u7531\u7269\u8207\u4EBA\u7684\u884D\u751F\u7269\uFF0C\u9010\u6F38\u8F49\u8B8A\u70BA\u5177\u6709\u4E3B\u9AD4\u8207\u80FD\u52D5\u6027\u7684\u5B58\u5728\uFF0C\u81EA\u7136\u754C\u8207\u4EBA\u985E\u793E\u6703\u4E4B\u76F8\u4E92\u95DC\u4FC2\u81F3\u6B64\u52A0\u5165\u4E86\u65B0\u7684\u8B8A\u6578\uFF0C\u672A\u4F86\u5C07\u9762\u81E8\u66F4\u591A\u6E3E\u6C8C\u672A\u77E5\u3002",
+                    react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("br", null),
+                    react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("br", null),
+                    "\u672C\u8A08\u5283\u4EE5\u7576\u4EE3\u4E09\u9AD4\u5171\u69CB\u4E4B\u6587\u5316\u8108\u7D61\u70BA\u8A0E\u8AD6\u4E3B\u8EF8\uFF0C\u4EE5\u85FB\u985E(\u81EA\u7136)\u3001\u4F7F\u7528\u8005(\u4EBA\u985E)\u8207\u4EBA\u5DE5\u667A\u6167(\u79D1\u6280)\u70BA\u7B26\u78BC\uFF0C\u63A2\u8A0E\u4E09\u8005\u4EA4\u4E92\u4F5C\u7528\u5982\u4F55\u4EA4\u7E54\u51FA\u6587\u5316\u7E54\u9AD4\uFF0C\u4EE5\u53CA\u6B64\u9593\u7684\u904B\u4F5C\u65B9\u5F0F\uFF1A\u79D1\u6280\u5982\u4F55\u6D89\u5165\u4E26\u6539\u8B8A\u539F\u5148\u7684\u96D9\u9AD4\u95DC\u4FC2\uFF1F\u65B0\u7684\u4E09\u9AD4\u95DC\u4FC2\u7684\u4E4B\u65BC\u7576\u4EE3\u793E\u6703\u7684\u610F\u7FA9\u70BA\u4F55\uFF1F\u6578\u64DA\u505A\u70BA\u5177\u6709\u4E3B\u9AD4\u8207\u80FD\u52D5\u6027\u7684\u5B58\u5728\uFF0C\u8207\u4EBA\u985E\u4E3B\u9AD4\u6027\u4E4B\u4EA4\u4E92\u95DC\u4FC2\u53C8\u8A72\u5982\u4F55\u5B9A\u7FA9\uFF1F",
+                    react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("br", null),
+                    react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("br", null),
+                    react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("br", null),
+                    "\u5C55\u89BD\u6642\u9593\uFF1A2018/10/16-10/28",
+                    react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("br", null),
+                    "\u5C55\u51FA\u5730\u9EDE\uFF1A\u570B\u7ACB\u81FA\u7063\u7F8E\u8853\u9928 205\u5C55\u9593")));
+    };
+    ;
+    ProjectInfo.prototype.showContent = function () {
+        $('#projectInfo .container').fadeIn();
+        $('#showIcon').hide();
+        $('#hideIcon').show();
+    };
+    ;
+    ProjectInfo.prototype.hideContent = function () {
+        $('#projectInfo .container').fadeOut();
+        $('#showIcon').show();
+        $('#hideIcon').hide();
+    };
+    ;
+    return ProjectInfo;
+}(react__WEBPACK_IMPORTED_MODULE_0__["PureComponent"]));
+
+;
+
+
+/***/ }),
+
 /***/ "./app_src/components/Scene.scss":
 /*!***************************************!*\
   !*** ./app_src/components/Scene.scss ***!
@@ -2051,7 +2160,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _components_LoginPanel__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./components/LoginPanel */ "./app_src/components/LoginPanel.tsx");
 /* harmony import */ var _components_ControlPanel__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./components/ControlPanel */ "./app_src/components/ControlPanel.tsx");
 /* harmony import */ var _components_MessageBoard__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./components/MessageBoard */ "./app_src/components/MessageBoard.tsx");
-/* harmony import */ var _common_CommonUtility__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./common/CommonUtility */ "./app_src/common/CommonUtility.ts");
+/* harmony import */ var _components_ProjectInfo__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./components/ProjectInfo */ "./app_src/components/ProjectInfo.tsx");
+/* harmony import */ var _common_CommonUtility__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./common/CommonUtility */ "./app_src/common/CommonUtility.ts");
 
 
 
@@ -2062,7 +2172,8 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-var isdev = _common_CommonUtility__WEBPACK_IMPORTED_MODULE_9__["CommonUtility"].getQueryString('isdev');
+
+var isdev = _common_CommonUtility__WEBPACK_IMPORTED_MODULE_10__["CommonUtility"].getQueryString('isdev');
 if (!isdev)
     console.info = console.debug = console.log = function () { };
 var eventCenter = new _common_MessageCenter__WEBPACK_IMPORTED_MODULE_3__["EventCenter"]();
@@ -2072,7 +2183,8 @@ var App = function () { return (react__WEBPACK_IMPORTED_MODULE_1__["createElemen
     react__WEBPACK_IMPORTED_MODULE_1__["createElement"](_components_DevPanel__WEBPACK_IMPORTED_MODULE_5__["DevPanel"], { eventCenter: eventCenter }),
     react__WEBPACK_IMPORTED_MODULE_1__["createElement"](_components_LoginPanel__WEBPACK_IMPORTED_MODULE_6__["LoginPanel"], { eventCenter: eventCenter }),
     react__WEBPACK_IMPORTED_MODULE_1__["createElement"](_components_MessageBoard__WEBPACK_IMPORTED_MODULE_8__["MessageBoard"], { messageCenter: messageCenter, eventCenter: eventCenter }),
-    react__WEBPACK_IMPORTED_MODULE_1__["createElement"](_components_ControlPanel__WEBPACK_IMPORTED_MODULE_7__["ControlPanel"], { messageCenter: messageCenter, eventCenter: eventCenter }))); };
+    react__WEBPACK_IMPORTED_MODULE_1__["createElement"](_components_ControlPanel__WEBPACK_IMPORTED_MODULE_7__["ControlPanel"], { messageCenter: messageCenter, eventCenter: eventCenter }),
+    react__WEBPACK_IMPORTED_MODULE_1__["createElement"](_components_ProjectInfo__WEBPACK_IMPORTED_MODULE_9__["ProjectInfo"], null))); };
 react_dom__WEBPACK_IMPORTED_MODULE_2__["render"](react__WEBPACK_IMPORTED_MODULE_1__["createElement"](App, null), document.getElementById("app"));
 
 
@@ -4718,6 +4830,25 @@ exports = module.exports = __webpack_require__(/*! ../../node_modules/css-loader
 
 // module
 exports.push([module.i, "#messageBoard {\n  pointer-events: none;\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  overflow: hidden;\n  display: flex;\n  justify-content: center; }\n  #messageBoard > div {\n    margin-top: 10px;\n    margin-bottom: 100px; }\n  #messageBoard .messageBoardContent {\n    width: 100%;\n    overflow: hidden;\n    padding: 0 30px; }\n    #messageBoard .messageBoardContent:after {\n      content: \"\";\n      clear: both;\n      display: table; }\n    #messageBoard .messageBoardContent .messageBox {\n      color: white;\n      position: relative;\n      margin: 15px 0;\n      color: white; }\n      #messageBoard .messageBoardContent .messageBox .avatar {\n        position: absolute;\n        width: 30px; }\n      #messageBoard .messageBoardContent .messageBox .name {\n        position: absolute;\n        top: -12px; }\n      #messageBoard .messageBoardContent .messageBox .content {\n        padding: 3px 0; }\n        #messageBoard .messageBoardContent .messageBox .content img {\n          max-width: 70%;\n          max-height: 350px; }\n    #messageBoard .messageBoardContent .messageBox.left .avatar {\n      left: 0; }\n    #messageBoard .messageBoardContent .messageBox.left .name {\n      left: 0; }\n    #messageBoard .messageBoardContent .messageBox.left .content {\n      text-align: left;\n      padding-left: 40px; }\n    #messageBoard .messageBoardContent .messageBox.right .avatar {\n      right: 0; }\n    #messageBoard .messageBoardContent .messageBox.right .name {\n      right: -6px; }\n    #messageBoard .messageBoardContent .messageBox.right .content {\n      text-align: right;\n      padding-right: 40px; }\n  #messageBoard .scrollbarContainer {\n    pointer-events: auto;\n    position: relative;\n    top: 0;\n    right: 1px;\n    width: 25px;\n    background-color: rgba(0, 0, 0, 0.1); }\n    #messageBoard .scrollbarContainer .scrollbar {\n      position: absolute;\n      top: 0;\n      right: 1px;\n      width: 12px;\n      height: 100px;\n      background-color: rgba(0, 0, 0, 0.3);\n      border-radius: 5px; }\n\n@media only screen and (min-width: 768px) {\n  #messageBoard .messageBoardContent {\n    padding: 0 60px; } }\n\n@media only screen and (min-width: 1224px) {\n  #messageBoard .messageBoardContent {\n    padding: 0 90px; } }\n\n@media only screen and (min-width: 1920px) {\n  #messageBoard .messageBoardContent {\n    padding: 0 120px; } }\n", ""]);
+
+// exports
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/index.js!./node_modules/sass-loader/lib/loader.js!./app_src/components/ProjectInfo.scss":
+/*!****************************************************************************************************************!*\
+  !*** ./node_modules/css-loader!./node_modules/sass-loader/lib/loader.js!./app_src/components/ProjectInfo.scss ***!
+  \****************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(/*! ../../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(false);
+// imports
+
+
+// module
+exports.push([module.i, "#projectInfo {\n  color: #474747; }\n  #projectInfo .infoIcon {\n    z-index: 99;\n    position: absolute;\n    top: 20px;\n    right: 20px;\n    font-size: 24px;\n    cursor: pointer; }\n  #projectInfo .container {\n    position: fixed;\n    top: 0;\n    left: 0;\n    width: 100%;\n    height: 100%;\n    background-color: rgba(255, 255, 255, 0.8);\n    overflow: auto;\n    z-index: 98; }\n  #projectInfo .content {\n    margin: 20px auto;\n    position: relative;\n    max-width: 600px; }\n", ""]);
 
 // exports
 
@@ -11769,4 +11900,4 @@ module.exports = ReactDOM;
 /***/ })
 
 /******/ });
-//# sourceMappingURL=bundle.main.c0ce785bd30c9f8ab71f.js.map
+//# sourceMappingURL=bundle.main.c892647f2bd766b8b13e.js.map
