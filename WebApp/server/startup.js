@@ -31,8 +31,8 @@ const server = app.listen(PORT, () => {
 
 
 // [Advanced]
-require('./apis.js').initAPIs(app);
 require('./socketIO.js').initSocketIO(server);
+require('./apis.js').initAPIs(app);
 require('./graphQL.js').initGraphQL(app);
 // [END Advanced]
 
