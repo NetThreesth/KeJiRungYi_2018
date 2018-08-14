@@ -7,6 +7,7 @@ export enum ContentType { Text, Image, Algae };
 
 export interface Content {
     role: Roles;
+    to?: Roles;
     type: ContentType;
     content?: string;
     algaeCount?: number;
@@ -59,19 +60,29 @@ export class MessageCenter {
         ).done(this.responseHandler.bind(this));
     };
 
-    private addMessage(content: Content) {
-        this.contents.push(content);
-        this.eventCenter.trigger(MessageCenter.eventName);
+    private addMessage(content: Content, delay: number = 0) {
+        setTimeout(() => {
+            this.contents.push(content);
+            this.eventCenter.trigger(MessageCenter.eventName);
+        }, delay)
     };
 
     private responseHandler(resp: ChatBotResponse) {
         this.eventCenter.trigger(AddLogEvent, resp);
         this.eventCenter.trigger(Event.AfterSubmitMessage, resp);
 
-        this.addText(Roles.ChatBot, resp.chatbotResponse);
-        this.addMessage({ role: Roles.Algae, type: ContentType.Algae, algaeCount: resp.density / 10 });
-        setTimeout(() => this.addText(Roles.Algae, resp.algaeResponse), 5000);
-        setTimeout(() => this.addText(Roles.ChatBot, resp.chatbot2algaeResponse), 6000);
+        this.addMessage(
+            { role: Roles.ChatBot, to: Roles.User, type: ContentType.Text, content: resp.chatbotResponse });
+
+        this.addMessage(
+            { role: Roles.Algae, type: ContentType.Algae, algaeCount: resp.density / 10 }
+            , 3000);
+        this.addMessage(
+            { role: Roles.Algae, type: ContentType.Text, content: resp.algaeResponse }
+            , 6000);
+        this.addMessage(
+            { role: Roles.ChatBot, to: Roles.Algae, type: ContentType.Text, content: resp.chatbot2algaeResponse }
+            , 7000);
     };
 };
 

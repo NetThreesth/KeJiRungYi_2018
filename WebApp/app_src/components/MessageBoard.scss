@@ -30,7 +30,7 @@
             .content {
                 padding: 3px 0;
                 img {
-                    max-width: 80%;
+                    max-width: 70%;
                     max-height: 350px;
                 }
             }
@@ -81,13 +81,19 @@
 }
 
 @media only screen and (min-width: 768px) {
-    .messageBoardContent {
-        padding: 0 120px;
+    #messageBoard .messageBoardContent {
+        padding: 0 60px;
     }
 }
 
 @media only screen and (min-width: 1224px) {
-    .messageBoardContent {
-        padding: 0 250px;
+    #messageBoard .messageBoardContent {
+        padding: 0 90px;
+    }
+}
+
+@media only screen and (min-width: 1920px) {
+    #messageBoard .messageBoardContent {
+        padding: 0 120px;
     }
 }

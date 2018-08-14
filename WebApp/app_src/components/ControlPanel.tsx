@@ -13,7 +13,7 @@ export class ControlPanel extends React.Component<
     {
         userName: string,
         roomID: number,
-        time: number,
+        time: string,
         touchEventCount: number
     }
     >{
@@ -21,7 +21,7 @@ export class ControlPanel extends React.Component<
     state = {
         userName: '',
         roomID: null,
-        time: 0,
+        time: '',
         touchEventCount: 0
     };
 
@@ -47,10 +47,13 @@ export class ControlPanel extends React.Component<
                 </button>
             </div>
             <div className="userRecord">
-                <div>用戶: {GlobalData.userName}</div>
-                <div>聊天室編號: {GlobalData.chatRoomIndex}</div>
-                <div>使用時間: {this.state.time} ms</div>
-                <div>觸碰事件: {this.state.touchEventCount} 次</div>
+                <div>[ 3sth.net ]</div>
+                <div>第{GlobalData.chatRoomIndex}平行世界</div>
+                <div>織衍第MjU5MjAw年</div>
+                <br />
+                <div>{GlobalData.userName}</div>
+                <div>織衍歲數：{this.state.time}歲</div>
+                <div>非預期擾動: {this.state.touchEventCount}能動點</div>
             </div>
         </div>;
     };
@@ -59,7 +62,7 @@ export class ControlPanel extends React.Component<
         this.props.eventCenter.on(Event.AfterLogin, () => {
             $('.control-panel').removeClass(['invisible', 'untouchable']).addClass('visible');
             this.setState({
-                time: new Date().getTime() - GlobalData.signInTime.getTime(),
+                time: this.btoa(new Date().getTime() - GlobalData.signInTime.getTime()),
                 touchEventCount: 0
             });
         });
@@ -81,10 +84,14 @@ export class ControlPanel extends React.Component<
             if (!GlobalData.signInTime) return;
             const newState = {
                 ...this.state,
-                time: new Date().getTime() - GlobalData.signInTime.getTime(),
+                time: this.btoa(new Date().getTime() - GlobalData.signInTime.getTime()),
             };
             this.setState(newState);
         }, 200);
+    };
+
+    private btoa(num: number | string) {
+        return window.btoa(String(num));
     };
 
     private switchUserRecord() {

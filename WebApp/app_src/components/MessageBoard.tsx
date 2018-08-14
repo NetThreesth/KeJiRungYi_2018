@@ -68,8 +68,10 @@ export class MessageBoard
         colors[Roles.ChatBot] = '#fff0f2';
         let $content: JSX.Element = null;
         if (content.type === ContentType.Text) {
+            const to = (content.to === Roles.Algae) ? '@aigae ' :
+                (content.to === Roles.User) ? `@${GlobalData.userName} ` : '';
             $content = <div className="content" style={{ color: colors[content.role] }}>
-                {content.content}
+                {to + content.content}
             </div >;
         }
         else if (content.type === ContentType.Image) {
@@ -78,7 +80,7 @@ export class MessageBoard
         else if (content.type === ContentType.Algae) {
             let algaes = [];
             CommonUtility.loop(content.algaeCount, () => {
-                algaes.push(<img src='3sth/algae/algae_particle.png' />);
+                algaes.push(<img style={{ height: '30px' }} src='3sth/algae/algae_particle.png' />);
             });
             $content = <div className="content">
                 {algaes}

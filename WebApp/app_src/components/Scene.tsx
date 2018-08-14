@@ -173,7 +173,7 @@ export class Scene extends React.Component<
 
 
 
-    private createBubbleSpray(position: BABYLON.Vector3, shapeCount: number) {
+    private createBubbleSpray(position: BABYLON.Vector3, bubbleCount: number) {
         if (this.bubbleSpray) this.bubbleSpray.dispose();
 
         const bubbleSpray = new BABYLON.SolidParticleSystem('bubbleSpray', this.scene);
@@ -182,7 +182,7 @@ export class Scene extends React.Component<
         bubbleSpray.billboard = true;
 
         const bubbleMash = BABYLON.MeshBuilder.CreateBox("bubbleMash", { size: 0.5 }, this.scene);
-        bubbleSpray.addShape(bubbleMash, shapeCount);
+        bubbleSpray.addShape(bubbleMash, bubbleCount);
         bubbleMash.dispose();
 
         const texture = new BABYLON.Texture('3sth/bubble/bubbles_combined.png', this.scene);
@@ -225,10 +225,10 @@ export class Scene extends React.Component<
             direction.y = direction.y * -1;
         }
         bubbleSpray.updateParticle = (particle) => {
-            particle.position.addInPlace(particle.velocity); // ´æ•£
+            particle.position.addInPlace(particle.velocity); // ï¿½æ•£
             const rise = 0.001;
-            particle.position.x += (direction.x * rise); // ä¸Šåx
-            particle.position.y += (direction.y * rise); // ä¸Šåy 
+            particle.position.x += (direction.x * rise); // ä¸Šï¿½x
+            particle.position.y += (direction.y * rise); // ä¸Šï¿½y 
 
             const scale = particle.scale.x + 0.000005;
             particle.scale.x = scale;
@@ -586,9 +586,9 @@ export class Scene extends React.Component<
                         initialZ + CommonUtility.getRandomNumberInRange(-2, 2, 3)
                     );
                     return {
-                        position: position, // åä½ç½®
-                        scale: CommonUtility.getRandomNumberInRange(0.005, 0.01, 3), // §åˆ¶Ÿåº¦
-                        translateVector: new BABYLON.Vector3(0, 0, position.z < initialZ ? 1 : -1) // å¹å
+                        position: position, // ï¿½ï¿½ä½ç½®
+                        scale: CommonUtility.getRandomNumberInRange(0.005, 0.01, 3), // ï¿½åˆ¶ï¿½åº¦
+                        translateVector: new BABYLON.Vector3(0, 0, position.z < initialZ ? 1 : -1) // ï¿½ï¿½ï¿½
                     };
                 });
             this.startUpdateTextNodes(textNodes);
@@ -602,7 +602,7 @@ export class Scene extends React.Component<
         this.maskColor.r = color[0];
         this.maskColor.g = color[1];
         this.maskColor.b = color[2];
-        let alpha = this.maskColor.a * ((100 + chatBotResponse.text2cmd.ledValue) / 100);
+        let alpha = this.maskColor.a * ((100 - chatBotResponse.text2cmd.ledValue) / 100);
         this.maskColor.a = (alpha < 0.3) ? Number(alpha.toFixed(3)) : 0.3;
         this.updateMask();
 
@@ -637,7 +637,7 @@ export class Scene extends React.Component<
         CommonUtility.setCookie('chatRoomIndex', String(GlobalData.chatRoomIndex), 30);
         const chatRoom = this.chatRoomsCenter[GlobalData.chatRoomIndex];
         const destination = chatRoom ?
-            new BABYLON.Vector3(chatRoom.x * 2.5, chatRoom.y * 2.5, 0) :
+            new BABYLON.Vector3(chatRoom.x * 2, chatRoom.y * 2, 0) :
             BABYLON.Vector3.Zero();
 
         const curve = BABYLON.Curve3.CreateHermiteSpline(
