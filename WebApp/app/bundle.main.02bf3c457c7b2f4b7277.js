@@ -1994,9 +1994,6 @@ var Scene = /** @class */ (function (_super) {
         var _this = this;
         if (this.linesForChatRooms.length === 0)
             return;
-        var highlightForLine = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["HighlightLayer"]("highlightForLine", this.scene);
-        highlightForLine.innerGlow = false;
-        var glowColor = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Color3"](246 / 255, 255 / 255, 201 / 255);
         var colorSetForLines = [
             [199, 222, 205],
             [192, 231, 164],
@@ -2019,6 +2016,19 @@ var Scene = /** @class */ (function (_super) {
             line.material = materials[materialIndex];
             _this.lineMeshContainer[materialIndex].push(line);
         });
+        this.tryAddHighlightLayer();
+    };
+    ;
+    Scene.prototype.tryAddHighlightLayer = function () {
+        var ua = window.navigator.userAgent;
+        var msie = ua.indexOf("MSIE ");
+        if (msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./)) {
+            alert('此網頁包含大量3D動畫，建議您使用chrome、safari等效能較好的瀏覽器瀏覽此頁');
+            return;
+        }
+        var highlightForLine = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["HighlightLayer"]("highlightForLine", this.scene);
+        highlightForLine.innerGlow = false;
+        var glowColor = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Color3"](246 / 255, 255 / 255, 201 / 255);
         this.lineMeshContainer.forEach(function (group) {
             var merged = babylonjs__WEBPACK_IMPORTED_MODULE_1__["Mesh"].MergeMeshes(group, true, false);
             highlightForLine.addMesh(merged, glowColor);
@@ -11919,4 +11929,4 @@ module.exports = ReactDOM;
 /***/ })
 
 /******/ });
-//# sourceMappingURL=bundle.main.831f97026c024f3b13d6.js.map
+//# sourceMappingURL=bundle.main.02bf3c457c7b2f4b7277.js.map

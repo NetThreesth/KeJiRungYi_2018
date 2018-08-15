@@ -498,9 +498,6 @@ export class Scene extends React.Component<
         if (this.linesForChatRooms.length === 0) return;
 
 
-        const highlightForLine = new BABYLON.HighlightLayer("highlightForLine", this.scene);
-        highlightForLine.innerGlow = false;
-        const glowColor = new BABYLON.Color3(246 / 255, 255 / 255, 201 / 255);
 
         const colorSetForLines = [
             [199, 222, 205],
@@ -525,6 +522,20 @@ export class Scene extends React.Component<
             line.material = materials[materialIndex];
             this.lineMeshContainer[materialIndex].push(line);
         });
+        this.tryAddHighlightLayer();
+    };
+    private tryAddHighlightLayer() {
+        var ua = window.navigator.userAgent;
+        var msie = ua.indexOf("MSIE ");
+
+        if (msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./)) {
+            alert('此網頁包含大量3D動畫，建議您使用chrome、safari等效能較好的瀏覽器瀏覽此頁');
+            return;
+        }
+
+        const highlightForLine = new BABYLON.HighlightLayer("highlightForLine", this.scene);
+        highlightForLine.innerGlow = false;
+        const glowColor = new BABYLON.Color3(246 / 255, 255 / 255, 201 / 255);
         this.lineMeshContainer.forEach(group => {
             const merged = BABYLON.Mesh.MergeMeshes(group, true, false);
             highlightForLine.addMesh(merged, glowColor);
