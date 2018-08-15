@@ -21,7 +21,7 @@ module.exports.initGraphQL = (app) => {
                         }
                     })
                 ),
-                resolve: () => repo.Message.findAll()
+                resolve: () => repo.Message.findAll({ limit: 1000, order: [['time', 'DESC']] })
             },
 
             userLog: {
@@ -38,7 +38,7 @@ module.exports.initGraphQL = (app) => {
                         }
                     })
                 ),
-                resolve: () => repo.UserLog.findAll()
+                resolve: () => repo.UserLog.findAll({ limit: 50, order: [['signInTime', 'DESC']] })
             }
         }
     });

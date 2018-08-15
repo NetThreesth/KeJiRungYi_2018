@@ -17,10 +17,11 @@ export class ProjectInfo extends React.PureComponent {
                 <i className="fas fa-times"></i>
             </div>
             <div className="container" style={{ display: 'none' }}>
-                <div className="content">
+                <h4 style={{ textAlign: 'center' }}>
                     關於<br />
-                    社群織衍計畫3sth.net<br />
-                    <br />
+                    社群織衍計畫3sth.net
+                    </h4>
+                <div className="content">
                     2006年小說《三體》的問世，讓這一古老的天文物理難題再度來到世人面前，三體問題所引發的思辨，亦可轉而探討當代文明的運作模式：不同於先古人們對於一體世界的詮釋(自然界)、文藝復興以降之二體世界觀(人與物、主體與客體)，當代社會漸漸形成以數據為基礎，自然、人類、科技三體交互作用而構築的有機網絡性社會。<br />
                     <br />
                     科技的飛速進展下，物理真實與虛擬真實因數據之產製與利用相互交融疊加，而數據也由物與人的衍生物，逐漸轉變為具有主體與能動性的存在，自然界與人類社會之相互關係至此加入了新的變數，未來將面臨更多渾沌未知。<br />

@@ -52,7 +52,7 @@ export class Scene extends React.Component<
 
     componentDidMount() {
         this.initScene();
-        this.getTexts();
+        this.getText();
         this.getPoints();
 
         this.createLinesWorker = new AsyncWorker(
@@ -70,8 +70,6 @@ export class Scene extends React.Component<
         this.props.eventCenter.on(Event.AfterSubmitMessage, this.cmdHandler.bind(this));
 
         window.addEventListener("resize", this.engine.resize.bind(this.engine));
-
-        this.updateMask();
     };
 
 
@@ -490,12 +488,15 @@ export class Scene extends React.Component<
         $.getJSON('apis/getPoints').then((data: { [key: string]: BABYLON.Vector3[] }) => {
             CommonUtility.loop(9, roomId => handleForRoom(roomId, data[`chatroom${roomId}`]));
             this.chatRoomsNodes = CommonUtility.shuffle(this.chatRoomsNodes);
+            this.drawLine();
         });
     };
 
 
+    private lineMeshContainer: BABYLON.Mesh[][] = [[], [], []];
     private drawLine() {
         if (this.linesForChatRooms.length === 0) return;
+
 
         const highlightForLine = new BABYLON.HighlightLayer("highlightForLine", this.scene);
         highlightForLine.innerGlow = false;
@@ -510,10 +511,10 @@ export class Scene extends React.Component<
             const color = new BABYLON.Color3(colorInRGB[0], colorInRGB[1], colorInRGB[2]);
             const mat = new BABYLON.StandardMaterial(`lineMat${i}`, this.scene);
             mat.diffuseColor = color;
+            mat.alpha = 0;
             return mat;
         });
 
-        const meshContainer: BABYLON.Mesh[][] = [[], [], []];
         this.linesForChatRooms.forEach((e, i) => {
             const materialIndex = CommonUtility.getRandomIntInRange(0, 2);
             const line = BABYLON.MeshBuilder.CreateTube(`line${i}`, {
@@ -522,30 +523,29 @@ export class Scene extends React.Component<
                 updatable: false
             }, this.scene);
             line.material = materials[materialIndex];
-            meshContainer[materialIndex].push(line);
+            this.lineMeshContainer[materialIndex].push(line);
         });
-        meshContainer.forEach(group => {
-            if (group.length === 0) return;
+        this.lineMeshContainer.forEach(group => {
             const merged = BABYLON.Mesh.MergeMeshes(group, true, false);
             highlightForLine.addMesh(merged, glowColor);
         });
     };
+    private showLine() {
+        this.lineMeshContainer.forEach(group => group.forEach(line => line.material.alpha = 1));
+    };
 
 
 
-    private getTexts() {
-        const img = new Image();
-        img.src = 'assets/textImage/image.png';
-        img.onload = () => {
+    private getText() {
+        const getTextNodes = (img: HTMLImageElement) => {
             const canvas = document.createElement('canvas');
             const height = canvas.height = img.height;
             const width = canvas.width = img.width;
             const context = canvas.getContext('2d');
             context.drawImage(img, 0, 0, width, height);
 
-            // inputs
-            const startX = 64 * CommonUtility.getRandomIntInRange(0, 6);
-            const startY = 64 * CommonUtility.getRandomIntInRange(0, 6);
+            const startX = 64 * CommonUtility.getRandomIntInRange(0, 7);
+            const startY = 64 * CommonUtility.getRandomIntInRange(0, 7);
             const takeWidth = 64;
             const rateOfWoverH = 1 / 1;
 
@@ -583,16 +583,22 @@ export class Scene extends React.Component<
                     const position = new BABYLON.Vector3(
                         (p.x - 32) * rate,
                         (p.y - 32) * -1 * rate,
-                        initialZ + CommonUtility.getRandomNumberInRange(-2, 2, 3)
+                        initialZ + CommonUtility.getRandomNumberInRange(-2, 2, 4)
                     );
                     return {
-                        position: position, // ��位置
-                        scale: CommonUtility.getRandomNumberInRange(0.005, 0.01, 3), // �制�度
-                        translateVector: new BABYLON.Vector3(0, 0, position.z < initialZ ? 1 : -1) // ���
+                        position: position,
+                        scale: CommonUtility.getRandomNumberInRange(0.005, 0.01, 4),
+                        translateVector: new BABYLON.Vector3(0, 0, position.z < initialZ ? 1 : -1)
                     };
                 });
             this.startUpdateTextNodes(textNodes);
         };
+
+        $.get('apis/getMetaPattern').then(metaPattern => {
+            const img = new Image();
+            img.src = `data:image/png;base64,${metaPattern.pattern}`;
+            img.onload = () => getTextNodes(img);
+        });
     };
 
     private cmdHandler(chatBotResponse: ChatBotResponse) {
@@ -618,13 +624,19 @@ export class Scene extends React.Component<
             this.translateType = TranslateType.Expand;
             setTimeout(() => {
                 this.linesForLinesystem.length = 0;
-                this.drawLine();
+                this.showLine();
                 this.startUpdateBackgroundParticles();
             }, 0.8 * 1000);
         }, 2 * 1000);
     };
 
-    private zoomIn() {
+    private resetMask() {
+        $.get(`/apis/getBaseline?rid=${GlobalData.chatRoomIndex}`).then(data => {
+            this.updateMask();
+        });
+    };
+
+    private setChatRoomIndex() {
         const checkChatRoomIndex = (chatRoomIndex) => {
             return !!chatRoomIndex || chatRoomIndex === '0' || chatRoomIndex === 0;
         };
@@ -635,9 +647,15 @@ export class Scene extends React.Component<
             GlobalData.chatRoomIndex = CommonUtility.getRandomIntInRange(0, this.chatRoomsCenter.length - 1);
 
         CommonUtility.setCookie('chatRoomIndex', String(GlobalData.chatRoomIndex), 30);
-        const chatRoom = this.chatRoomsCenter[GlobalData.chatRoomIndex];
-        const destination = chatRoom ?
-            new BABYLON.Vector3(chatRoom.x * 2, chatRoom.y * 2, 0) :
+    };
+
+    private zoomIn() {
+        this.setChatRoomIndex();
+        this.resetMask();
+
+        const chatRoomCenter = this.chatRoomsCenter[GlobalData.chatRoomIndex];
+        const destination = chatRoomCenter ?
+            new BABYLON.Vector3(chatRoomCenter.x * 2, chatRoomCenter.y * 2, 0) :
             BABYLON.Vector3.Zero();
 
         const curve = BABYLON.Curve3.CreateHermiteSpline(

@@ -41,4 +41,33 @@ repo.UserLog = sequelize.define(
         freezeTableName: true,
         tableName: 'userlog',
     }
+);
+
+repo.MetaPattern = sequelize.define(
+    'metaPattern',
+    {
+        id: { type: Sequelize.INTEGER, primaryKey: true },
+        pattern: { type: Sequelize.STRING }
+    },
+    {
+        timestamps: false,
+        freezeTableName: true,
+        tableName: 'metapattern',
+    }
+);
+
+repo.Baseline = sequelize.define(
+    'baseline',
+    {
+        id: { type: Sequelize.INTEGER, primaryKey: true },
+        rid: { type: Sequelize.INTEGER },
+        led: { type: Sequelize.INTEGER },
+        pump: { type: Sequelize.INTEGER },
+        time: { type: Sequelize.TIME }
+    },
+    {
+        timestamps: false,
+        freezeTableName: true,
+        tableName: 'baseline',
+    }
 ); 

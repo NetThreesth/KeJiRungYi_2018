@@ -42,7 +42,6 @@ const proxy = require('http-proxy').createProxyServer();
 proxy.on('error', err => logger.error(err));
 const assetsServer = 'https://s3.amazonaws.com';
 app.all("/3sth/*", (req, res) => {
-    logger.info('redirecting to assets server: ' + req.originalUrl);
     return proxy.web(req, res, { changeOrigin: true, target: assetsServer });
 });
 // [END Reverse Proxy]

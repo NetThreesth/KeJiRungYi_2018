@@ -40,7 +40,7 @@ const socketIO = {
 
             socket.on('disconnect', () => {
                 clearInterval(push);
-                if (!userInfo) return;
+                if (!userInfo || !userInfo.userName) return;
 
                 logger.info('sign out: ' + common.deserializeSafely(userInfo));
                 const signInTime = new Date(userInfo.signInTime);
@@ -63,11 +63,13 @@ const socketIO = {
                     const baseline = {
                         rid: userInfo.chatRoomIndex,
                         led: response.data.baseline_led,
-                        pump: response.data.baseline_pump
+                        pump: response.data.baseline_pump,
+                        time: new Date()
                     };
-                    logger.info(baseline);
+                    logger.info(`baseline: ${common.deserializeSafely(baseline)}`);
+                    repo.Baseline.create(baseline).catch(err => logger.error(err));
                     userInfo = null;
-                });
+                }).catch(err => logger.error(err));
 
             });
         });

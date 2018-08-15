@@ -1,5 +1,8 @@
 'use strict';
 
+const { from } = require('rxjs');
+const { map } = require('rxjs/operators');
+const axios = require('axios');
 const logger = require('./logger');
 const common = require('./commonNodeJSUtility.js');
 const { io, backgroundParticles } = require('./socketIO.js');
@@ -25,11 +28,30 @@ module.exports.initAPIs = (app) => {
             message: body.message,
             name: 'chatbot',
             chatroomId: body.rid,
-        });
+        })
+            .catch(err => errorHandler(err, next));
         io.sockets.emit('uploadDeepAlMessage', body);
         createParticle(body.rid, 'pink', 0);
         res.send(true);
     });
+
+
+    app.route('/apis/getBaseline').get((req, res, next) => {
+        if (!req.query.rid && req.query.rid !== 0) res.send('rid is required');
+        repo.Baseline.findOne({
+            where: { rid: req.query.rid },
+            order: [['time', 'DESC']]
+        }).then(data => res.json(data))
+            .catch(err => errorHandler(err, next));
+    });
+
+
+    app.route('/apis/getMetaPattern').get((req, res, next) => {
+        repo.MetaPattern.findOne({
+            order: [['id', 'DESC']]
+        }).then(data => res.json(data)).catch(err => next(err));
+    });
+
 
     app.route('/apis/uploadImage').post((req, res, next) => {
         logger.info(`${new Date()} uploadImage fired`);
@@ -120,12 +142,9 @@ function sentToChatbots(text, rid, userName) {
         message: text,
         name: userName,
         chatroomId: rid,
-    });
+    }).catch(err => errorHandler(err));
     createParticle(rid, 'white', 0);
 
-    const { from } = require('rxjs');
-    const { map } = require('rxjs/operators');
-    const axios = require('axios');
     const observable = from(axios.post('http://35.236.167.99:5000/3sth/api/v1.0/chatbots/', {
         msg: text,
         rid: rid
@@ -152,7 +171,7 @@ function sentToChatbots(text, rid, userName) {
                 name: 'chatbot',
                 chatroomId: rid,
             }
-        ]);
+        ]).catch(err => errorHandler(err));
         return resp;
     }));
 };
