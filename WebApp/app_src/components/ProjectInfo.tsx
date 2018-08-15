@@ -8,15 +8,18 @@ export class ProjectInfo extends React.PureComponent {
         return <div id="projectInfo">
             <div id="showIcon"
                 onClick={this.showContent.bind(this)}
-                className="infoIcon">
+                className="infoIcon"
+                style={{ color: 'white' }}>
                 <i className="fas fa-info-circle"></i>
             </div>
             <div id="hideIcon"
                 onClick={this.hideContent.bind(this)}
-                className="infoIcon" style={{ display: 'none' }}>
+                className="infoIcon"
+                style={{ display: 'none' }}>
                 <i className="fas fa-times"></i>
             </div>
-            <div className="container" style={{ display: 'none' }}>
+            <div className="container"
+                style={{ display: 'none' }}>
                 <h4 style={{ textAlign: 'center' }}>
                     關於<br />
                     社群織衍計畫3sth.net
@@ -30,7 +33,10 @@ export class ProjectInfo extends React.PureComponent {
                     <br />
                     <br />
                     展覽時間：2018/10/16-10/28<br />
-                    展出地點：國立臺灣美術館 205展間
+                    展出地點：國立臺灣美術館 205展間<br />
+                    <div style={{ textAlign: 'center', width: '100%' }}>
+                        <a target="_blank" href="3sth.net/aigaerithm_beta_0.1">了解更多</a>
+                    </div>
                 </div>
             </div>
         </div>;

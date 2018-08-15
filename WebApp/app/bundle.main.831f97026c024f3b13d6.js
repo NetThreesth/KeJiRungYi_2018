@@ -1435,7 +1435,7 @@ var ProjectInfo = /** @class */ (function (_super) {
     }
     ProjectInfo.prototype.render = function () {
         return react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { id: "projectInfo" },
-            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { id: "showIcon", onClick: this.showContent.bind(this), className: "infoIcon" },
+            react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { id: "showIcon", onClick: this.showContent.bind(this), className: "infoIcon", style: { color: 'white' } },
                 react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("i", { className: "fas fa-info-circle" })),
             react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { id: "hideIcon", onClick: this.hideContent.bind(this), className: "infoIcon", style: { display: 'none' } },
                 react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("i", { className: "fas fa-times" })),
@@ -1457,7 +1457,10 @@ var ProjectInfo = /** @class */ (function (_super) {
                     react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("br", null),
                     "\u5C55\u89BD\u6642\u9593\uFF1A2018/10/16-10/28",
                     react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("br", null),
-                    "\u5C55\u51FA\u5730\u9EDE\uFF1A\u570B\u7ACB\u81FA\u7063\u7F8E\u8853\u9928 205\u5C55\u9593")));
+                    "\u5C55\u51FA\u5730\u9EDE\uFF1A\u570B\u7ACB\u81FA\u7063\u7F8E\u8853\u9928 205\u5C55\u9593",
+                    react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("br", null),
+                    react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { style: { textAlign: 'center', width: '100%' } },
+                        react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("a", { target: "_blank", href: "3sth.net/aigaerithm_beta_0.1" }, "\u4E86\u89E3\u66F4\u591A")))));
     };
     ;
     ProjectInfo.prototype.showContent = function () {
@@ -1800,7 +1803,7 @@ var Scene = /** @class */ (function (_super) {
                             return;
                         particle.scaleOut = true;
                         var mesh = particle.mesh;
-                        var scale = mesh.scaling.x * 0.95;
+                        var scale = mesh.scaling.x * 0.98;
                         mesh.scaling = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"](scale, scale, scale);
                     });
                     var first = particlesForOneColor.particles[0];
@@ -11916,4 +11919,4 @@ module.exports = ReactDOM;
 /***/ })
 
 /******/ });
-//# sourceMappingURL=bundle.main.2e7b0d2cbb3df99e6245.js.map
+//# sourceMappingURL=bundle.main.831f97026c024f3b13d6.js.map

@@ -222,6 +222,7 @@ export class Scene extends React.Component<
             direction.x = direction.x * -1;
             direction.y = direction.y * -1;
         }
+
         bubbleSpray.updateParticle = (particle) => {
             particle.position.addInPlace(particle.velocity); // �散
             const rise = 0.001;
@@ -239,7 +240,6 @@ export class Scene extends React.Component<
         bubbleSpray.particles.forEach(particle => initParticle(particle));
         this.bubbleSpray = bubbleSpray.setParticles();
     };
-
 
 
     private getTextureForParticle = function () {
@@ -292,7 +292,7 @@ export class Scene extends React.Component<
                         if (i + 1 > toScaleOutCount) return;
                         particle.scaleOut = true;
                         const mesh = particle.mesh;
-                        const scale = mesh.scaling.x * 0.95;
+                        const scale = mesh.scaling.x * 0.98;
                         mesh.scaling = new BABYLON.Vector3(scale, scale, scale);
                     });
                     const first = particlesForOneColor.particles[0];
