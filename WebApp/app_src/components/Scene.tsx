@@ -131,7 +131,6 @@ export class Scene extends React.Component<
     };
 
 
-
     private updateCameraPosition() {
         const cameraLocationsLen = this.cameraLocations.length;
         if (cameraLocationsLen > 0) {
@@ -160,15 +159,12 @@ export class Scene extends React.Component<
     };
 
 
-
-
     private renderAfter() {
         this.props.eventCenter.trigger(Event.UpdateDevPanelData, {
             fps: this.engine.getFps().toFixed() + ' fps',
             coordinate: BabylonUtility.positionToString(this.camera.position)
         });
     };
-
 
 
     private createBubbleSpray(position: BABYLON.Vector3, bubbleCount: number) {
@@ -554,14 +550,7 @@ export class Scene extends React.Component<
             const width = canvas.width = img.width;
             const context = canvas.getContext('2d');
             context.drawImage(img, 0, 0, width, height);
-
-            const startX = 64 * CommonUtility.getRandomIntInRange(0, 7);
-            const startY = 64 * CommonUtility.getRandomIntInRange(0, 7);
-            const takeWidth = 64;
-            const rateOfWoverH = 1 / 1;
-
-            const takeHeight = takeWidth / rateOfWoverH;
-            const imgData = context.getImageData(startX, startY, takeWidth, takeHeight);
+            const imgData = context.getImageData(0, 0, 64, 64);
 
             const pixels: {
                 x: number, y: number,
@@ -577,8 +566,8 @@ export class Scene extends React.Component<
                 const brightness = (0.299 * r) + (0.587 * g) + (0.114 * b);
 
                 const pixelNumber = (i / 4) + 1;
-                const rowNumber = Math.floor(pixelNumber / takeWidth);
-                const culNumber = pixelNumber % takeWidth;
+                const rowNumber = Math.floor(pixelNumber / 64);
+                const culNumber = pixelNumber % 64;
                 pixels.push({
                     x: culNumber, y: rowNumber,
                     r: r, g: g, b: b,
@@ -619,7 +608,7 @@ export class Scene extends React.Component<
         this.maskColor.r = color[0];
         this.maskColor.g = color[1];
         this.maskColor.b = color[2];
-        let alpha = this.maskColor.a * ((100 - chatBotResponse.text2cmd.ledValue) / 100);
+        const alpha = this.maskColor.a * ((100 - chatBotResponse.text2cmd.ledValue) / 100);
         this.maskColor.a = (alpha < 0.3) ? Number(alpha.toFixed(3)) : 0.3;
         this.updateMask();
 

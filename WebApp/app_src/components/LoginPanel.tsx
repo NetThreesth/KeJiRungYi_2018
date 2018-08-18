@@ -151,9 +151,9 @@ export class LoginPanel extends React.Component<
 
     private signInButtonClickHandler() {
         const signInName = this.state.signInName;
-        if (signInName.length === 0) return;
+        if (!signInName || signInName.length === 0) return;
 
-        GlobalData.userName = this.state.signInName;
+        GlobalData.userName = signInName;
         CommonUtility.setCookie('signInName', GlobalData.userName, 30);
         GlobalData.signInTime = new Date();
         setTimeout(() => socketClient.emit('updateUserInfo', GlobalData), 0);

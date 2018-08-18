@@ -187,7 +187,7 @@ function createParticle(rid, color, delay) {
         return logger.error(`rid undefined, rid: ${rid}`);
     }
 
-    const reduceTime = 30 * 60 * 1000;
+    const reduceTime = 15 * 60 * 1000;
     const particles = backgroundParticles[rid];
     setTimeout(() => {
 

@@ -13,7 +13,8 @@ export class ControlPanel extends React.Component<
     {
         userName: string,
         roomID: number,
-        time: string,
+        appTime: string,
+        clientTime: string,
         touchEventCount: number
     }
     >{
@@ -21,7 +22,8 @@ export class ControlPanel extends React.Component<
     state = {
         userName: '',
         roomID: null,
-        time: '',
+        appTime: '',
+        clientTime: '',
         touchEventCount: 0
     };
 
@@ -49,10 +51,10 @@ export class ControlPanel extends React.Component<
             <div className="userRecord">
                 <div>[ 3sth.net ]</div>
                 <div>第{GlobalData.chatRoomIndex}平行世界</div>
-                <div>織衍第MjU5MjAw年</div>
+                <div>織衍第{this.state.appTime}年</div>
                 <br />
                 <div>{GlobalData.userName}</div>
-                <div>織衍歲數：{this.state.time}歲</div>
+                <div>織衍歲數：{this.state.clientTime}歲</div>
                 <div>非預期擾動: {this.state.touchEventCount}能動點</div>
             </div>
         </div>;
@@ -62,21 +64,17 @@ export class ControlPanel extends React.Component<
         this.props.eventCenter.on(Event.AfterLogin, () => {
             $('.control-panel').removeClass(['invisible', 'untouchable']).addClass('visible');
             this.setState({
-                time: this.btoa(new Date().getTime() - GlobalData.signInTime.getTime()),
                 touchEventCount: 0
             });
         });
 
-        $(document).on('mouseup touchend click', () => {
-            const newState = {
-                ...this.state,
-                touchEventCount: this.state.touchEventCount + 1
-            };
-            this.setState(newState);
+        $(document).on('touchend click', () => {
+            const touchEventCount = this.state.touchEventCount + 1;
+            this.setState({ touchEventCount: touchEventCount });
             setTimeout(() => {
                 socketClient.emit(
                     'updateUserInfo',
-                    { touchEventCount: newState.touchEventCount, ...GlobalData }
+                    { touchEventCount: touchEventCount, ...GlobalData }
                 );
             }, 0);
         });
@@ -84,10 +82,21 @@ export class ControlPanel extends React.Component<
             if (!GlobalData.signInTime) return;
             const newState = {
                 ...this.state,
-                time: this.btoa(new Date().getTime() - GlobalData.signInTime.getTime()),
+                appTime: this.getAppTime(),
+                clientTime: this.getClientTime(),
             };
             this.setState(newState);
         }, 200);
+    };
+
+    private getAppTime() {
+        const ms = new Date().getTime() - new Date(2018, 8, 1).getTime();
+        return this.btoa(ms / 1000);
+    };
+
+    private getClientTime() {
+        const ms = new Date().getTime() - GlobalData.signInTime.getTime();
+        return this.btoa(ms / 1000);
     };
 
     private btoa(num: number | string) {
