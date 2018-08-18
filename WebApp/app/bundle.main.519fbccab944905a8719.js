@@ -1476,7 +1476,7 @@ var ProjectInfo = /** @class */ (function (_super) {
                     "\u5C55\u51FA\u5730\u9EDE\uFF1A\u570B\u7ACB\u81FA\u7063\u7F8E\u8853\u9928 205\u5C55\u9593",
                     react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("br", null),
                     react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("br", null),
-                    react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("a", { target: "_blank", href: "3sth.net/aigaerithm_beta_0.1" }, "\u4E86\u89E3\u66F4\u591A"))));
+                    react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("a", { target: "_blank", href: "https://3sth.net/aigaerithm_beta_0.1" }, "\u4E86\u89E3\u66F4\u591A"))));
     };
     ;
     ProjectInfo.prototype.showContent = function () {
@@ -12826,4 +12826,4 @@ module.exports = ReactDOM;
 /***/ })
 
 /******/ });
-//# sourceMappingURL=bundle.main.83973991e6d286d17b09.js.map
+//# sourceMappingURL=bundle.main.519fbccab944905a8719.js.map

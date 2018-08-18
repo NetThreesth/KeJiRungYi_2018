@@ -35,7 +35,7 @@ export class ProjectInfo extends React.PureComponent {
                     <br />
                     展覽時間：2018/10/16-10/28<br />
                     展出地點：國立臺灣美術館 205展間<br /><br />
-                    <a target="_blank" href="3sth.net/aigaerithm_beta_0.1">了解更多</a>
+                    <a target="_blank" href="https://3sth.net/aigaerithm_beta_0.1">了解更多</a>
 
                 </div>
             </div>
