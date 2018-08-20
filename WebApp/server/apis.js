@@ -14,6 +14,14 @@ module.exports.initAPIs = (app) => {
     app.route('/apis/uploadAlgaeImage').post((req, res, next) => {
 
         const body = req.body;
+
+        repo.Message.create({
+            time: new Date(),
+            message: body.base64Image,
+            name: 'algae',
+            chatroomId: body.rid,
+        }).catch(err => errorHandler(err, next));
+
         body.base64Image = body.base64Image.replace(/b'/g, '').replace(/'/g, '');
         io.sockets.emit('uploadAlgaeImage', body);
         createParticle(body.rid, 'yellow', 0);
@@ -28,8 +36,8 @@ module.exports.initAPIs = (app) => {
             message: body.message,
             name: 'chatbot',
             chatroomId: body.rid,
-        })
-            .catch(err => errorHandler(err, next));
+        }).catch(err => errorHandler(err, next));
+        
         io.sockets.emit('uploadDeepAlMessage', body);
         createParticle(body.rid, 'pink', 0);
         res.send(true);
