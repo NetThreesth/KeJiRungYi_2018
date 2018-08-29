@@ -269,6 +269,7 @@ export class Scene extends React.Component<
         this.chatRoomsCenter.forEach((center, i) => {
             const particlesSettings = this.backgroundParticles[i];
             ['white', 'yellow', 'pink'].forEach(color => {
+                if (!particlesSettings) debugger;
                 const particlesForOneColor = particlesSettings[color];
                 const count = particlesForOneColor.targetCount - particlesForOneColor.particles.length;
                 if (count > 0) {
@@ -435,55 +436,17 @@ export class Scene extends React.Component<
         return CommonUtility.getRandomIntInRange(60 * 3, 60 * 6);
     };
 
-    private chatRoomsNodes: BABYLON.Vector3[] = [];
     private chatRoomsCenter: BABYLON.Vector3[] = [];
+    private chatRoomsNodes: BABYLON.Vector3[] = [];
     private linesForChatRooms: Line[] = [];
-
     private getPoints() {
-        const addNodeCount = Number(CommonUtility.getQueryString('addNodeCount'));
-
-        const handleForRoom = (roomId: number, data: BABYLON.Vector3[]) => {
-            const range = { x: { from: null, to: null }, y: { from: null, to: null }, z: { from: null, to: null } };
-            const pointInGroup = data.map(p => {
-                ['x', 'y', 'z'].forEach(axis => {
-                    const oneAxis = range[axis];
-                    oneAxis.from = oneAxis.from ? Math.min(oneAxis.from, p[axis]) : p[axis];
-                    oneAxis.to = oneAxis.to ? Math.max(oneAxis.to, p[axis]) : p[axis];
-                });
-                const position = new BABYLON.Vector3(p.x, p.y, p.z);
-                if (addNodeCount) {
-                    const node = BABYLON.MeshBuilder.CreateSphere("node", { diameter: 0.2 }, this.scene);
-                    node.position = position;
-                }
-                return position;
-            });
-            for (let c = 0; c < addNodeCount; c++) {
-                const position = new BABYLON.Vector3(
-                    CommonUtility.getRandomNumberInRange(range.x.from, range.x.to, 5),
-                    CommonUtility.getRandomNumberInRange(range.y.from, range.y.to, 5),
-                    CommonUtility.getRandomNumberInRange(range.z.from, range.z.to, 5)
-                );
-                pointInGroup.push(position);
-                const node = BABYLON.MeshBuilder.CreateSphere("node", { diameter: 0.2 }, this.scene);
-                node.position = position;
-                const nodeMaterial = node.material = new BABYLON.StandardMaterial("nodeMaterial", this.scene);
-                nodeMaterial.diffuseColor = new BABYLON.Color3(1, 0, 1);
-            }
-            this.chatRoomsNodes = this.chatRoomsNodes.concat(pointInGroup);
-
-            const linesInGroup = BabylonUtility.getLineToEachOther(pointInGroup);
-            const maxLine = CommonUtility.sort(linesInGroup, e => e.distance)[linesInGroup.length - 1];
-            const center = new BABYLON.Vector3(0, 0, 0);
-            ['x', 'y', 'z'].forEach(axis => {
-                center[axis] = (maxLine.from[axis] + maxLine.to[axis]) / 2
-            });
-            this.chatRoomsCenter.push(center);
-            this.linesForChatRooms = this.linesForChatRooms.concat(linesInGroup.slice(0, 120));
-        };
-
-        $.getJSON('apis/getPoints').then((data: { [key: string]: BABYLON.Vector3[] }) => {
-            CommonUtility.loop(9, roomId => handleForRoom(roomId, data[`chatroom${roomId}`]));
-            this.chatRoomsNodes = CommonUtility.shuffle(this.chatRoomsNodes);
+        $.getJSON('apis/getPoints').then((data: any) => {
+            this.chatRoomsCenter = data.roomCenters;
+            this.chatRoomsNodes = CommonUtility.shuffle(
+                data.chatRoomsNodes,
+                node => new BABYLON.Vector3(node.x, node.y, node.z)
+            );
+            this.linesForChatRooms = data.linesForChatRooms;
             this.drawLine();
         });
     };
@@ -508,10 +471,13 @@ export class Scene extends React.Component<
             return mat;
         });
 
+
+        const createVector = (data: BABYLON.Vector3) => new BABYLON.Vector3(data.x, data.y, data.z);
+
         this.linesForChatRooms.forEach((e, i) => {
             const materialIndex = CommonUtility.getRandomIntInRange(0, 2);
             const line = BABYLON.MeshBuilder.CreateTube(`line${i}`, {
-                path: [e.from, e.to],
+                path: [createVector(e.from), createVector(e.to)],
                 radius: 0.03,
                 updatable: false
             }, this.scene);
@@ -533,7 +499,7 @@ export class Scene extends React.Component<
         highlightForLine.innerGlow = false;
         const glowColor = new BABYLON.Color3(246 / 255, 255 / 255, 201 / 255);
         this.lineMeshContainer.forEach(group => {
-            const merged = BABYLON.Mesh.MergeMeshes(group, true, false);
+            const merged = BABYLON.Mesh.MergeMeshes(group, true, true);
             highlightForLine.addMesh(merged, glowColor);
         });
     };

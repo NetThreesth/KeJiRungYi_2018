@@ -255,7 +255,7 @@ var CommonUtility = /** @class */ (function () {
         return array;
     };
     ;
-    CommonUtility.shuffle = function (array) {
+    CommonUtility.shuffle = function (array, mapFunc) {
         var currentIndex = array.length;
         var temporaryValue;
         var randomIndex;
@@ -268,6 +268,8 @@ var CommonUtility = /** @class */ (function () {
             temporaryValue = array[currentIndex];
             array[currentIndex] = array[randomIndex];
             array[randomIndex] = temporaryValue;
+            if (mapFunc)
+                mapFunc(temporaryValue, randomIndex);
         }
         return array;
     };
@@ -362,4 +364,4 @@ var CommonUtility = /** @class */ (function () {
 /***/ })
 
 /******/ });
-//# sourceMappingURL=bundle.CreateLinesWorker.5f3c1182e5f94e53cc07.js.map
+//# sourceMappingURL=bundle.CreateLinesWorker.js.map

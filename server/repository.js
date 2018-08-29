@@ -26,6 +26,24 @@ repo.Message = sequelize.define(
     }
 );
 
+
+repo.UploadedImage = sequelize.define(
+    'message',
+    {
+        id: { type: Sequelize.INTEGER, primaryKey: true },
+        time: { type: Sequelize.TIME },
+        base64image: { type: Sequelize.STRING },
+        name: { type: Sequelize.STRING },
+        chatroomId: { type: Sequelize.STRING },
+    },
+    {
+        timestamps: false,
+        freezeTableName: true,
+        tableName: 'uploadedimage',
+    }
+);
+
+
 repo.UserLog = sequelize.define(
     'userLog',
     {

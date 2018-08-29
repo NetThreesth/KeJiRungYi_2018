@@ -44,7 +44,7 @@ export class CommonUtility {
         return array;
     };
 
-    static shuffle<T>(array: T[]) {
+    static shuffle<T>(array: T[], mapFunc?: (each: T, newIndex: number) => void) {
         let currentIndex = array.length;
         let temporaryValue;
         let randomIndex;
@@ -60,6 +60,7 @@ export class CommonUtility {
             temporaryValue = array[currentIndex];
             array[currentIndex] = array[randomIndex];
             array[randomIndex] = temporaryValue;
+            if (mapFunc) mapFunc(temporaryValue, randomIndex);
         }
 
         return array;

@@ -1,5 +1,7 @@
 'use strict';
 
+const fs = require('fs');
+const vision = require('@google-cloud/vision');
 const { from } = require('rxjs');
 const { map } = require('rxjs/operators');
 const axios = require('axios');
@@ -15,9 +17,9 @@ module.exports.initAPIs = (app) => {
 
         const body = req.body;
 
-        repo.Message.create({
+        repo.UploadedImage.create({
             time: new Date(),
-            message: body.base64Image,
+            base64image: body.base64Image,
             name: 'algae',
             chatroomId: body.rid,
         }).catch(err => errorHandler(err, next));
@@ -37,7 +39,7 @@ module.exports.initAPIs = (app) => {
             name: 'chatbot',
             chatroomId: body.rid,
         }).catch(err => errorHandler(err, next));
-        
+
         io.sockets.emit('uploadDeepAlMessage', body);
         createParticle(body.rid, 'pink', 0);
         res.send(true);
@@ -70,8 +72,14 @@ module.exports.initAPIs = (app) => {
             return;
         }
 
+        repo.UploadedImage.create({
+            time: new Date(),
+            base64image: body.base64Image,
+            name: body.userName,
+            chatroomId: body.rid,
+        }).catch(err => errorHandler(err));
+
         //  Google Cloud Vision Api
-        const vision = require('@google-cloud/vision');
         const client = new vision.ImageAnnotatorClient();
         const query = {
             image: {
@@ -128,19 +136,108 @@ module.exports.initAPIs = (app) => {
             if (err) errorHandler(err, next);
 
             const data = JSON.parse(content);
+
             const rate = 0.006;
-            Object.keys(data).forEach((key, i) => {
-                const nodesOfRoom = data[key]
-                nodesOfRoom.forEach(n => {
+            const dateDiff = Math.round(
+                (new Date().getTime() - new Date(2018, 8 - 1, 15).getTime()) / (1000 * 60 * 60 * 24)
+            );
+
+            const result = {
+                roomCenters: [],
+                chatRoomsNodes: [],
+                linesForChatRooms: []
+            };
+
+            forEachRoom(data, (nodes, roomId) => {
+
+                const centerDeg = 185 + 40 * (roomId + 1);
+                const chatroomRadius = 6.2;
+                const center = degToPosition(centerDeg, chatroomRadius);
+                result.roomCenters.push(center);
+
+                nodes.forEach(n => {
                     n.x = n.x * rate;
                     n.y = n.y * rate;
                     n.z = (Math.random() - Math.random()) * 2;
                 });
+
+                addDerivativedNodes(nodes, centerDeg, chatroomRadius, dateDiff * 2);
+                result.chatRoomsNodes = result.chatRoomsNodes.concat(nodes);
+
+                const lines = getLineToEachOther(nodes, 0.1);
+                result.linesForChatRooms = result.linesForChatRooms.concat(lines.slice(0, 160));
             });
 
-            res.json(data);
+            res.json(result);
         });
     });
+};
+
+function forEachRoom(data, func) {
+    for (let i = 0; i < 9; i++) {
+        func(data[`chatroom${i}`], i);
+    }
+};
+
+function degToPosition(deg, radius, randomZ) {
+    const degToRad = 0.0174533;
+    const rad = deg * degToRad;
+    const x = radius * Math.sin(rad);
+    const y = radius * Math.cos(rad);
+    const position = { x, y, z: 0 };
+    if (randomZ) position.z = (Math.random() - Math.random()) * 2;
+    return position;
+};
+
+
+
+function getRandomNumberInRange(min, max, digits) {
+    const rate = Math.pow(10, digits);
+    return getRandomIntInRange(min * rate, max * rate) / rate;
+};
+
+function getRandomIntInRange(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+};
+
+function addDerivativedNodes(data, centerDeg, chatroomRadius, count) {
+    for (let c = 0; c < count; c++) {
+        const degRange = 15;
+        const deg = getRandomNumberInRange(centerDeg - degRange, centerDeg + degRange, 2);
+        const radius = chatroomRadius + getRandomNumberInRange(0.5, 1.2, 2);
+        const position = degToPosition(deg, radius, true);
+        data.push(position);
+    }
+};
+
+function getDistance(v1, v2) {
+    var dx = v1.x - v2.x;
+    var dy = v1.y - v2.y;
+    var dz = v1.z - v2.z;
+
+    return Math.sqrt(dx * dx + dy * dy + dz * dz);
+};
+
+function getLineToEachOther(points, filterLength) {
+    const lines = [];
+    points.forEach((from, iOfFrom) => {
+        points.forEach((to, iOfTo) => {
+            if (iOfFrom < iOfTo) {
+                const distance = getDistance(from, to);
+                if (filterLength && filterLength > distance)
+                    return;
+
+                const key = `${iOfFrom}-${iOfTo}`;
+                lines.push({
+                    key: key,
+                    from: from,
+                    to: to,
+                    distance: distance
+                });
+            }
+        });
+    });
+    return lines.sort((a, b) => a.distance - b.distance);
 };
 
 function sentToChatbots(text, rid, userName) {

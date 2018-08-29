@@ -261,7 +261,7 @@ var CommonUtility = /** @class */ (function () {
         return array;
     };
     ;
-    CommonUtility.shuffle = function (array) {
+    CommonUtility.shuffle = function (array, mapFunc) {
         var currentIndex = array.length;
         var temporaryValue;
         var randomIndex;
@@ -274,6 +274,8 @@ var CommonUtility = /** @class */ (function () {
             temporaryValue = array[currentIndex];
             array[currentIndex] = array[randomIndex];
             array[randomIndex] = temporaryValue;
+            if (mapFunc)
+                mapFunc(temporaryValue, randomIndex);
         }
         return array;
     };
@@ -1471,7 +1473,7 @@ var ProjectInfo = /** @class */ (function (_super) {
                     react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("br", null),
                     react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("br", null),
                     react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("br", null),
-                    "\u5C55\u89BD\u6642\u9593\uFF1A2018/10/16-10/28",
+                    "\u5C55\u89BD\u6642\u9593\uFF1A2018/10/16-11/11",
                     react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("br", null),
                     "\u5C55\u51FA\u5730\u9EDE\uFF1A\u570B\u7ACB\u81FA\u7063\u7F8E\u8853\u9928 205\u5C55\u9593",
                     react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("br", null),
@@ -1610,8 +1612,8 @@ var Scene = /** @class */ (function (_super) {
         _this.linesystem = null;
         _this.translateType = TranslateType.Simple;
         _this.linesystemPerformance = 0;
-        _this.chatRoomsNodes = [];
         _this.chatRoomsCenter = [];
+        _this.chatRoomsNodes = [];
         _this.linesForChatRooms = [];
         _this.lineMeshContainer = [[], [], []];
         return _this;
@@ -1799,6 +1801,8 @@ var Scene = /** @class */ (function (_super) {
         this.chatRoomsCenter.forEach(function (center, i) {
             var particlesSettings = _this.backgroundParticles[i];
             ['white', 'yellow', 'pink'].forEach(function (color) {
+                if (!particlesSettings)
+                    debugger;
                 var particlesForOneColor = particlesSettings[color];
                 var count = particlesForOneColor.targetCount - particlesForOneColor.particles.length;
                 if (count > 0) {
@@ -1965,43 +1969,10 @@ var Scene = /** @class */ (function (_super) {
     ;
     Scene.prototype.getPoints = function () {
         var _this = this;
-        var addNodeCount = Number(_common_CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getQueryString('addNodeCount'));
-        var handleForRoom = function (roomId, data) {
-            var range = { x: { from: null, to: null }, y: { from: null, to: null }, z: { from: null, to: null } };
-            var pointInGroup = data.map(function (p) {
-                ['x', 'y', 'z'].forEach(function (axis) {
-                    var oneAxis = range[axis];
-                    oneAxis.from = oneAxis.from ? Math.min(oneAxis.from, p[axis]) : p[axis];
-                    oneAxis.to = oneAxis.to ? Math.max(oneAxis.to, p[axis]) : p[axis];
-                });
-                var position = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"](p.x, p.y, p.z);
-                if (addNodeCount) {
-                    var node = babylonjs__WEBPACK_IMPORTED_MODULE_1__["MeshBuilder"].CreateSphere("node", { diameter: 0.2 }, _this.scene);
-                    node.position = position;
-                }
-                return position;
-            });
-            for (var c = 0; c < addNodeCount; c++) {
-                var position = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"](_common_CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getRandomNumberInRange(range.x.from, range.x.to, 5), _common_CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getRandomNumberInRange(range.y.from, range.y.to, 5), _common_CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getRandomNumberInRange(range.z.from, range.z.to, 5));
-                pointInGroup.push(position);
-                var node = babylonjs__WEBPACK_IMPORTED_MODULE_1__["MeshBuilder"].CreateSphere("node", { diameter: 0.2 }, _this.scene);
-                node.position = position;
-                var nodeMaterial = node.material = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["StandardMaterial"]("nodeMaterial", _this.scene);
-                nodeMaterial.diffuseColor = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Color3"](1, 0, 1);
-            }
-            _this.chatRoomsNodes = _this.chatRoomsNodes.concat(pointInGroup);
-            var linesInGroup = _common_BabylonUtility__WEBPACK_IMPORTED_MODULE_5__["BabylonUtility"].getLineToEachOther(pointInGroup);
-            var maxLine = _common_CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].sort(linesInGroup, function (e) { return e.distance; })[linesInGroup.length - 1];
-            var center = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"](0, 0, 0);
-            ['x', 'y', 'z'].forEach(function (axis) {
-                center[axis] = (maxLine.from[axis] + maxLine.to[axis]) / 2;
-            });
-            _this.chatRoomsCenter.push(center);
-            _this.linesForChatRooms = _this.linesForChatRooms.concat(linesInGroup.slice(0, 120));
-        };
         jquery__WEBPACK_IMPORTED_MODULE_2__["getJSON"]('apis/getPoints').then(function (data) {
-            _common_CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].loop(9, function (roomId) { return handleForRoom(roomId, data["chatroom" + roomId]); });
-            _this.chatRoomsNodes = _common_CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].shuffle(_this.chatRoomsNodes);
+            _this.chatRoomsCenter = data.roomCenters;
+            _this.chatRoomsNodes = _common_CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].shuffle(data.chatRoomsNodes, function (node) { return new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"](node.x, node.y, node.z); });
+            _this.linesForChatRooms = data.linesForChatRooms;
             _this.drawLine();
         });
     };
@@ -2022,10 +1993,11 @@ var Scene = /** @class */ (function (_super) {
             mat.alpha = 0;
             return mat;
         });
+        var createVector = function (data) { return new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"](data.x, data.y, data.z); };
         this.linesForChatRooms.forEach(function (e, i) {
             var materialIndex = _common_CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getRandomIntInRange(0, 2);
             var line = babylonjs__WEBPACK_IMPORTED_MODULE_1__["MeshBuilder"].CreateTube("line" + i, {
-                path: [e.from, e.to],
+                path: [createVector(e.from), createVector(e.to)],
                 radius: 0.03,
                 updatable: false
             }, _this.scene);
@@ -2046,7 +2018,7 @@ var Scene = /** @class */ (function (_super) {
         highlightForLine.innerGlow = false;
         var glowColor = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Color3"](246 / 255, 255 / 255, 201 / 255);
         this.lineMeshContainer.forEach(function (group) {
-            var merged = babylonjs__WEBPACK_IMPORTED_MODULE_1__["Mesh"].MergeMeshes(group, true, false);
+            var merged = babylonjs__WEBPACK_IMPORTED_MODULE_1__["Mesh"].MergeMeshes(group, true, true);
             highlightForLine.addMesh(merged, glowColor);
         });
     };
@@ -11940,4 +11912,4 @@ module.exports = ReactDOM;
 /***/ })
 
 /******/ });
-//# sourceMappingURL=bundle.main.2e3fa3adf501081924d8.js.map
+//# sourceMappingURL=bundle.main.js.map
