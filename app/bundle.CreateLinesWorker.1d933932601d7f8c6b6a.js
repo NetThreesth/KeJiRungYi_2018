@@ -171,6 +171,10 @@ var BabylonUtility = /** @class */ (function () {
         return positions.join(', ');
     };
     ;
+    BabylonUtility.createVector = function (data) {
+        return new BABYLON.Vector3(data.x, data.y, data.z);
+    };
+    ;
     BabylonUtility.getLineToEachOther = function (points) {
         var lines = [];
         points.forEach(function (from, iOfFrom) {
@@ -364,4 +368,4 @@ var CommonUtility = /** @class */ (function () {
 /***/ })
 
 /******/ });
-//# sourceMappingURL=bundle.CreateLinesWorker.2d1faa4527f5e17106df.js.map
+//# sourceMappingURL=bundle.CreateLinesWorker.1d933932601d7f8c6b6a.js.map

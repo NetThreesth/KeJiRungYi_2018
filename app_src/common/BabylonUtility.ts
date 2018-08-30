@@ -56,6 +56,9 @@ export class BabylonUtility {
         return positions.join(', ');
     };
 
+    static createVector(data: BABYLON.Vector3) {
+        return new BABYLON.Vector3(data.x, data.y, data.z);
+    };
 
     static getLineToEachOther(points: BABYLON.Vector3[]) {
 

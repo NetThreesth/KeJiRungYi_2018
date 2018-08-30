@@ -440,8 +440,9 @@ export class Scene extends React.Component<
     private chatRoomsNodes: BABYLON.Vector3[] = [];
     private linesForChatRooms: Line[] = [];
     private getPoints() {
+        const createVector = BabylonUtility.createVector;
         $.getJSON('apis/getPoints').then((data: any) => {
-            this.chatRoomsCenter = data.roomCenters;
+            this.chatRoomsCenter = data.roomCenters.map(e => createVector(e));
             this.chatRoomsNodes = CommonUtility.shuffle(
                 data.chatRoomsNodes,
                 node => new BABYLON.Vector3(node.x, node.y, node.z)
@@ -456,8 +457,6 @@ export class Scene extends React.Component<
     private drawLine() {
         if (this.linesForChatRooms.length === 0) return;
 
-
-
         const colorSetForLines = [
             [199, 222, 205],
             [192, 231, 164],
@@ -471,9 +470,7 @@ export class Scene extends React.Component<
             return mat;
         });
 
-
-        const createVector = (data: BABYLON.Vector3) => new BABYLON.Vector3(data.x, data.y, data.z);
-
+        const createVector = BabylonUtility.createVector;
         this.linesForChatRooms.forEach((e, i) => {
             const materialIndex = CommonUtility.getRandomIntInRange(0, 2);
             const line = BABYLON.MeshBuilder.CreateTube(`line${i}`, {

@@ -177,6 +177,10 @@ var BabylonUtility = /** @class */ (function () {
         return positions.join(', ');
     };
     ;
+    BabylonUtility.createVector = function (data) {
+        return new BABYLON.Vector3(data.x, data.y, data.z);
+    };
+    ;
     BabylonUtility.getLineToEachOther = function (points) {
         var lines = [];
         points.forEach(function (from, iOfFrom) {
@@ -1969,8 +1973,9 @@ var Scene = /** @class */ (function (_super) {
     ;
     Scene.prototype.getPoints = function () {
         var _this = this;
+        var createVector = _common_BabylonUtility__WEBPACK_IMPORTED_MODULE_5__["BabylonUtility"].createVector;
         jquery__WEBPACK_IMPORTED_MODULE_2__["getJSON"]('apis/getPoints').then(function (data) {
-            _this.chatRoomsCenter = data.roomCenters;
+            _this.chatRoomsCenter = data.roomCenters.map(function (e) { return createVector(e); });
             _this.chatRoomsNodes = _common_CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].shuffle(data.chatRoomsNodes, function (node) { return new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"](node.x, node.y, node.z); });
             _this.linesForChatRooms = data.linesForChatRooms;
             _this.drawLine();
@@ -1993,7 +1998,7 @@ var Scene = /** @class */ (function (_super) {
             mat.alpha = 0;
             return mat;
         });
-        var createVector = function (data) { return new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"](data.x, data.y, data.z); };
+        var createVector = _common_BabylonUtility__WEBPACK_IMPORTED_MODULE_5__["BabylonUtility"].createVector;
         this.linesForChatRooms.forEach(function (e, i) {
             var materialIndex = _common_CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getRandomIntInRange(0, 2);
             var line = babylonjs__WEBPACK_IMPORTED_MODULE_1__["MeshBuilder"].CreateTube("line" + i, {
@@ -11912,4 +11917,4 @@ module.exports = ReactDOM;
 /***/ })
 
 /******/ });
-//# sourceMappingURL=bundle.main.6fc58ef3922365705c70.js.map
+//# sourceMappingURL=bundle.main.3c474a1389e660bd60d7.js.map
