@@ -8,7 +8,7 @@ const logger = require('./logger');
 
 const app = express();
 app.use(morgan('combined', { stream: logger.accessLogStream }));
-const setting = { limit: '50mb' };
+const setting = { limit: '100mb' };
 app.use(bodyParser.urlencoded(Object.assign({ extended: false }, setting)));
 app.use(bodyParser.json(setting));
 app.use((err, req, res, next) => {

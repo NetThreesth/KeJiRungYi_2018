@@ -14,7 +14,6 @@ const repo = require('./repository.js');
 module.exports.initAPIs = (app) => {
 
     app.route('/apis/uploadAlgaeImage').post((req, res, next) => {
-
         const body = req.body;
 
         repo.UploadedImage.create({

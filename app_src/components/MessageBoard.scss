@@ -29,6 +29,7 @@
                 font-size: 12px;
             }
             .content {
+                @include shadow-text;
                 padding: 3px 0;
                 img {
                     max-width: 60%;

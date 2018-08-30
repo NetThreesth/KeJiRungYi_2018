@@ -57,20 +57,25 @@ export class MessageBoard
         });
     };
 
+    private contentColor = function () {
+        const colors = {};
+        colors[Roles.User] = 'white';
+        colors[Roles.Algae] = '#ffffe0';
+        colors[Roles.ChatBot] = '#fff0f2';
+        return colors;
+    }();
+
     private createContent(content: Content) {
         const isUser = content.role === Roles.User;
         const name = isUser ? GlobalData.userName :
             content.role === Roles.Algae ? 'aigae' : 'bot';
         const float = isUser ? 'right' : 'left';
-        const colors = {};
-        colors[Roles.User] = 'white';
-        colors[Roles.Algae] = '#ffffe0';
-        colors[Roles.ChatBot] = '#fff0f2';
         let $content: JSX.Element = null;
         if (content.type === ContentType.Text) {
             const to = (content.to === Roles.Algae) ? '@aigae ' :
-                (content.to === Roles.User) ? `@${GlobalData.userName} ` : '';
-            $content = <div className="content" style={{ color: colors[content.role] }}>
+                (content.to === Roles.User) ? `@${GlobalData.userName} ` :
+                    '';
+            $content = <div className="content" style={{ color: this.contentColor[content.role] }}>
                 {to + content.content}
             </div >;
         }

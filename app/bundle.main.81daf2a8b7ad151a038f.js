@@ -1299,6 +1299,13 @@ var MessageBoard = /** @class */ (function (_super) {
             avatars[_common_GlobalData__WEBPACK_IMPORTED_MODULE_3__["Roles"].ChatBot] = '3sth/avatar/avatar_pink.png';
             return avatars;
         }();
+        _this.contentColor = function () {
+            var colors = {};
+            colors[_common_GlobalData__WEBPACK_IMPORTED_MODULE_3__["Roles"].User] = 'white';
+            colors[_common_GlobalData__WEBPACK_IMPORTED_MODULE_3__["Roles"].Algae] = '#ffffe0';
+            colors[_common_GlobalData__WEBPACK_IMPORTED_MODULE_3__["Roles"].ChatBot] = '#fff0f2';
+            return colors;
+        }();
         var messageCenter = _this.props.messageCenter;
         _this.state = { contents: messageCenter.contents.slice() };
         _this.props.eventCenter.on(_common_MessageCenter__WEBPACK_IMPORTED_MODULE_1__["MessageCenter"].eventName, _this.refresh.bind(_this));
@@ -1339,15 +1346,12 @@ var MessageBoard = /** @class */ (function (_super) {
         var name = isUser ? _common_GlobalData__WEBPACK_IMPORTED_MODULE_3__["GlobalData"].userName :
             content.role === _common_GlobalData__WEBPACK_IMPORTED_MODULE_3__["Roles"].Algae ? 'aigae' : 'bot';
         var float = isUser ? 'right' : 'left';
-        var colors = {};
-        colors[_common_GlobalData__WEBPACK_IMPORTED_MODULE_3__["Roles"].User] = 'white';
-        colors[_common_GlobalData__WEBPACK_IMPORTED_MODULE_3__["Roles"].Algae] = '#ffffe0';
-        colors[_common_GlobalData__WEBPACK_IMPORTED_MODULE_3__["Roles"].ChatBot] = '#fff0f2';
         var $content = null;
         if (content.type === _common_MessageCenter__WEBPACK_IMPORTED_MODULE_1__["ContentType"].Text) {
             var to = (content.to === _common_GlobalData__WEBPACK_IMPORTED_MODULE_3__["Roles"].Algae) ? '@aigae ' :
-                (content.to === _common_GlobalData__WEBPACK_IMPORTED_MODULE_3__["Roles"].User) ? "@" + _common_GlobalData__WEBPACK_IMPORTED_MODULE_3__["GlobalData"].userName + " " : '';
-            $content = react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "content", style: { color: colors[content.role] } }, to + content.content);
+                (content.to === _common_GlobalData__WEBPACK_IMPORTED_MODULE_3__["Roles"].User) ? "@" + _common_GlobalData__WEBPACK_IMPORTED_MODULE_3__["GlobalData"].userName + " " :
+                    '';
+            $content = react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "content", style: { color: this.contentColor[content.role] } }, to + content.content);
         }
         else if (content.type === _common_MessageCenter__WEBPACK_IMPORTED_MODULE_1__["ContentType"].Image) {
             $content = react__WEBPACK_IMPORTED_MODULE_0__["createElement"]("div", { className: "content" },
@@ -1767,6 +1771,18 @@ var Scene = /** @class */ (function (_super) {
             particle.uvs.y = Math.random() >= 0.5 ? 0.5 : 0;
             particle.uvs.z = particle.uvs.x + 0.5;
             particle.uvs.w = particle.uvs.y + 0.5;
+            particle['age'] = Math.random() * 3;
+            return particle;
+        };
+        var recycleParticle = function (particle) {
+            particle.position.x = 0;
+            particle.position.y = 0;
+            particle.position.z = 0;
+            var scale = (Math.random() / 2) + 0.5;
+            particle.scale.x = scale;
+            particle.scale.y = scale;
+            particle.scale.z = scale;
+            particle['age'] = Math.random() * 3 + 2;
             return particle;
         };
         var direction = this.camera.rotation.clone();
@@ -1775,6 +1791,9 @@ var Scene = /** @class */ (function (_super) {
             direction.y = direction.y * -1;
         }
         bubbleSpray.updateParticle = function (particle) {
+            if (particle['age'] < 0) {
+                recycleParticle(particle);
+            }
             particle.position.addInPlace(particle.velocity); // �散
             var rise = 0.001;
             particle.position.x += (direction.x * rise); // 上�x
@@ -1783,6 +1802,7 @@ var Scene = /** @class */ (function (_super) {
             particle.scale.x = scale;
             particle.scale.y = scale;
             particle.scale.z = scale;
+            particle['age'] -= 0.01;
             return particle;
         };
         bubbleSpray.particles.forEach(function (particle) { return initParticle(particle); });
@@ -2089,7 +2109,7 @@ var Scene = /** @class */ (function (_super) {
         this.updateMask();
         // Bubble
         var center = this.chatRoomsCenter[_common_GlobalData__WEBPACK_IMPORTED_MODULE_7__["GlobalData"].chatRoomIndex];
-        this.createBubbleSpray(center, 12 + (chatBotResponse.text2cmd.pumpValue * 2));
+        this.createBubbleSpray(center, chatBotResponse.pump);
     };
     ;
     Scene.prototype.transformation = function () {
@@ -4789,7 +4809,7 @@ exports = module.exports = __webpack_require__(/*! ../../node_modules/css-loader
 
 
 // module
-exports.push([module.i, ".control-panel {\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  justify-content: center;\n  -webkit-transition: all 0.3s ease;\n  -moz-transition: all 0.3s ease;\n  -o-transition: all 0.3s ease;\n  transition: all 0.3s ease;\n  position: fixed;\n  bottom: 30px;\n  left: 0;\n  width: 100%;\n  height: 70px;\n  margin: 0 auto; }\n  .control-panel .buttons > * {\n    margin: 0 3px; }\n  .control-panel .button {\n    background-color: transparent;\n    cursor: pointer;\n    text-shadow: 0px 0px 6px #404040;\n    color: white;\n    font-size: 28px;\n    border: 0; }\n  .control-panel .textInput {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    -webkit-transition: all 0.3s ease;\n    -moz-transition: all 0.3s ease;\n    -o-transition: all 0.3s ease;\n    transition: all 0.3s ease;\n    width: 100%;\n    max-width: 35em;\n    margin-bottom: 30px; }\n  .control-panel .textInput input {\n    background-color: transparent;\n    border: solid 1px white;\n    border-radius: 1px;\n    width: 80%; }\n  .control-panel .textInput button {\n    border: solid 1px white;\n    font-size: 14px;\n    border-radius: 1px;\n    margin-left: 3px;\n    padding: 2px; }\n  .control-panel .userRecord {\n    display: none;\n    position: absolute;\n    top: -10px;\n    left: 50%;\n    transform: translate(-50%, -100%);\n    padding: 10px;\n    width: 220px;\n    background-color: rgba(255, 255, 255, 0.5);\n    border-radius: 8px;\n    text-align: center;\n    font-size: 12px; }\n    .control-panel .userRecord div {\n      padding: 2px 0; }\n", ""]);
+exports.push([module.i, ".control-panel {\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  justify-content: center;\n  -webkit-transition: all 0.3s ease;\n  -moz-transition: all 0.3s ease;\n  -o-transition: all 0.3s ease;\n  transition: all 0.3s ease;\n  position: fixed;\n  bottom: 30px;\n  left: 0;\n  width: 100%;\n  height: 70px;\n  margin: 0 auto; }\n  .control-panel .buttons > * {\n    margin: 0 3px; }\n  .control-panel .button {\n    background-color: transparent;\n    cursor: pointer;\n    text-shadow: 0px 0px 6px #404040;\n    color: white;\n    font-size: 28px;\n    border: 0; }\n  .control-panel .textInput {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    -webkit-transition: all 0.3s ease;\n    -moz-transition: all 0.3s ease;\n    -o-transition: all 0.3s ease;\n    transition: all 0.3s ease;\n    width: 100%;\n    max-width: 35em;\n    margin-bottom: 30px; }\n  .control-panel .textInput input {\n    background-color: transparent;\n    border: solid 1px white;\n    border-radius: 1px;\n    width: 80%; }\n  .control-panel .textInput button {\n    border: solid 1px white;\n    font-size: 14px;\n    border-radius: 1px;\n    margin-left: 3px;\n    padding: 2px; }\n  .control-panel .userRecord {\n    display: none;\n    position: absolute;\n    top: -30px;\n    left: 50%;\n    transform: translate(-50%, -100%);\n    padding: 10px;\n    width: 220px;\n    background-color: rgba(255, 255, 255, 0.5);\n    border-radius: 8px;\n    text-align: center;\n    font-size: 12px; }\n    .control-panel .userRecord div {\n      padding: 2px 0; }\n", ""]);
 
 // exports
 
@@ -4846,7 +4866,7 @@ exports = module.exports = __webpack_require__(/*! ../../node_modules/css-loader
 
 
 // module
-exports.push([module.i, "#messageBoard {\n  pointer-events: none;\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  overflow: hidden;\n  display: flex;\n  justify-content: center; }\n  #messageBoard > div {\n    margin-top: 10px;\n    margin-bottom: 100px; }\n  #messageBoard .messageBoardContent {\n    width: 100%;\n    overflow: hidden;\n    padding: 0 80px; }\n    #messageBoard .messageBoardContent:after {\n      content: \"\";\n      clear: both;\n      display: table; }\n    #messageBoard .messageBoardContent .messageBox {\n      color: white;\n      position: relative;\n      margin: 15px 0;\n      color: white; }\n      #messageBoard .messageBoardContent .messageBox .avatar {\n        position: absolute;\n        width: 30px; }\n      #messageBoard .messageBoardContent .messageBox .name {\n        position: absolute;\n        top: -12px;\n        font-size: 12px; }\n      #messageBoard .messageBoardContent .messageBox .content {\n        padding: 3px 0; }\n        #messageBoard .messageBoardContent .messageBox .content img {\n          max-width: 60%;\n          max-height: 300px; }\n    #messageBoard .messageBoardContent .messageBox.left .avatar {\n      left: 0; }\n    #messageBoard .messageBoardContent .messageBox.left .name {\n      left: 0; }\n    #messageBoard .messageBoardContent .messageBox.left .content {\n      text-align: left;\n      padding-left: 40px; }\n    #messageBoard .messageBoardContent .messageBox.right .avatar {\n      right: 0; }\n    #messageBoard .messageBoardContent .messageBox.right .name {\n      right: -6px; }\n    #messageBoard .messageBoardContent .messageBox.right .content {\n      text-align: right;\n      padding-right: 40px; }\n  #messageBoard .scrollbarContainer {\n    pointer-events: auto;\n    position: relative;\n    top: 0;\n    right: 1px;\n    width: 20px;\n    background-color: rgba(0, 0, 0, 0.1); }\n    #messageBoard .scrollbarContainer .scrollbar {\n      position: absolute;\n      top: 0;\n      right: 1px;\n      width: 12px;\n      height: 100px;\n      background-color: rgba(0, 0, 0, 0.3);\n      border-radius: 5px; }\n\n@media only screen and (min-width: 768px) {\n  #messageBoard .messageBoardContent {\n    padding: 0 200px; } }\n\n@media only screen and (min-width: 1224px) {\n  #messageBoard .messageBoardContent {\n    padding: 0 350px; } }\n\n@media only screen and (min-width: 1920px) {\n  #messageBoard .messageBoardContent {\n    padding: 0 550px; } }\n", ""]);
+exports.push([module.i, "#messageBoard {\n  pointer-events: none;\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  overflow: hidden;\n  display: flex;\n  justify-content: center; }\n  #messageBoard > div {\n    margin-top: 10px;\n    margin-bottom: 100px; }\n  #messageBoard .messageBoardContent {\n    width: 100%;\n    overflow: hidden;\n    padding: 0 80px; }\n    #messageBoard .messageBoardContent:after {\n      content: \"\";\n      clear: both;\n      display: table; }\n    #messageBoard .messageBoardContent .messageBox {\n      color: white;\n      position: relative;\n      margin: 15px 0;\n      color: white; }\n      #messageBoard .messageBoardContent .messageBox .avatar {\n        position: absolute;\n        width: 30px; }\n      #messageBoard .messageBoardContent .messageBox .name {\n        position: absolute;\n        top: -12px;\n        font-size: 12px; }\n      #messageBoard .messageBoardContent .messageBox .content {\n        text-shadow: 0px 0px 6px #404040;\n        padding: 3px 0; }\n        #messageBoard .messageBoardContent .messageBox .content img {\n          max-width: 60%;\n          max-height: 300px; }\n    #messageBoard .messageBoardContent .messageBox.left .avatar {\n      left: 0; }\n    #messageBoard .messageBoardContent .messageBox.left .name {\n      left: 0; }\n    #messageBoard .messageBoardContent .messageBox.left .content {\n      text-align: left;\n      padding-left: 40px; }\n    #messageBoard .messageBoardContent .messageBox.right .avatar {\n      right: 0; }\n    #messageBoard .messageBoardContent .messageBox.right .name {\n      right: -6px; }\n    #messageBoard .messageBoardContent .messageBox.right .content {\n      text-align: right;\n      padding-right: 40px; }\n  #messageBoard .scrollbarContainer {\n    pointer-events: auto;\n    position: relative;\n    top: 0;\n    right: 1px;\n    width: 20px;\n    background-color: rgba(0, 0, 0, 0.1); }\n    #messageBoard .scrollbarContainer .scrollbar {\n      position: absolute;\n      top: 0;\n      right: 1px;\n      width: 12px;\n      height: 100px;\n      background-color: rgba(0, 0, 0, 0.3);\n      border-radius: 5px; }\n\n@media only screen and (min-width: 768px) {\n  #messageBoard .messageBoardContent {\n    padding: 0 200px; } }\n\n@media only screen and (min-width: 1224px) {\n  #messageBoard .messageBoardContent {\n    padding: 0 350px; } }\n\n@media only screen and (min-width: 1920px) {\n  #messageBoard .messageBoardContent {\n    padding: 0 550px; } }\n", ""]);
 
 // exports
 
@@ -11917,4 +11937,4 @@ module.exports = ReactDOM;
 /***/ })
 
 /******/ });
-//# sourceMappingURL=bundle.main.3c474a1389e660bd60d7.js.map
+//# sourceMappingURL=bundle.main.81daf2a8b7ad151a038f.js.map

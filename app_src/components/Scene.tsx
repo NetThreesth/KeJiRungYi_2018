@@ -210,6 +210,21 @@ export class Scene extends React.Component<
             particle.uvs.z = particle.uvs.x + 0.5;
             particle.uvs.w = particle.uvs.y + 0.5;
 
+            particle['age'] = Math.random() * 3;
+            return particle;
+        };
+
+        const recycleParticle = (particle: BABYLON.SolidParticle) => {
+            particle.position.x = 0;
+            particle.position.y = 0;
+            particle.position.z = 0;
+
+            const scale = (Math.random() / 2) + 0.5;
+            particle.scale.x = scale;
+            particle.scale.y = scale;
+            particle.scale.z = scale;
+            particle['age'] = Math.random() * 3 + 2;
+
             return particle;
         };
 
@@ -220,6 +235,10 @@ export class Scene extends React.Component<
         }
 
         bubbleSpray.updateParticle = (particle) => {
+            if (particle['age'] < 0) {
+                recycleParticle(particle);
+            }
+
             particle.position.addInPlace(particle.velocity); // �散
             const rise = 0.001;
             particle.position.x += (direction.x * rise); // 上�x
@@ -230,6 +249,7 @@ export class Scene extends React.Component<
             particle.scale.y = scale;
             particle.scale.z = scale;
 
+            particle['age'] -= 0.01;
             return particle;
         };
 
@@ -577,7 +597,7 @@ export class Scene extends React.Component<
 
         // Bubble
         const center = this.chatRoomsCenter[GlobalData.chatRoomIndex];
-        this.createBubbleSpray(center, 12 + (chatBotResponse.text2cmd.pumpValue * 2));
+        this.createBubbleSpray(center, chatBotResponse.pump);
     };
 
 
