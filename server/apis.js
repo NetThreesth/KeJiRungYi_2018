@@ -160,7 +160,7 @@ module.exports.initAPIs = (app) => {
                     n.z = (Math.random() - Math.random()) * 2;
                 });
 
-                addDerivativedNodes(nodes, centerDeg, chatroomRadius, dateDiff * 2);
+                addAdditionalNodes(nodes, centerDeg, chatroomRadius, dateDiff * 2);
                 result.chatRoomsNodes = result.chatRoomsNodes.concat(nodes);
 
                 const lines = getLineToEachOther(nodes, 0.1);
@@ -184,7 +184,10 @@ function degToPosition(deg, radius, randomZ) {
     const x = radius * Math.sin(rad);
     const y = radius * Math.cos(rad);
     const position = { x, y, z: 0 };
-    if (randomZ) position.z = (Math.random() - Math.random()) * 2;
+    if (randomZ) {
+        position.z = (Math.random() - Math.random()) * 1.3;
+        position.z = position.z < 0 ? position.z - 0.6 : position.z + 0.6;
+    }
     return position;
 };
 
@@ -199,12 +202,13 @@ function getRandomIntInRange(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
-function addDerivativedNodes(data, centerDeg, chatroomRadius, count) {
+function addAdditionalNodes(data, centerDeg, chatroomRadius, count) {
     for (let c = 0; c < count; c++) {
         const degRange = 15;
         const deg = getRandomNumberInRange(centerDeg - degRange, centerDeg + degRange, 2);
-        const radius = chatroomRadius + getRandomNumberInRange(0.5, 1.2, 2);
+        const radius = getRandomNumberInRange(chatroomRadius - 0.5, chatroomRadius + 0.5, 2);
         const position = degToPosition(deg, radius, true);
+        position['isAdditional'] = true;
         data.push(position);
     }
 };

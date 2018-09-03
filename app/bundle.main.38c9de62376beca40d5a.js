@@ -479,9 +479,15 @@ var MessageCenter = /** @class */ (function () {
         this.eventCenter.trigger(_components_DevPanel__WEBPACK_IMPORTED_MODULE_3__["AddLogEvent"], resp);
         this.eventCenter.trigger(Event.AfterSubmitMessage, resp);
         this.addMessage({ role: _GlobalData__WEBPACK_IMPORTED_MODULE_1__["Roles"].ChatBot, to: _GlobalData__WEBPACK_IMPORTED_MODULE_1__["Roles"].User, type: ContentType.Text, content: resp.chatbotResponse });
-        this.addMessage({ role: _GlobalData__WEBPACK_IMPORTED_MODULE_1__["Roles"].Algae, type: ContentType.Algae, algaeCount: resp.density / 10 }, 3000);
-        this.addMessage({ role: _GlobalData__WEBPACK_IMPORTED_MODULE_1__["Roles"].Algae, type: ContentType.Text, content: resp.algaeResponse }, 6000);
-        this.addMessage({ role: _GlobalData__WEBPACK_IMPORTED_MODULE_1__["Roles"].ChatBot, to: _GlobalData__WEBPACK_IMPORTED_MODULE_1__["Roles"].Algae, type: ContentType.Text, content: resp.chatbot2algaeResponse }, 7000);
+        if (resp.density) {
+            this.addMessage({ role: _GlobalData__WEBPACK_IMPORTED_MODULE_1__["Roles"].Algae, type: ContentType.Algae, algaeCount: resp.density / 10 }, 3000);
+        }
+        if (resp.algaeResponse) {
+            this.addMessage({ role: _GlobalData__WEBPACK_IMPORTED_MODULE_1__["Roles"].Algae, type: ContentType.Text, content: resp.algaeResponse }, 6000);
+        }
+        if (resp.chatbot2algaeResponse) {
+            this.addMessage({ role: _GlobalData__WEBPACK_IMPORTED_MODULE_1__["Roles"].ChatBot, to: _GlobalData__WEBPACK_IMPORTED_MODULE_1__["Roles"].Algae, type: ContentType.Text, content: resp.chatbot2algaeResponse }, 7000);
+        }
     };
     ;
     MessageCenter.eventName = 'addMessage';
@@ -1810,7 +1816,7 @@ var Scene = /** @class */ (function (_super) {
     };
     ;
     Scene.prototype.createParticle = function (center, color) {
-        var particle = babylonjs__WEBPACK_IMPORTED_MODULE_1__["Mesh"].CreatePlane("particle", 0.5, this.scene);
+        var particle = babylonjs__WEBPACK_IMPORTED_MODULE_1__["Mesh"].CreatePlane("particle", 0.3, this.scene);
         particle.position = center.clone();
         particle.billboardMode = babylonjs__WEBPACK_IMPORTED_MODULE_1__["Mesh"].BILLBOARDMODE_ALL;
         var material = particle.material = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["StandardMaterial"]("particleMaterial", this.scene);
@@ -1997,6 +2003,16 @@ var Scene = /** @class */ (function (_super) {
         jquery__WEBPACK_IMPORTED_MODULE_2__["getJSON"]('apis/getPoints').then(function (data) {
             _this.chatRoomsCenter = data.roomCenters.map(function (e) { return createVector(e); });
             _this.chatRoomsNodes = _common_CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].shuffle(data.chatRoomsNodes, function (node) { return new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Vector3"](node.x, node.y, node.z); });
+            if (_common_CommonUtility__WEBPACK_IMPORTED_MODULE_4__["CommonUtility"].getQueryString('markNodes')) {
+                var nodeMaterial_1 = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["StandardMaterial"]("nodeMaterial", _this.scene);
+                nodeMaterial_1.diffuseColor = new babylonjs__WEBPACK_IMPORTED_MODULE_1__["Color3"](1, 0, 1);
+                data.chatRoomsNodes.forEach(function (position) {
+                    var node = babylonjs__WEBPACK_IMPORTED_MODULE_1__["MeshBuilder"].CreateSphere("node", { diameter: 0.1 }, _this.scene);
+                    node.position = position;
+                    if (position.isAdditional)
+                        node.material = nodeMaterial_1;
+                });
+            }
             _this.linesForChatRooms = data.linesForChatRooms;
             _this.drawLine();
         });
@@ -2101,15 +2117,19 @@ var Scene = /** @class */ (function (_super) {
     Scene.prototype.cmdHandler = function (chatBotResponse) {
         // Mask
         var color = chatBotResponse.color;
-        this.maskColor.r = color[0];
-        this.maskColor.g = color[1];
-        this.maskColor.b = color[2];
-        var alpha = this.maskColor.a * ((100 - chatBotResponse.text2cmd.ledValue) / 100);
-        this.maskColor.a = (alpha < 0.3) ? Number(alpha.toFixed(3)) : 0.3;
-        this.updateMask();
+        if (color) {
+            this.maskColor.r = color[0];
+            this.maskColor.g = color[1];
+            this.maskColor.b = color[2];
+            var alpha = this.maskColor.a * ((100 - chatBotResponse.text2cmd.ledValue) / 100);
+            this.maskColor.a = (alpha < 0.3) ? Number(alpha.toFixed(3)) : 0.3;
+            this.updateMask();
+        }
         // Bubble
-        var center = this.chatRoomsCenter[_common_GlobalData__WEBPACK_IMPORTED_MODULE_7__["GlobalData"].chatRoomIndex];
-        this.createBubbleSpray(center, chatBotResponse.pump);
+        if (chatBotResponse.pump) {
+            var center = this.chatRoomsCenter[_common_GlobalData__WEBPACK_IMPORTED_MODULE_7__["GlobalData"].chatRoomIndex];
+            this.createBubbleSpray(center, chatBotResponse.pump);
+        }
     };
     ;
     Scene.prototype.transformation = function () {
@@ -11937,4 +11957,4 @@ module.exports = ReactDOM;
 /***/ })
 
 /******/ });
-//# sourceMappingURL=bundle.main.81daf2a8b7ad151a038f.js.map
+//# sourceMappingURL=bundle.main.38c9de62376beca40d5a.js.map

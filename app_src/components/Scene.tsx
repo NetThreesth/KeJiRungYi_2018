@@ -274,7 +274,7 @@ export class Scene extends React.Component<
     }.bind(this)();
 
     private createParticle(center: BABYLON.Vector3, color: string) {
-        const particle = BABYLON.Mesh.CreatePlane(`particle`, 0.5, this.scene);
+        const particle = BABYLON.Mesh.CreatePlane(`particle`, 0.3, this.scene);
         particle.position = center.clone();
         particle.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL;
 
@@ -467,6 +467,16 @@ export class Scene extends React.Component<
                 data.chatRoomsNodes,
                 node => new BABYLON.Vector3(node.x, node.y, node.z)
             );
+            if (CommonUtility.getQueryString('markNodes')) {
+                const nodeMaterial = new BABYLON.StandardMaterial("nodeMaterial", this.scene);
+                nodeMaterial.diffuseColor = new BABYLON.Color3(1, 0, 1);
+
+                data.chatRoomsNodes.forEach(position => {
+                    const node = BABYLON.MeshBuilder.CreateSphere("node", { diameter: 0.1 }, this.scene);
+                    node.position = position;
+                    if (position.isAdditional) node.material = nodeMaterial;
+                });
+            }
             this.linesForChatRooms = data.linesForChatRooms;
             this.drawLine();
         });
@@ -588,16 +598,20 @@ export class Scene extends React.Component<
 
         // Mask
         const color = chatBotResponse.color;
-        this.maskColor.r = color[0];
-        this.maskColor.g = color[1];
-        this.maskColor.b = color[2];
-        const alpha = this.maskColor.a * ((100 - chatBotResponse.text2cmd.ledValue) / 100);
-        this.maskColor.a = (alpha < 0.3) ? Number(alpha.toFixed(3)) : 0.3;
-        this.updateMask();
+        if (color) {
+            this.maskColor.r = color[0];
+            this.maskColor.g = color[1];
+            this.maskColor.b = color[2];
+            const alpha = this.maskColor.a * ((100 - chatBotResponse.text2cmd.ledValue) / 100);
+            this.maskColor.a = (alpha < 0.3) ? Number(alpha.toFixed(3)) : 0.3;
+            this.updateMask();
+        }
 
         // Bubble
-        const center = this.chatRoomsCenter[GlobalData.chatRoomIndex];
-        this.createBubbleSpray(center, chatBotResponse.pump);
+        if (chatBotResponse.pump) {
+            const center = this.chatRoomsCenter[GlobalData.chatRoomIndex];
+            this.createBubbleSpray(center, chatBotResponse.pump);
+        }
     };
 
 

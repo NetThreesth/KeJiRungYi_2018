@@ -76,15 +76,21 @@ export class MessageCenter {
         this.addMessage(
             { role: Roles.ChatBot, to: Roles.User, type: ContentType.Text, content: resp.chatbotResponse });
 
-        this.addMessage(
-            { role: Roles.Algae, type: ContentType.Algae, algaeCount: resp.density / 10 }
-            , 3000);
-        this.addMessage(
-            { role: Roles.Algae, type: ContentType.Text, content: resp.algaeResponse }
-            , 6000);
-        this.addMessage(
-            { role: Roles.ChatBot, to: Roles.Algae, type: ContentType.Text, content: resp.chatbot2algaeResponse }
-            , 7000);
+        if (resp.density) {
+            this.addMessage(
+                { role: Roles.Algae, type: ContentType.Algae, algaeCount: resp.density / 10 }
+                , 3000);
+        }
+        if (resp.algaeResponse) {
+            this.addMessage(
+                { role: Roles.Algae, type: ContentType.Text, content: resp.algaeResponse }
+                , 6000);
+        }
+        if (resp.chatbot2algaeResponse) {
+            this.addMessage(
+                { role: Roles.ChatBot, to: Roles.Algae, type: ContentType.Text, content: resp.chatbot2algaeResponse }
+                , 7000);
+        }
     };
 };
 
