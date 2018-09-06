@@ -40,7 +40,7 @@ export class Scene extends React.Component<
 
     private createLinesWorker: AsyncWorker<BABYLON.Vector3[], BABYLON.Vector3[][]>;
 
-    private maskColor = { r: 0, g: 255, b: 0, a: 0.1 };
+    private maskColor = { r: 0, g: 255, b: 0, a: 0.355 };
 
     render() {
         return <div>
@@ -274,7 +274,7 @@ export class Scene extends React.Component<
     }.bind(this)();
 
     private createParticle(center: BABYLON.Vector3, color: string) {
-        const particle = BABYLON.Mesh.CreatePlane(`particle`, 0.3, this.scene);
+        const particle = BABYLON.Mesh.CreatePlane(`particle`, 0.1, this.scene);
         particle.position = center.clone();
         particle.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL;
 
@@ -602,8 +602,7 @@ export class Scene extends React.Component<
             this.maskColor.r = color[0];
             this.maskColor.g = color[1];
             this.maskColor.b = color[2];
-            const alpha = this.maskColor.a * ((100 - chatBotResponse.text2cmd.ledValue) / 100);
-            this.maskColor.a = (alpha < 0.3) ? Number(alpha.toFixed(3)) : 0.3;
+            this.maskColor.a = 0.355 - (chatBotResponse.led / 1000);
             this.updateMask();
         }
 
@@ -628,7 +627,10 @@ export class Scene extends React.Component<
     };
 
     private resetMask() {
-        $.get(`/apis/getBaseline?rid=${GlobalData.chatRoomIndex}`).then(data => {
+        $.get(`/apis/getBaseline?rid=${GlobalData.chatRoomIndex}`)
+            .then(data => {
+                this.maskColor.a = 0.355 - (data.led / 1000);
+            }).always(() => {
             this.updateMask();
         });
     };

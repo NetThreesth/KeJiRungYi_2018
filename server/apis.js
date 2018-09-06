@@ -23,9 +23,6 @@ module.exports.initAPIs = (app) => {
             chatroomId: body.rid,
         }).catch(err => errorHandler(err, next));
 
-        body.base64Image = body.base64Image.replace(/b'/g, '').replace(/'/g, '');
-        io.sockets.emit('uploadAlgaeImage', body);
-        createParticle(body.rid, 'yellow', 0);
         res.send(true);
     });
 
@@ -253,33 +250,65 @@ function sentToChatbots(text, rid, userName) {
     }).catch(err => errorHandler(err));
     createParticle(rid, 'white', 0);
 
+    if (Math.random() <= 0.1) {
+        /* 
+        {
+            time: new Date(),
+            base64image: body.base64Image,
+            name: body.userName,
+            chatroomId: body.rid,
+        }
+        */
+        let image = repo.UploadedImage.findOne({
+            where: { chatroomId: rid },
+            order: [['time', 'DESC']]
+        }).catch(err => errorHandler(err, next));
+
+        image.base64Image = image.base64Image.replace(/b'/g, '').replace(/'/g, '');
+        io.sockets.emit('uploadAlgaeImage', image);
+        createParticle(rid, 'yellow', 0);
+    }
+
     const observable = from(axios.post('http://35.236.167.99:5000/3sth/api/v1.0/chatbots/', {
         msg: text,
         rid: rid
     }));
     return observable.pipe(map(resp => {
         const now = new Date();
-        createParticlesForResponse(rid);
-        repo.Message.bulkCreate([
+
+        createParticle(rid, 'pink', 0);
+        const messages = [
             {
                 time: now,
                 message: resp.data.chatbotResponse,
                 name: 'chatbot',
                 chatroomId: rid,
-            },
-            {
+            }
+        ];
+
+        if (resp.data.text2cmd)
+            createParticle(rid, 'pink', 0.5 * 1000);
+        if (resp.data.density)
+            createParticle(rid, 'yellow', 3 * 1000);
+        if (resp.data.algaeResponse) {
+            messages.push({
                 time: now,
                 message: resp.data.algaeResponse,
                 name: 'algae',
                 chatroomId: rid,
-            },
-            {
+            });
+            createParticle(rid, 'yellow', 6 * 1000);
+        }
+        if (resp.data.chatbot2algaeResponse) {
+            messages.push({
                 time: now,
                 message: resp.data.chatbot2algaeResponse,
                 name: 'chatbot',
                 chatroomId: rid,
-            }
-        ]).catch(err => errorHandler(err));
+            });
+            createParticle(rid, 'pink', 7 * 1000);
+        }
+        repo.Message.bulkCreate(messages).catch(err => errorHandler(err));
         return resp;
     }));
 };

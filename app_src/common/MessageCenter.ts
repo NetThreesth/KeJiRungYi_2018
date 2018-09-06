@@ -24,7 +24,7 @@ export class MessageCenter {
     ) {
         socketClient.on('uploadAlgaeImage', data => {
             this.eventCenter.trigger(AddLogEvent, data);
-            if (GlobalData.chatRoomIndex === data.rid)
+            if (GlobalData.chatRoomIndex === data.chatRoomIndex)
                 this.addMessage({ role: Roles.Algae, type: ContentType.Image, content: `data:image/png;base64,${data.base64Image}` });
         });
         socketClient.on('uploadDeepAlMessage', data => {
