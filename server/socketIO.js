@@ -45,31 +45,48 @@ const socketIO = {
                 logger.info('sign out: ' + common.deserializeSafely(userInfo));
                 const signInTime = new Date(userInfo.signInTime);
                 const stayTime = Date.now() - signInTime.getTime();
+
                 repo.UserLog.create({
                     userName: userInfo.userName,
                     chatRoomIndex: userInfo.chatRoomIndex,
                     touchEventCount: userInfo.touchEventCount,
                     signInTime: signInTime,
                     stayTime: stayTime
-                });
+                })
+                    .then(() => {
+                        return repo.UserLog.findAll({
+                            where: { chatRoomIndex: userInfo.chatRoomIndex }
+                        });
+                    })
+                    .then(instances => {
+                        const sum = {
+                            touch: 0,
+                            time: 0,
+                            rid: userInfo.chatRoomIndex
+                        };
+                        instances.forEach(i => {
+                            sum.touch += i.touchEventCount;
+                            sum.time += i.stayTime;
+                        });
+                        sum.time = sum.time / 1000 / 60;
+                        return require('axios').post(
+                            'http://35.236.167.99:5000/3sth/api/v1.0/userdata/',
+                            sum
+                        );
+                    })
+                    .then(response => {
+                        const baseline = {
+                            rid: userInfo.chatRoomIndex,
+                            led: response.data.baseline_led,
+                            pump: response.data.baseline_pump,
+                            time: new Date()
+                        };
+                        logger.info(`baseline: ${common.deserializeSafely(baseline)}`);
+                        repo.Baseline.create(baseline).catch(err => logger.error(err));
+                        userInfo = null;
+                    })
+                    .catch(err => logger.error(err));;
 
-                const axios = require('axios');
-                axios.post('http://35.236.167.99:5000/3sth/api/v1.0/userdata/', {
-                    "touch": userInfo.touchEventCount,
-                    "time": stayTime / 1000 / 60, //單位是分鐘
-                    "rid": userInfo.chatRoomIndex // 0-8
-                }).then(response => {
-
-                    const baseline = {
-                        rid: userInfo.chatRoomIndex,
-                        led: response.data.baseline_led,
-                        pump: response.data.baseline_pump,
-                        time: new Date()
-                    };
-                    logger.info(`baseline: ${common.deserializeSafely(baseline)}`);
-                    repo.Baseline.create(baseline).catch(err => logger.error(err));
-                    userInfo = null;
-                }).catch(err => logger.error(err));
 
             });
         });

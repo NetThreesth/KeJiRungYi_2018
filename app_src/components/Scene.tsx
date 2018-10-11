@@ -626,10 +626,12 @@ export class Scene extends React.Component<
         }, 2 * 1000);
     };
 
-    private resetMask() {
+    private setBackground() {
         $.get(`/apis/getBaseline?rid=${GlobalData.chatRoomIndex}`)
             .then(data => {
                 this.maskColor.a = 0.355 - (data.led / 1000);
+                const center = this.chatRoomsCenter[GlobalData.chatRoomIndex];
+                this.createBubbleSpray(center, data.pump);
             }).always(() => {
             this.updateMask();
         });
@@ -650,7 +652,7 @@ export class Scene extends React.Component<
 
     private zoomIn() {
         this.setChatRoomIndex();
-        this.resetMask();
+        this.setBackground();
 
         const chatRoomCenter = this.chatRoomsCenter[GlobalData.chatRoomIndex];
         const destination = chatRoomCenter ?
