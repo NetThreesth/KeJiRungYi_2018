@@ -250,21 +250,13 @@ function sentToChatbots(text, rid, userName) {
     }).catch(err => errorHandler(err));
     createParticle(rid, 'white', 0);
 
-    if (Math.random() <= 0.1) {
-        /* 
-        {
-            time: new Date(),
-            base64image: body.base64Image,
-            name: body.userName,
-            chatroomId: body.rid,
-        }
-        */
+    if (Math.random() <= 0.2) {
         let image = repo.UploadedImage.findOne({
             where: { chatroomId: rid },
             order: [['time', 'DESC']]
         }).catch(err => errorHandler(err, next));
 
-        image.base64Image = image.base64Image.replace(/b'/g, '').replace(/'/g, '');
+        //  image.base64Image = image.base64Image.replace(/b'/g, '').replace(/'/g, '');
         io.sockets.emit('uploadAlgaeImage', image);
         createParticle(rid, 'yellow', 0);
     }
