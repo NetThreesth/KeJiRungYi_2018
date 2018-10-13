@@ -254,11 +254,11 @@ function sentToChatbots(text, rid, userName) {
         let image = repo.UploadedImage.findOne({
             where: { chatroomId: rid },
             order: [['time', 'DESC']]
+        }).then(image => {
+            image.base64Image = image.base64Image.replace(/b'/g, '').replace(/'/g, '');
+            io.sockets.emit('uploadAlgaeImage', image);
+            createParticle(rid, 'yellow', 0);
         }).catch(err => errorHandler(err, next));
-
-        //  image.base64Image = image.base64Image.replace(/b'/g, '').replace(/'/g, '');
-        io.sockets.emit('uploadAlgaeImage', image);
-        createParticle(rid, 'yellow', 0);
     }
 
     const observable = from(axios.post('http://35.236.167.99:5000/3sth/api/v1.0/chatbots/', {
