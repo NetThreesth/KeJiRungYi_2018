@@ -104,7 +104,7 @@ module.exports.initAPIs = (app) => {
                 const translationResult = translations.join('');
                 logger.info('Translations: ' + translationResult);
 
-                return sentToChatbots(translationResult, body.rid, body.userName).toPromise();
+                return sentToChatbots(translationResult, body.rid, body.userName, next).toPromise();
             })
             .then(result => {
                 logger.info(result.data);
@@ -116,7 +116,7 @@ module.exports.initAPIs = (app) => {
     app.route('/apis/uploadText').post((req, res, next) => {
         const body = req.body;
 
-        sentToChatbots(body.text, body.rid, body.userName)
+        sentToChatbots(body.text, body.rid, body.userName, next)
             .subscribe(
                 result => {
                     logger.info(result.data);
@@ -240,7 +240,7 @@ function getLineToEachOther(points, filterLength) {
     return lines.sort((a, b) => a.distance - b.distance);
 };
 
-function sentToChatbots(text, rid, userName) {
+function sentToChatbots(text, rid, userName, next) {
 
     repo.Message.create({
         time: new Date(),
@@ -251,11 +251,16 @@ function sentToChatbots(text, rid, userName) {
     createParticle(rid, 'white', 0);
 
     if (Math.random() <= 0.2) {
-        let image = repo.UploadedImage.findOne({
-            where: { chatroomId: rid },
+        repo.UploadedImage.findOne({
+            where: {
+                chatroomId: rid,
+                base64Image: {
+                    [repo.Op.ne]: ''
+                }
+            },
             order: [['time', 'DESC']]
-        }).then(image => {
-            image.base64Image = image.base64Image.replace(/b'/g, '').replace(/'/g, '');
+        }).then(instance => {
+            const image = instance.get({ plain: true });
             io.sockets.emit('uploadAlgaeImage', image);
             createParticle(rid, 'yellow', 0);
         }).catch(err => errorHandler(err, next));

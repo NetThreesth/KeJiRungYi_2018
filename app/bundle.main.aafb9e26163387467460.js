@@ -436,8 +436,10 @@ var MessageCenter = /** @class */ (function () {
         this.contents = [];
         _SocketClient__WEBPACK_IMPORTED_MODULE_0__["socketClient"].on('uploadAlgaeImage', function (data) {
             _this.eventCenter.trigger(_components_DevPanel__WEBPACK_IMPORTED_MODULE_3__["AddLogEvent"], data);
-            if (_GlobalData__WEBPACK_IMPORTED_MODULE_1__["GlobalData"].chatRoomIndex === data.chatRoomIndex)
-                _this.addMessage({ role: _GlobalData__WEBPACK_IMPORTED_MODULE_1__["Roles"].Algae, type: ContentType.Image, content: "data:image/png;base64," + data.base64Image });
+            if (_GlobalData__WEBPACK_IMPORTED_MODULE_1__["GlobalData"].chatRoomIndex === Number(data.chatroomId)) {
+                var base64image = data.base64image.replace(/b'/g, '').replace(/'/g, '');
+                _this.addMessage({ role: _GlobalData__WEBPACK_IMPORTED_MODULE_1__["Roles"].Algae, type: ContentType.Image, content: "data:image/png;base64," + base64image });
+            }
         });
         _SocketClient__WEBPACK_IMPORTED_MODULE_0__["socketClient"].on('uploadDeepAlMessage', function (data) {
             _this.eventCenter.trigger(_components_DevPanel__WEBPACK_IMPORTED_MODULE_3__["AddLogEvent"], data);
@@ -11961,4 +11963,4 @@ module.exports = ReactDOM;
 /***/ })
 
 /******/ });
-//# sourceMappingURL=bundle.main.d69e6cdb75a93e548971.js.map
+//# sourceMappingURL=bundle.main.aafb9e26163387467460.js.map

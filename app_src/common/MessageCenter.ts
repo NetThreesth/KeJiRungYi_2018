@@ -24,8 +24,10 @@ export class MessageCenter {
     ) {
         socketClient.on('uploadAlgaeImage', data => {
             this.eventCenter.trigger(AddLogEvent, data);
-            if (GlobalData.chatRoomIndex === data.chatRoomIndex)
-                this.addMessage({ role: Roles.Algae, type: ContentType.Image, content: `data:image/png;base64,${data.base64Image}` });
+            if (GlobalData.chatRoomIndex === Number(data.chatroomId)) {
+                const base64image = data.base64image.replace(/b'/g, '').replace(/'/g, '');
+                this.addMessage({ role: Roles.Algae, type: ContentType.Image, content: `data:image/png;base64,${base64image}` });
+            }
         });
         socketClient.on('uploadDeepAlMessage', data => {
             this.eventCenter.trigger(AddLogEvent, data);

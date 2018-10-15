@@ -10,6 +10,8 @@ sequelize.authenticate()
 
 const repo = module.exports = {};
 
+repo.Op = Sequelize.Op;
+
 repo.Message = sequelize.define(
     'message',
     {
