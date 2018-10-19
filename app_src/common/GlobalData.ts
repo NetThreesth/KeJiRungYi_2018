@@ -1,4 +1,3 @@
-import { CommonUtility } from './CommonUtility';
 
 export const GlobalData: {
     userName: string;

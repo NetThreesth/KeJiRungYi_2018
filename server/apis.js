@@ -41,6 +41,11 @@ module.exports.initAPIs = (app) => {
         res.send(true);
     });
 
+    app.route('/apis/getAlgaeImages').get((req, res, next) => {
+        repo.getAlgaeImages()
+            .then(data => res.json(data))
+            .catch(err => errorHandler(err, next));
+    });
 
     app.route('/apis/getBaseline').get((req, res, next) => {
         if (!req.query.rid && req.query.rid !== 0) res.send('rid is required');

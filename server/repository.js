@@ -90,4 +90,18 @@ repo.Baseline = sequelize.define(
         freezeTableName: true,
         tableName: 'baseline',
     }
-); 
+);
+
+
+repo.getAlgaeImages = () => {
+    return repo.UploadedImage.findAll(
+        {
+            limit: 10,
+            where: { name: 'algae' },
+            attributes: [
+                'chatroomId', 'time', 'base64image'
+            ],
+            order: [['time', 'DESC']]
+        }
+    );
+};

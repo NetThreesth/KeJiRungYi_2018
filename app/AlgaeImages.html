@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <title>社群織衍計畫-AlgaeMonitor</title>
+    <link rel="icon" href="https://s3.amazonaws.com/3sth/favicon/favicon-32x32.png">
+</head>
+
+<body>
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script>
+        $.getJSON('apis/getAlgaeImages').done(function (data) {
+            console.log(data);
+            data.forEach(function (record) {
+                var $div = $('<div><div class="info"></div><img style="max-width:100%" /></div><hr>')
+                $div.find('.info').text(record.chatroomId + ' - ' + record.time);
+                $div.find('img').attr('src', 'data:image/png;base64,' + record.base64image);
+                $div.appendTo('body');
+            });
+        });
+    </script>
+
+</html>
