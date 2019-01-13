@@ -7,4 +7,5 @@
 - 協助團隊：江宜庭、蔡銘、吳迺菲、蘇紳源
 
 ## Licensing
+- MIT LICENSE
 
